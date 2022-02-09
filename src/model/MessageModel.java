@@ -18,7 +18,9 @@ public class MessageModel {
         this.date = date;
     }
 
+    //returns true if thisMessage is equals to anotherMessage
     public boolean equals(MessageModel thisMessage, MessageModel anotherMessage){
+
         return thisMessage.content.equals(anotherMessage.content);
     }
 
