@@ -9,10 +9,10 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class ServerModel {
-    private static int port = 2015;
+    private static final int port = 2015;
     private static ServerSocket serverSocket;
     private static Socket clientSocket;
-    private static ExecutorService pool = Executors.newCachedThreadPool();
+    private static final ExecutorService pool = Executors.newCachedThreadPool();
 
     List<UserModel> registeredUsers;
     List<MessageModel> chatHistory;
