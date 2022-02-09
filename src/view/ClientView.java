@@ -6,7 +6,7 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 
 
-public class View extends JFrame {
+class View extends JFrame {
 
     JPanel mainPanel, contactsPanel, membersPanel, chatPanel;
     static Font headingFont = new Font("Calibri", Font.PLAIN, 20);
@@ -74,7 +74,6 @@ class ChatPanel extends JPanel {
 
         this.roomName = new JLabel(roomName, SwingConstants.CENTER);
         this.roomName.setFont(View.headingFont);
-
         this.setLayout(new BorderLayout());
         this.add(this.roomName, BorderLayout.NORTH);
         this.add(this.scrollPane, BorderLayout.CENTER);
