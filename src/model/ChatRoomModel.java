@@ -3,16 +3,24 @@ package model;
 import java.util.List;
 
 public class ChatRoomModel {
-    String name;
-    List<UserModel> users;
-    List<MessageModel> chatHistory;
+    private String name;
+    private List<UserModel> users;
+    private List<MessageModel> chatHistory;
 
-    public UserModel searchUser(UserModel user) {
-        return null;
+    private UserModel searchUser(UserModel user) {
+        //returns the user if userList contains the specified user
+        if(users.contains(user))
+            return user;
+        else
+            return null;
     }
 
-    public void addUser(UserModel user) {
+    private void addUser(UserModel user) {
+        users.add(user); //adds user to the list of users
+    }
 
+    private void kickUser(UserModel user) {
+        users.remove(user); //removes the user from list of users
     }
 
     public String getName() {
@@ -39,9 +47,7 @@ public class ChatRoomModel {
         this.chatHistory = chatHistory;
     }
 
-    public void kickUser(UserModel user) {
 
-    }
 
     /**
      * Default Constructor

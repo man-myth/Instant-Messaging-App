@@ -6,7 +6,7 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 
 
-class View extends JFrame {
+public class View extends JFrame {
 
     JPanel mainPanel, contactsPanel, membersPanel, chatPanel;
     static Font headingFont = new Font("Calibri", Font.PLAIN, 20);

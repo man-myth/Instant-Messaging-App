@@ -4,11 +4,11 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 
 public class MessageModel {
-    UserModel sender;
-    ChatRoomModel receiver;
-    String content;
-    LocalTime time;
-    LocalDate date;
+    private UserModel sender;
+    private ChatRoomModel receiver;
+    private String content;
+    private LocalTime time;
+    private LocalDate date;
 
     MessageModel(UserModel sender, ChatRoomModel receiver, String content, LocalTime time, LocalDate date){
         this.sender = sender;
