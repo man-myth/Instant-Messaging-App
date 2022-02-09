@@ -1,18 +1,20 @@
+package model;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class User implements Serializable {
+public class UserModel implements Serializable {
     String username;
     String password;
     String status;
     String userType;
-    List<User> contacts;
-    List<User> bookmarks;
-    List<ChatRoom> chatRooms;
-    List<Message> unreadMessages;
+    List<UserModel> contacts;
+    List<UserModel> bookmarks;
+    List<ChatRoomModel> chatRooms;
+    List<MessageModel> unreadMessages;
 
-    public User(String username, String password) {
+    public UserModel(String username, String password) {
         this.username = username;
         this.password = password;
         this.status = "";
@@ -21,11 +23,11 @@ public class User implements Serializable {
         this.chatRooms = new ArrayList<>();
     }
 
-    public void sortNames(List<User> nameList) {
+    public void sortNames(List<UserModel> nameList) {
 
     }
 
-    public User searchUser(User user) {
+    public UserModel searchUser(UserModel user) {
         return null;
     }
 }

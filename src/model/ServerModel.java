@@ -1,9 +1,11 @@
+package model;
+
 import java.util.List;
 
-public class Server {
+public class ServerModel {
     int port;
-    List<User> registeredUsers;
-    List<Message> chatHistory;
+    List<UserModel> registeredUsers;
+    List<MessageModel> chatHistory;
 
     private String checkStatus(String username) {
         return "";
@@ -13,15 +15,11 @@ public class Server {
         return false;
     }
 
-    private Message searchConvo(String key) {
+    private MessageModel searchConvo(String key) {
         return null;
     }
 
     private void createChat(String name) {
-
-    }
-
-    public static void main(String[] args) {
 
     }
 }
