@@ -1,17 +1,19 @@
 package view;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.swing.border.EtchedBorder;
 import java.awt.*;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 
 
-public class View extends JFrame {
+public class ClientView extends JFrame {
 
     JPanel mainPanel, contactsPanel, membersPanel, chatPanel;
     static Font headingFont = new Font("Calibri", Font.PLAIN, 20);
 
-    public View() {
+    public ClientView() {
         mainPanel = new JPanel(new BorderLayout());
         contactsPanel = new ContactsPanel();
         chatPanel = new ChatPanel("Room Name");
@@ -20,7 +22,7 @@ public class View extends JFrame {
         mainPanel.add(contactsPanel, BorderLayout.WEST);
         mainPanel.add(chatPanel, BorderLayout.CENTER);
         mainPanel.add(membersPanel, BorderLayout.EAST);
-
+        mainPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         this.add(mainPanel);
         this.setTitle("Messenger");
         this.pack();
@@ -28,40 +30,21 @@ public class View extends JFrame {
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setResizable(false);
     }
-}
 
-class LoginPanel extends JPanel {
-    LoginPanel() {
+    public static ImageIcon scaleIcon(String filename) {
+        ImageIcon imageIcon = new ImageIcon(filename);
+        Image image = imageIcon.getImage();
+        Image scaledImage = image.getScaledInstance(30, 30, java.awt.Image.SCALE_SMOOTH);
+        imageIcon = new ImageIcon(scaledImage);
 
-        JTextField usernameTextField = new HintTextField("Username");
-        JTextField passwordTextField = new HintTextField("Password");
-        JButton loginButton = new JButton("Login");
-        loginButton.addActionListener(e -> {
-            boolean loggedIn = false;
-            /*
-            for (model.User user : users) {
-                if (usernameTextField.getText().equals(user.username) && passwordTextField.getText().equals(user.password)) {
-                    loggedIn = true;
-                }
-            }
-             */
-            if (loggedIn) {
-                System.out.println("Logged in");
-            } else {
-                System.out.println("Account doesn't exist");
-            }
-        });
-
-        this.add(usernameTextField);
-        this.add(passwordTextField);
-        this.add(loginButton);
+        return imageIcon;
     }
 }
 
 class ChatPanel extends JPanel {
     JLabel roomName;
     JTextPane content;
-    JTextField messageTextField;
+    JTextArea messageTextArea;
     JScrollPane scrollPane;
 
     ChatPanel(String roomName) {
@@ -69,16 +52,17 @@ class ChatPanel extends JPanel {
         content.setEditable(false);
         content.setFocusable(false);
         scrollPane = new JScrollPane(content);
-        messageTextField = new HintTextField("model.Message");
-        messageTextField.setMaximumSize(new Dimension(Integer.MAX_VALUE, 250));
+        messageTextArea = new HintTextArea("Message");
+        messageTextArea.setPreferredSize(new Dimension(550, 35));
+        messageTextArea.setBorder(UIManager.getLookAndFeel().getDefaults().getBorder("TextField.border"));
 
         this.roomName = new JLabel(roomName, SwingConstants.CENTER);
-        this.roomName.setFont(View.headingFont);
+        this.roomName.setFont(ClientView.headingFont);
 
         this.setLayout(new BorderLayout());
         this.add(this.roomName, BorderLayout.NORTH);
         this.add(this.scrollPane, BorderLayout.CENTER);
-        this.add(this.messageTextField, BorderLayout.SOUTH);
+        this.add(this.messageTextArea, BorderLayout.SOUTH);
         this.setPreferredSize(new Dimension(550, 420));
     }
 }
@@ -89,29 +73,45 @@ class ContactsPanel extends JPanel {
 
     public ContactsPanel() {
         JLabel contactsLabel = new JLabel("Contacts", SwingConstants.CENTER);
-        contactsLabel.setFont(View.headingFont);
+        contactsLabel.setFont(ClientView.headingFont);
 
         panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-        panel.add(new ContactButton("Contact"));
-        panel.add(new ContactButton("Contact"));
-        panel.add(new ContactButton("Contact"));
-        panel.add(new ContactButton("Contact"));
-        panel.add(new ContactButton("Contact"));
-        panel.setPreferredSize(new Dimension(100, 420));
+        panel.add(new ContactButton("Contact", false));
+        panel.add(new ContactButton("Contact", true));
+        panel.setPreferredSize(new Dimension(100, 430));
 
-        searchBar = new HintTextField("Search");
+        searchBar = new HintTextField("Search Contacts");
+        searchBar.setPreferredSize(new Dimension(200, 35));
 
-        this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-        this.add(contactsLabel);
-        this.add(new JScrollPane(panel));
-        this.add(searchBar);
+        this.setLayout(new BorderLayout());
+        this.add(contactsLabel, BorderLayout.NORTH);
+        this.add(new JScrollPane(panel), BorderLayout.CENTER);
+        this.add(searchBar, BorderLayout.SOUTH);
+        this.setMinimumSize(new Dimension(200, 500));
+        this.setPreferredSize(new Dimension(200, 500));
+        this.setMaximumSize(new Dimension(200, 500));
     }
 
+
     class ContactButton extends JButton {
-        public ContactButton(String contactName) {
+        ImageIcon imageIcon;
+
+        public ContactButton(String contactName, boolean hasUnread) {
             this.setMaximumSize(new Dimension(Integer.MAX_VALUE, 35));
             this.setText(contactName);
+            if (hasUnread) {
+                imageIcon = new ImageIcon("res/graphics/has-unread.png");
+            } else {
+                imageIcon = new ImageIcon("res/graphics/user.png");
+            }
+
+            Image image = imageIcon.getImage();
+            Image scaledImage = image.getScaledInstance(30, 30, java.awt.Image.SCALE_SMOOTH);
+            imageIcon = new ImageIcon(scaledImage);
+            this.setIcon(imageIcon);
+            this.setHorizontalAlignment(SwingConstants.LEFT);
+            this.setBackground(Color.WHITE);
         }
     }
 }
@@ -119,85 +119,63 @@ class ContactsPanel extends JPanel {
 class MembersPanel extends JPanel {
     JPanel panel, settingsPanel;
     JButton addButton, kickButton, settingsButton;
+    JScrollPane scrollPane;
     JTextField searchBar;
 
     public MembersPanel() {
-        searchBar = new HintTextField("Search");
-        //searchBar.setMaximumSize(new Dimension(200, 50));
+        searchBar = new HintTextField("Search Members");
+        searchBar.setPreferredSize(new Dimension(200, 25));
 
         panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-        panel.add(new MemberButton("Member"));
-        panel.add(new MemberButton("Member"));
-        panel.add(new MemberButton("Member"));
-        panel.add(new MemberButton("Member"));
-        panel.add(new MemberButton("Member"));
-        panel.add(new MemberButton("Member"));
+        for (int i = 0; i < 20; i++) {
+            panel.add(new MemberButton("Member"));
+        }
+        scrollPane = new JScrollPane(panel);
+        scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 
-        panel.setPreferredSize(new Dimension(200, 420));
-        panel.setMaximumSize(new Dimension(200, 420));
 
         settingsPanel = new JPanel(new GridLayout());
-        addButton = new JButton("Add");
-        kickButton = new JButton("Kick");
-        settingsButton = new JButton("Settings");
+        addButton = new JButton(ClientView.scaleIcon("res/graphics/add-user.png"));
+        addButton.setBackground(Color.WHITE);
+        kickButton = new JButton(ClientView.scaleIcon("res/graphics/remove-user.png"));
+        kickButton.setBackground(Color.WHITE);
+        settingsButton = new JButton(ClientView.scaleIcon("res/graphics/gear.png"));
+        settingsButton.setBackground(Color.WHITE);
 
         settingsPanel.add(addButton);
         settingsPanel.add(kickButton);
         settingsPanel.add(settingsButton);
-        settingsPanel.setPreferredSize(new Dimension(200, 20));
-        settingsPanel.setMaximumSize(new Dimension(200, 20));
+        settingsPanel.setPreferredSize(new Dimension(200, 35));
 
-        this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+        this.setLayout(new BorderLayout());
         this.setBackground(Color.GREEN);
 
-        //this.add(searchBar);
-        this.add(panel);
-        this.add(settingsPanel);
-        //this.setMaximumSize(new Dimension(200, 500));
+        this.add(searchBar, BorderLayout.NORTH);
+        this.add(scrollPane, BorderLayout.CENTER);
+        this.add(settingsPanel, BorderLayout.SOUTH);
+        this.setMinimumSize(new Dimension(200, 500));
+        this.setPreferredSize(new Dimension(200, 500));
+        this.setMaximumSize(new Dimension(200, 500));
     }
 
     class MemberButton extends JButton {
+        ImageIcon imageIcon;
+
         public MemberButton(String memberName) {
-            this.setMaximumSize(new Dimension(Integer.MAX_VALUE, 35));
+            this.setMinimumSize(new Dimension(175, 35));
+            this.setPreferredSize(new Dimension(200, 35));
+            this.setMaximumSize(new Dimension(200, 35));
             this.setText(memberName);
+
+            imageIcon = new ImageIcon("res/graphics/user.png");
+
+            Image image = imageIcon.getImage();
+            Image scaledImage = image.getScaledInstance(30, 30, java.awt.Image.SCALE_SMOOTH);
+            imageIcon = new ImageIcon(scaledImage);
+            this.setIcon(imageIcon);
+            this.setHorizontalAlignment(SwingConstants.LEFT);
+            this.setBackground(Color.WHITE);
         }
-    }
-}
-
-class HintTextField extends JTextField implements FocusListener {
-
-    private final String hint;
-    private boolean showingHint;
-
-    public HintTextField(final String hint) {
-        super(hint);
-        this.setForeground(Color.GRAY);
-        this.hint = hint;
-        this.showingHint = true;
-        super.addFocusListener(this);
-    }
-
-    @Override
-    public void focusGained(FocusEvent e) {
-        if (this.getText().isEmpty()) {
-            super.setForeground(Color.BLACK);
-            super.setText("");
-            showingHint = false;
-        }
-    }
-
-    @Override
-    public void focusLost(FocusEvent e) {
-        if (this.getText().isEmpty()) {
-            super.setForeground(Color.GRAY);
-            super.setText(hint);
-            showingHint = true;
-        }
-    }
-
-    @Override
-    public String getText() {
-        return showingHint ? "" : super.getText();
     }
 }
