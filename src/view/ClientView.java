@@ -58,7 +58,6 @@ class ChatPanel extends JPanel {
 
         this.roomName = new JLabel(roomName, SwingConstants.CENTER);
         this.roomName.setFont(ClientView.headingFont);
-
         this.setLayout(new BorderLayout());
         this.add(this.roomName, BorderLayout.NORTH);
         this.add(this.scrollPane, BorderLayout.CENTER);
