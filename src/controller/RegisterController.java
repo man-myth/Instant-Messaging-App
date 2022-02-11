@@ -64,9 +64,10 @@ public class RegisterController implements ActionListener {
         if (e.getSource() == register) {
             if(userName.equals(""))
                 System.out.println("Please enter a username");
-            if(!password.equals(reEnteredPass))
-                System.out.println("invalid password");
+            else if(!password.equals(reEnteredPass))
+                System.out.println("Password did not match. Try again");
             else {
+                System.out.println("Done");
                 UserModel user = new UserModel(userName, password, false);
                 //Todo = add user object to server
             }
