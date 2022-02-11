@@ -53,8 +53,8 @@ public class RegisterView extends JFrame{
         return registerButton;
     }
 
-    public JTextField getUsernameTextField() {
-        return usernameTextField;
+    public String getUsername() {
+        return usernameTextField.getText();
     }
 
     public String getPassword() {
