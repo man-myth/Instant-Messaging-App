@@ -1,5 +1,7 @@
 package model;
 
+import controller.ClientController;
+
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -37,17 +39,17 @@ public class ServerModel {
         this.serverSocket = serverSocket;
     }
 
-    public static void main(String[] args) throws IOException {
+    public static void run(String[] args) throws IOException {
 
-        int port = 2022;
-        ArrayList<ClientHandler> clients = new ArrayList<>();
+        int port = 2019;
+        ArrayList<ClientController> clients = new ArrayList<>();
         ServerSocket serverSocket = new ServerSocket(port);
         ExecutorService pool = Executors.newCachedThreadPool();
 
 
         while (true) {
             Socket clientSocket = serverSocket.accept();
-            ClientHandler clientThread = new ClientHandler(clientSocket);
+            ClientController clientThread = new ClientController(clientSocket);
 
             clients.add(clientThread);
             pool.execute(clientThread);
