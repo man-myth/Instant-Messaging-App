@@ -14,10 +14,8 @@ import java.awt.event.ActionListener;
 public class RegisterController{
     private final RegisterView view;
     private final RegisterModel model;
-    private String userName;
-    private String password;
-    private String reEnteredPass;
 
+    //Constructor for register controller
     public RegisterController(RegisterView view, RegisterModel model){
         this.view = view;
         this.model = model;
@@ -29,10 +27,10 @@ public class RegisterController{
     class RegisterListener implements ActionListener{
         @Override
         public void actionPerformed(ActionEvent e) {
-            userName = view.getName();
-            password = view.getPassword();
-            reEnteredPass = view.getConfirmPassword();
-            model.register(userName,password,reEnteredPass);
+            String userName = view.getName();
+            String password = view.getPassword();
+            String reEnteredPass = view.getConfirmPassword();
+            model.register(userName, password, reEnteredPass);
 
         }
     }//end of RegisterListener
@@ -45,14 +43,5 @@ public class RegisterController{
         }
     }//end of LoginListener
 
-    //setters
-    public void setPassword(String password) {this.password = password;}
-    public void setReEnteredPass(String reEnteredPass) {this.reEnteredPass = reEnteredPass;}
-    public void setUserName(String userName) {this.userName = userName;}
-
-    //getters
-    public String getPassword() {return password;}
-    public String getReEnteredPass() {return reEnteredPass;}
-    public String getUserName() {return userName;}
 
 }
