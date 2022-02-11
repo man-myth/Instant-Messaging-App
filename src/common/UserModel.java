@@ -13,20 +13,18 @@ public class UserModel implements Serializable {
     String password;
     String status;
     String userType;
-    Boolean isAdmin;
     List<UserModel> contacts;
     List<UserModel> bookmarks;
     List<ChatRoomModel> chatRooms;
     List<MessageModel> unreadMessages;
 
-    public UserModel(String username, String password, Boolean isAdmin) {
+    public UserModel(String username, String password) {
         this.username = username;
         this.password = password;
         this.status = "";
         this.userType = "";
         this.contacts = new ArrayList<>();
         this.chatRooms = new ArrayList<>();
-        this.isAdmin = isAdmin;
     }
 
     public String getUsername() {
@@ -59,14 +57,6 @@ public class UserModel implements Serializable {
 
     public void setUserType(String userType) {
         this.userType = userType;
-    }
-
-    public Boolean getAdmin() {
-        return isAdmin;
-    }
-
-    public void setAdmin(Boolean admin) {
-        isAdmin = admin;
     }
 
     public List<UserModel> getContacts() {
@@ -120,7 +110,6 @@ public class UserModel implements Serializable {
                 ", password='" + password + '\'' +
                 ", status='" + status + '\'' +
                 ", userType='" + userType + '\'' +
-                ", isAdmin=" + isAdmin +
                 ", contacts=" + contacts +
                 ", bookmarks=" + bookmarks +
                 ", chatRooms=" + chatRooms +
