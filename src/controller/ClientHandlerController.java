@@ -1,22 +1,22 @@
-package model;
+package controller;
 
 import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
 
-public class ClientHandler implements Runnable{
+public class ClientHandlerController implements Runnable{
     private Socket client;
     private BufferedReader reader;
     private PrintWriter writer;
 
     //list of connected clients
-    public static ArrayList<ClientHandler> clientHandlers = new ArrayList<>();
+    public static ArrayList<ClientHandlerController> clientHandlerControllers = new ArrayList<>();
 
     /**
      * Creates
      * @param clientSocket
      */
-    public ClientHandler(Socket clientSocket){
+    public ClientHandlerController(Socket clientSocket){
             try {
                 this.client = clientSocket;
                 reader = new BufferedReader(new InputStreamReader(client.getInputStream()));
