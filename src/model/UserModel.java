@@ -2,6 +2,8 @@ package model;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class UserModel implements Serializable {
@@ -97,12 +99,17 @@ public class UserModel implements Serializable {
         this.unreadMessages = unreadMessages;
     }
 
+    //sorts the names of the given list
     public void sortNames(List<UserModel> nameList) {
-
+        nameList.sort(Comparator.comparing(UserModel::getUsername));
     }
 
+    //returns the user if he/she is in the contact list
     public UserModel searchUser(UserModel user) {
-        return null;
+        if(contacts.contains(user))
+            return user;
+        else
+            return null;
     }
 
     public String toString() {
