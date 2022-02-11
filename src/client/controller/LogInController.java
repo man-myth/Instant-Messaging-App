@@ -1,6 +1,7 @@
-package controller;
+package client.controller;
 
-import model.UserModel;
+
+import common.UserModel;
 
 public class LogInController {
     private RegisterController register;

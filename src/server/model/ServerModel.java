@@ -1,6 +1,7 @@
-package model;
+package server.model;
 
-import controller.ClientController;
+import client.controller.ClientController;
+import common.UserModel;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -39,20 +40,26 @@ public class ServerModel {
         this.serverSocket = serverSocket;
     }
 
-    public static void run(String[] args) throws IOException {
+    public static void run(){
 
         int port = 2019;
         ArrayList<ClientController> clients = new ArrayList<>();
-        ServerSocket serverSocket = new ServerSocket(port);
-        ExecutorService pool = Executors.newCachedThreadPool();
+        ServerSocket serverSocket = null;
+        try {
+            serverSocket = new ServerSocket(port);
+            ExecutorService pool = Executors.newCachedThreadPool();
 
 
-        while (true) {
-            Socket clientSocket = serverSocket.accept();
-            ClientController clientThread = new ClientController(clientSocket);
+            while (true) {
+                Socket clientSocket = serverSocket.accept();
+                ClientController clientThread = new ClientController(clientSocket);
 
-            clients.add(clientThread);
-            pool.execute(clientThread);
+                clients.add(clientThread);
+                pool.execute(clientThread);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
+
     }
 }

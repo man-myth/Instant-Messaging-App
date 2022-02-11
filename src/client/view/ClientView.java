@@ -1,11 +1,7 @@
-package view;
+package client.view;
 
-import javax.imageio.ImageIO;
 import javax.swing.*;
-import javax.swing.border.EtchedBorder;
 import java.awt.*;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
 
 
 public class ClientView extends JFrame {

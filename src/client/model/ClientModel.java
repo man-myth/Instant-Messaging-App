@@ -1,4 +1,4 @@
-package model;
+package client.model;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -8,7 +8,7 @@ import java.net.Socket;
 import java.util.Scanner;
 
 public class ClientModel {
-    public static void main(String[] args) {
+    public static void run() {
         Scanner keyboard = new Scanner(System.in);
         int port = 2022;
         try (

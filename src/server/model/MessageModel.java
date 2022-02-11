@@ -1,4 +1,6 @@
-package model;
+package server.model;
+
+import common.UserModel;
 
 import java.time.LocalDate;
 import java.time.LocalTime;

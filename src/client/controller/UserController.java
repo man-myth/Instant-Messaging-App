@@ -1,8 +1,9 @@
-package controller;
+package client.controller;
 
-import model.ChatRoomModel;
-import model.MessageModel;
-import model.UserModel;
+import common.UserModel;
+import server.model.ChatRoomModel;
+import server.model.MessageModel;
+
 import javax.swing.text.View;
 import java.util.List;
 
@@ -66,7 +67,7 @@ public class UserController {
     }
     public void updateView(){
         /*
-        Method in updating the view with the content from the model to be added
+        Method in updating the client.view with the content from the client.model to be added
          */
     }
 }

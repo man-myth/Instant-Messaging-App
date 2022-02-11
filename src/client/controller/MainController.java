@@ -1,6 +1,7 @@
-package controller;
+package client.controller;
 
-import model.UserModel;
+import common.UserModel;
+import server.controller.AdminController;
 
 import java.net.Socket;
 
@@ -19,7 +20,7 @@ public class MainController {
         if(user.getAdmin()){    // if the user is admin, render the admin client
             adminController = new AdminController(user); // show the client for admin
         } else {
-            clientController = new ClientController(socket); // else show the client controller
+            clientController = new ClientController(socket); // else show the client client.controller
         }
 
     }

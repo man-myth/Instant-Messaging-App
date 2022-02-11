@@ -1,16 +1,16 @@
-package view;
+package client.view;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 
-public class HintTextField extends JTextField implements FocusListener {
+public class HintTextArea extends JTextArea implements FocusListener {
 
     private final String hint;
     private boolean showingHint;
 
-    public HintTextField(final String hint) {
+    public HintTextArea(final String hint) {
         super(hint);
         this.setForeground(Color.GRAY);
         this.hint = hint;

@@ -1,17 +1,17 @@
-package view;
+package client.view;
 
 import javax.swing.*;
 import java.awt.*;
 
-public class RegisterView extends JFrame{
+public class LoginView extends JFrame {
 
     JPanel mainPanel, buttonsPanel;
     JTextField usernameTextField;
-    JPasswordField passwordTextField, confirmPasswordTextField;
+    JPasswordField passwordTextField;
     JButton loginButton, registerButton;
     Dimension dimension;
 
-    public RegisterView() {
+    public LoginView() {
         mainPanel = new JPanel();
         buttonsPanel = new JPanel();
 
@@ -21,12 +21,12 @@ public class RegisterView extends JFrame{
         usernameTextField.setPreferredSize(dimension);
         passwordTextField = new HintPasswordField("Password");
         passwordTextField.setPreferredSize(dimension);
-        confirmPasswordTextField = new HintPasswordField("Confirm Password");
-        confirmPasswordTextField.setPreferredSize(dimension);
 
         loginButton = new JButton("Login");
         registerButton = new JButton("Register");
 
+
+        buttonsPanel.add(loginButton);
         buttonsPanel.add(registerButton);
         buttonsPanel.setBackground(Color.WHITE);
 
@@ -34,12 +34,12 @@ public class RegisterView extends JFrame{
         mainPanel.setBackground(Color.WHITE);
         mainPanel.add(usernameTextField);
         mainPanel.add(passwordTextField);
-        mainPanel.add(confirmPasswordTextField);
         mainPanel.add(buttonsPanel);
         mainPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         this.add(mainPanel);
-        this.setTitle("Register");
+        this.setTitle("Login");
         this.pack();
         this.setLocationRelativeTo(null);
     }
+
 }

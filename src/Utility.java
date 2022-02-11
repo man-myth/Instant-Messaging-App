@@ -1,11 +1,10 @@
-import model.UserModel;
+import common.UserModel;
 
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Utility {
-
 
     public void exportData(List<UserModel> users){
         try(
@@ -20,7 +19,7 @@ public class Utility {
         }
     }
 
-    public List<UserModel> readData(String filename){
+    public static List<UserModel> readData(String filename){
         List<UserModel> users = new ArrayList<>();
         try(
                 ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(new File("res/data.dat")));
