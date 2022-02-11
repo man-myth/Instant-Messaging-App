@@ -70,7 +70,7 @@ public class RegisterController implements ActionListener {
                 System.out.println("Password did not match. Try again");
             else {
                 System.out.println("Done");
-                UserModel user = new UserModel(userName, password, false);
+                UserModel user = new UserModel(userName, password);
                 //Todo = add user object to server
             }
         }//end of register button---
