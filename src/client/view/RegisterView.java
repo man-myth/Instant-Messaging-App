@@ -2,6 +2,7 @@ package client.view;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionListener;
 
 public class RegisterView extends JFrame{
 
@@ -56,11 +57,19 @@ public class RegisterView extends JFrame{
         return usernameTextField;
     }
 
-    public JPasswordField getPasswordTextField() {
-        return passwordTextField;
+    public String getPassword() {
+        return new String(passwordTextField.getPassword());
     }
 
-    public JPasswordField getConfirmPasswordTextField() {
-        return confirmPasswordTextField;
+    public String getConfirmPassword() {
+        return new String(confirmPasswordTextField.getPassword());
+    }
+
+    public void addRegisterListener(ActionListener listener){
+        registerButton.addActionListener(listener);
+    }
+
+    public void addLoginListener(ActionListener listener){
+        loginButton.addActionListener(listener);
     }
 }
