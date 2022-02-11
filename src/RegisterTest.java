@@ -1,4 +1,4 @@
-import controller.RegisterController;
+import client.controller.RegisterController;
 
 public class RegisterTest {
     public static void main(String[] args) {

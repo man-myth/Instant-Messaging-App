@@ -1,5 +1,7 @@
 package server.model;
 
+import common.UserModel;
+
 import java.util.List;
 
 public class ChatRoomModel {
