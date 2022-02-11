@@ -42,4 +42,25 @@ public class RegisterView extends JFrame{
         this.pack();
         this.setLocationRelativeTo(null);
     }
+
+    //getters
+    public JButton getLoginButton() {
+        return loginButton;
+    }
+
+    public JButton getRegisterButton() {
+        return registerButton;
+    }
+
+    public JTextField getUsernameTextField() {
+        return usernameTextField;
+    }
+
+    public JPasswordField getPasswordTextField() {
+        return passwordTextField;
+    }
+
+    public JPasswordField getConfirmPasswordTextField() {
+        return confirmPasswordTextField;
+    }
 }

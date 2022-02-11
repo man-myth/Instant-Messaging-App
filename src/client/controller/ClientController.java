@@ -29,6 +29,5 @@ public class ClientController implements Runnable{
     @Override
     public void run(){
         //TODO what the server will do when called
-
     }
 }

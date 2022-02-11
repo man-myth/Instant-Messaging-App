@@ -40,7 +40,7 @@ public class ServerModel {
         this.serverSocket = serverSocket;
     }
 
-    public static void run(){
+    public static void run() {
 
         int port = 2019;
         ArrayList<ClientController> clients = new ArrayList<>();
@@ -51,7 +51,9 @@ public class ServerModel {
 
 
             while (true) {
+                System.out.println("[SERVER]: waiting for connection");
                 Socket clientSocket = serverSocket.accept();
+                System.out.println("[SERVER]: client connected.");
                 ClientController clientThread = new ClientController(clientSocket);
 
                 clients.add(clientThread);
