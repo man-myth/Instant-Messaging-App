@@ -1,11 +1,12 @@
 package controller;
-
 import model.UserModel;
 import view.RegisterView;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+// this will show the GUI for registering the user,
+// and it will add the user to the data file
 
 /**
  * Register pseudo
