@@ -48,7 +48,9 @@ public class ServerModel {
 
 
         while (true) {
+            System.out.println("[SERVER]: waiting for connection");
             Socket clientSocket = serverSocket.accept();
+            System.out.println("[SERVER]: client connected.");
             ClientController clientThread = new ClientController(clientSocket);
 
             clients.add(clientThread);
