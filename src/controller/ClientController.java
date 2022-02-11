@@ -4,7 +4,7 @@ import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
 
-class ClientController implements Runnable{
+public class ClientController implements Runnable{
     private Socket client;
     private BufferedReader reader;
     private PrintWriter writer;

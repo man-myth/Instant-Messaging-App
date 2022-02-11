@@ -1,6 +1,10 @@
 package controller;
 
 public class RegisterController {
+
+    // this will show the GUI for registering the user,
+    // and it will add the user to the data file
+
     private String userName;
     private String password;
     private String reEnteredPass;

@@ -3,8 +3,7 @@ package controller;
 import model.ChatRoomModel;
 import model.MessageModel;
 import model.UserModel;
-import view.View;
-
+import javax.swing.text.View;
 import java.util.List;
 
 public class UserController {
