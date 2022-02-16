@@ -1,5 +1,6 @@
 import client.controller.ClientController;
 import client.controller.LogInController;
+import client.model.ClientModel;
 import common.UserModel;
 import server.controller.AdminController;
 
@@ -16,11 +17,13 @@ public class Client {
     public static void main(String[] args) {
         // start client
 
-        logInController = new LogInController();  //show the login frame
-        user = logInController.getUser();         // get the user that logged in
+//        logInController = new LogInController();  //show the login frame
+//        user = logInController.getUser();         // get the user that logged in
+//
+//
+//        clientController = new ClientController(socket, user);
 
-
-        clientController = new ClientController(socket, user);
-
+        ClientModel client = new ClientModel();
+        client.run();
     }
 }
