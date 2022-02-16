@@ -1,3 +1,5 @@
+package server.model;
+
 import common.UserModel;
 
 import java.io.*;
