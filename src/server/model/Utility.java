@@ -6,7 +6,7 @@ import java.util.List;
 
 public class Utility {
 
-    public void exportData(List<UserModel> users){
+    public static void exportData(List<UserModel> users){
         try(
                 ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream(new File("res/data.dat")));
         ) {

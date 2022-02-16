@@ -9,7 +9,7 @@ public class RegisterView extends JFrame{
     JPanel mainPanel, buttonsPanel;
     JTextField usernameTextField;
     JPasswordField passwordTextField, confirmPasswordTextField;
-    JButton loginButton, registerButton;
+    public JButton registerButton;
     Dimension dimension;
 
     public RegisterView() {
@@ -25,7 +25,6 @@ public class RegisterView extends JFrame{
         confirmPasswordTextField = new HintPasswordField("Confirm Password");
         confirmPasswordTextField.setPreferredSize(dimension);
 
-        loginButton = new JButton("Login");
         registerButton = new JButton("Register");
 
         buttonsPanel.add(registerButton);
@@ -42,11 +41,6 @@ public class RegisterView extends JFrame{
         this.setTitle("Register");
         this.pack();
         this.setLocationRelativeTo(null);
-    }
-
-    //getters
-    public JButton getLoginButton() {
-        return loginButton;
     }
 
     public JButton getRegisterButton() {
@@ -67,9 +61,5 @@ public class RegisterView extends JFrame{
 
     public void addRegisterListener(ActionListener listener){
         registerButton.addActionListener(listener);
-    }
-
-    public void addLoginListener(ActionListener listener){
-        loginButton.addActionListener(listener);
     }
 }

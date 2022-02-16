@@ -17,25 +17,25 @@ public class AuthenticatorModel {
         this.users = users;
     }
 
-    public boolean verifyUser(){
+    /***
+     * Checks if user is in the database
+     * @return
+     */
+    public boolean verifyUser(String username, String password) {
         try {
             while (true) {
-                outputStream.writeObject("username: ");
-                String username = (String) inputStream.readObject();
-                outputStream.writeObject("password: ");
-                String password = (String) inputStream.readObject();
-
                 for (UserModel user : users) {
+                    System.out.println(user);
                     if (user.getUsername().compareTo(username) == 0 && user.getPassword().compareTo(password) == 0) {
+                        System.out.println("it's here");
                         outputStream.writeObject("VERIFIED");
                         return true;
                     }
                 }
             }
-        } catch (IOException | ClassNotFoundException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
-
         return false;
     }
 

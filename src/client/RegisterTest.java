@@ -9,8 +9,8 @@ import client.view.RegisterView;
 public class RegisterTest {
     public static void main(String[] args) {
         RegisterView view = new RegisterView();
-        RegisterModel model = new RegisterModel();
-        RegisterController controller = new RegisterController(view,model);
-        view.setVisible(true);
+        //RegisterModel model = new RegisterModel();
+        //RegisterController controller = new RegisterController(view,model);
+        //view.setVisible(true);
     }
 }

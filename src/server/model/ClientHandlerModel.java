@@ -22,6 +22,7 @@ public class ClientHandlerModel implements Runnable {
     public void run() {
         //MessageModel messageReceived;
         String msg;
+        /*
         while (true) {
             try {
                 // receive the string
@@ -42,6 +43,8 @@ public class ClientHandlerModel implements Runnable {
                 e.printStackTrace();
             }
         }
+
+         */
 
 //        try {
 //            inputStream.close();
