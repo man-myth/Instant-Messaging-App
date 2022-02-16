@@ -1,19 +1,24 @@
 package server.model;
 
+import client.controller.ClientController;
+
 import java.io.*;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class ServerModel {
-    private static final int port = 2022;
-    private static ServerSocket serverSocket;
-    private static Socket clientSocket;
-    private static final ExecutorService pool = Executors.newCachedThreadPool();
     List<UserModel> registeredUsers;
     List<MessageModel> chatHistory;
+
+    public ServerModel(List<UserModel> registeredUsers, List<MessageModel> chatHistory) {
+        this.registeredUsers = registeredUsers;
+        this.chatHistory = chatHistory;
+    }
 
     private String checkStatus(String username) {
         return "";
@@ -27,43 +32,28 @@ public class ServerModel {
         return null;
     }
 
-    private void createChat(String name) {
+    public void createChat(String name) {
+
     }
 
-    private void addUser(UserModel user){
-        registeredUsers.add(user);
+    public List<UserModel> getRegisteredUsers() {
+        return registeredUsers;
     }
 
-    public void run() {
-        //ArrayList<ClientController> clients = new ArrayList<>();
-        registeredUsers = Utility.readData("res/data.dat");
+    public void setRegisteredUsers(List<UserModel> registeredUsers) {
+        this.registeredUsers = registeredUsers;
+    }
 
-        serverSocket = null;
-        try {
-            serverSocket = new ServerSocket(port);
-            System.out.println("Server Started");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        while (true) {
-            try {
-                clientSocket = serverSocket.accept();
-                System.out.println("Client connected: ." + clientSocket);
-                ExecutorService pool = Executors.newCachedThreadPool();
-                ObjectOutputStream outputStream = new ObjectOutputStream(clientSocket.getOutputStream());
-                ObjectInputStream inputStream = new ObjectInputStream(clientSocket.getInputStream());
-                //ClientController clientThread = new ClientController(clientSocket);
-                AuthenticatorModel authenticate = new AuthenticatorModel(inputStream, outputStream, registeredUsers);
-                if (authenticate.verifyUser()) {
-                    ClientHandlerModel client = new ClientHandlerModel(clientSocket, inputStream, outputStream, chatHistory);
-                    //clients.add(clientThread);
-                    pool.execute(client);
-                }
+    public List<MessageModel> getChatHistory() {
+        return chatHistory;
+    }
 
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
+    public void setChatHistory(List<MessageModel> chatHistory) {
+        this.chatHistory = chatHistory;
+    }
+
+    public void addRegisteredUser(UserModel user) {
+        this.registeredUsers.add(user);
     }
 
 }

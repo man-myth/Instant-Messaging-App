@@ -6,9 +6,9 @@ import java.awt.*;
 public class LoginView extends JFrame {
 
     JPanel mainPanel, buttonsPanel;
-    JTextField usernameTextField;
-    JPasswordField passwordTextField;
-    JButton loginButton, registerButton;
+    public JTextField usernameTextField;
+    public JPasswordField passwordTextField;
+    public JButton loginButton, registerButton;
     Dimension dimension;
 
     public LoginView() {
@@ -24,7 +24,6 @@ public class LoginView extends JFrame {
 
         loginButton = new JButton("Login");
         registerButton = new JButton("Register");
-
 
         buttonsPanel.add(loginButton);
         buttonsPanel.add(registerButton);

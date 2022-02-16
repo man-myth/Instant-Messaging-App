@@ -5,28 +5,25 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Scanner;
 
-public class LogInModel {
-    ObjectInputStream inputStream;
-    ObjectOutputStream outputStream;
-    Scanner kbd;
-    public LogInModel(ObjectInputStream inputStream, ObjectOutputStream outputStream, Scanner kbd) {
+public class LoginModel {
+    public ObjectInputStream inputStream;
+    public ObjectOutputStream outputStream;
+
+    public LoginModel(ObjectInputStream inputStream, ObjectOutputStream outputStream) {
         this.inputStream = inputStream;
         this.outputStream = outputStream;
-        this.kbd = kbd;
     }
 
-    public boolean isUser(){
+    public boolean isUser(String username, String password) {
         try {
-            String input = "";
             String message = "";
+            outputStream.writeObject(username);
+            outputStream.writeObject(password);
             while (true) {
                 message = (String) inputStream.readObject();
-                if(message.equals("VERIFIED")){
+                if (message.equals("VERIFIED")) {
                     return true;
                 }
-                System.out.print(message);
-                input = kbd.nextLine();
-                outputStream.writeObject(input);
             }
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
