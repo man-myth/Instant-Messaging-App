@@ -28,9 +28,10 @@ public class ServerController {
     private static ServerSocket serverSocket;
     private static Socket clientSocket;
     private static ExecutorService pool = Executors.newCachedThreadPool();
+    private final Utility utility = new Utility();
 
     public ServerController() {
-        serverModel = new ServerModel(Utility.readData("res/data.dat"), new ArrayList<>());
+        serverModel = new ServerModel(utility.readData("res/data.dat"), new ArrayList<>());
     }
 
     public void run() {
@@ -68,7 +69,7 @@ public class ServerController {
                     System.out.println("Attempting to register.");
                     input = inputStream.readObject();
                     serverModel.addRegisteredUser((UserModel) input);
-                    Utility.exportData(serverModel.getRegisteredUsers());
+                    utility.exportData(serverModel.getRegisteredUsers());
                     outputStream.writeObject("registered");
                 }
             }

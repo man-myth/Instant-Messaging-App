@@ -1,9 +1,13 @@
 package client.model;
 
 import server.model.UserModel;
+import server.model.Utility;
 
+import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.OutputStream;
+import java.util.List;
 
 public class RegisterModel {
 
@@ -15,13 +19,17 @@ public class RegisterModel {
         this.outputStream = outputStream;
     }
 
-    public void addUser() {
-
+    //method that adds user to the server
+    public void addUser(UserModel userModel) {
+        Utility utility = new Utility();
+        List<UserModel> users = utility.readData("res/data.dat");
+        users.add(userModel);
+        utility.exportData(users);
     }
 
 
     //method that registers the user
-    public void registerUser(String username, String pass1, String pass2) {
+    public void registerUser(String username, String pass1, String pass2) throws IOException {
         //if username field is empty, prompt an error
         if (username.equals(""))
             System.out.println("Please enter a username");
@@ -34,7 +42,8 @@ public class RegisterModel {
         else {
             System.out.println("Registration done.");
             UserModel userModel = new UserModel(username, pass1);
-            //todo = add userModel to the server
+
         }
     }
 }
+

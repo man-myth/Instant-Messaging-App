@@ -6,7 +6,9 @@ import java.util.List;
 
 public class Utility {
 
-    public static void exportData(List<UserModel> users){
+    public Utility(){}
+
+    public void exportData(List<UserModel> users){
         try(
                 ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream(new File("res/data.dat")));
         ) {
@@ -19,7 +21,7 @@ public class Utility {
         }
     }
 
-    public static List<UserModel> readData(String filename){
+    public List<UserModel> readData(String filename){
         List<UserModel> users = new ArrayList<>();
         try(
                 ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(new File(filename)));
