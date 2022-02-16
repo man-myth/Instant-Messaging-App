@@ -1,7 +1,7 @@
 package client.controller;
 
 import client.view.LoginView;
-import common.UserModel;
+import server.model.UserModel;
 
 public class LogInController {
     private RegisterController register;

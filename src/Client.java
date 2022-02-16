@@ -1,7 +1,7 @@
 import client.controller.ClientController;
 import client.controller.LogInController;
 import client.model.ClientModel;
-import common.UserModel;
+import server.model.UserModel;
 import server.controller.AdminController;
 
 import java.net.Socket;

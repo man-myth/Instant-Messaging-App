@@ -1,7 +1,5 @@
 package server.model;
 
-import common.UserModel;
-
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,7 +22,7 @@ public class Utility {
     public static List<UserModel> readData(String filename){
         List<UserModel> users = new ArrayList<>();
         try(
-                ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(new File("res/data.dat")));
+                ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(new File(filename)));
         ) {
             UserModel u;
             while (true){

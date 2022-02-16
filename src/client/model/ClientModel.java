@@ -19,6 +19,10 @@ public class ClientModel {
                 ObjectOutputStream outputStream = new ObjectOutputStream(socket.getOutputStream());
         ) {
             while (true){
+                LogInModel login = new LogInModel(inputStream, outputStream, keyboard);
+                login.isUser();
+                System.out.println("----------Connection Succesful-------------");
+                System.out.println("Write message below");
                 String msg = keyboard.nextLine();
                 try {
                     // write on the output stream

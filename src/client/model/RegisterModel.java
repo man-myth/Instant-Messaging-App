@@ -1,6 +1,6 @@
 package client.model;
 
-import common.UserModel;
+import server.model.UserModel;
 
 public class RegisterModel {
 

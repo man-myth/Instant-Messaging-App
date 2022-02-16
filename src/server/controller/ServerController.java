@@ -1,9 +1,8 @@
 package server.controller;
 
-import common.UserModel;
+import server.model.UserModel;
 import server.model.ServerModel;
 
-import java.net.ServerSocket;
 import java.util.ArrayList;
 
 
@@ -17,7 +16,7 @@ import java.util.ArrayList;
 public class ServerController {
     public static ArrayList<UserModel> users;
 
-    public static void main(String[] args) {
+    public ServerController() {
         ServerModel server = new ServerModel();
         server.run();
     }

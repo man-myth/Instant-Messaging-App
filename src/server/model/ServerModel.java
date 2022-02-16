@@ -1,17 +1,13 @@
 package server.model;
 
-import client.controller.ClientController;
-import common.UserModel;
-
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class ServerModel{
+public class ServerModel {
     private static final int port = 2022;
     private static ServerSocket serverSocket;
     private static Socket clientSocket;
@@ -35,28 +31,35 @@ public class ServerModel{
     }
 
     public void run() {
-        ArrayList<ClientController> clients = new ArrayList<>();
+        //ArrayList<ClientController> clients = new ArrayList<>();
+        registeredUsers = Utility.readData("res/data.dat");
+
         serverSocket = null;
         try {
             serverSocket = new ServerSocket(port);
+            System.out.println("Server Started");
         } catch (IOException e) {
             e.printStackTrace();
         }
         while (true) {
-            try{
+            try {
                 clientSocket = serverSocket.accept();
                 System.out.println("Client connected: ." + clientSocket);
                 ExecutorService pool = Executors.newCachedThreadPool();
                 ObjectOutputStream outputStream = new ObjectOutputStream(clientSocket.getOutputStream());
                 ObjectInputStream inputStream = new ObjectInputStream(clientSocket.getInputStream());
                 //ClientController clientThread = new ClientController(clientSocket);
-                ClientHandlerModel client = new ClientHandlerModel(clientSocket,inputStream, outputStream, chatHistory);
-                //clients.add(clientThread);
-                pool.execute(client);
+                AuthenticatorModel authenticate = new AuthenticatorModel(inputStream, outputStream, registeredUsers);
+                if (authenticate.verifyUser()) {
+                    ClientHandlerModel client = new ClientHandlerModel(clientSocket, inputStream, outputStream, chatHistory);
+                    //clients.add(clientThread);
+                    pool.execute(client);
+                }
 
-            } catch (IOException e){
+            } catch (IOException e) {
                 e.printStackTrace();
             }
         }
     }
+
 }
