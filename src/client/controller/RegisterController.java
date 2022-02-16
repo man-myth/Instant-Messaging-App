@@ -8,7 +8,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 // this will show the GUI for registering the user,
 // and it will add the user to the data file
-
 public class RegisterController{
     private final RegisterView view;
     private final RegisterModel model;

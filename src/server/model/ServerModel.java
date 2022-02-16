@@ -54,7 +54,7 @@ public class ServerModel {
                 System.out.println("[SERVER]: waiting for connection");
                 Socket clientSocket = serverSocket.accept();
                 System.out.println("[SERVER]: client connected.");
-                ClientController clientThread = new ClientController(clientSocket);
+                ClientController clientThread = new ClientController(clientSocket, new UserModel("test", "123"));
 
                 clients.add(clientThread);
                 pool.execute(clientThread);
