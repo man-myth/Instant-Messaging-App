@@ -1,6 +1,14 @@
 package client.model;
 
+import server.controller.ServerController;
 import server.model.UserModel;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.net.ServerSocket;
+import java.util.Scanner;
 
 public class RegisterModel {
 
@@ -14,10 +22,18 @@ public class RegisterModel {
         else if (!pass1.equals(pass2))
             System.out.println("Password did not match, try again.");
 
-        //if info is valid, add the user to the server
+        //if info is valid, writes the user info to newUser.txt
         else {
+            try {
+                //creates the text file
+                File newUserInfo = new File("res/newUser.txt");
+                FileWriter myWriter = new FileWriter(newUserInfo);
+                myWriter.write(username + "\n" + pass1);
+                myWriter.close();
+            }catch (Exception e){
+                System.out.println(e.getMessage());
+            }
             System.out.println("Registration done.");
-            UserModel userModel = new UserModel(username,pass1);
             //todo = add userModel to the server
         }
     }

@@ -30,6 +30,10 @@ public class ServerModel {
     private void createChat(String name) {
     }
 
+    private void addUser(UserModel user){
+        registeredUsers.add(user);
+    }
+
     public void run() {
         //ArrayList<ClientController> clients = new ArrayList<>();
         registeredUsers = Utility.readData("res/data.dat");

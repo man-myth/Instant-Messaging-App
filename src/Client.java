@@ -1,5 +1,6 @@
 import client.controller.ClientController;
 import client.controller.LogInController;
+import client.controller.RegisterController;
 import client.model.ClientModel;
 import server.model.UserModel;
 import server.controller.AdminController;
@@ -8,6 +9,7 @@ import java.net.Socket;
 
 public class Client {
 
+    private static RegisterController registerController;
     private static LogInController logInController;
     private static ClientController clientController;
     private static AdminController adminController;
