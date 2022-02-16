@@ -29,7 +29,7 @@ public class RegisterModel {
 
 
     //method that registers the user
-    public void registerUser(String username, String pass1, String pass2) throws IOException {
+    public void registerUser(String username, String pass1, String pass2) {
         //if username field is empty, prompt an error
         if (username.equals(""))
             System.out.println("Please enter a username");
@@ -42,7 +42,7 @@ public class RegisterModel {
         else {
             System.out.println("Registration done.");
             UserModel userModel = new UserModel(username, pass1);
-
+            addUser(userModel);
         }
     }
 }
