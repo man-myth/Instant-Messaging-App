@@ -1,6 +1,6 @@
 package server.controller;
 
-import common.UserModel;
+import server.model.UserModel;
 
 public class AdminController {
     private static UserModel admin;

@@ -1,7 +1,4 @@
-package common;
-
-import server.model.ChatRoomModel;
-import server.model.MessageModel;
+package server.model;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -105,7 +102,7 @@ public class UserModel implements Serializable {
     }
 
     public String toString() {
-        return "common.UserModel{" +
+        return "server.model.UserModel{" +
                 "username='" + username + '\'' +
                 ", password='" + password + '\'' +
                 ", status='" + status + '\'' +

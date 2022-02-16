@@ -1,6 +1,6 @@
 package client.controller;
 
-import common.UserModel;
+import server.model.UserModel;
 
 import java.io.*;
 import java.net.Socket;

@@ -1,6 +1,6 @@
 package client.controller;
 
-import common.UserModel;
+import server.model.UserModel;
 import server.model.ChatRoomModel;
 import server.model.MessageModel;
 

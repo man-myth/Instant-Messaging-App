@@ -1,7 +1,6 @@
 package client.model;
 
-import common.UserModel;
-import server.model.ServerModel;
+import server.model.UserModel;
 
 public class RegisterModel {
 
@@ -19,7 +18,6 @@ public class RegisterModel {
         else {
             System.out.println("Registration done.");
             UserModel userModel = new UserModel(username,pass1);
-
             //todo = add userModel to the server
         }
     }
