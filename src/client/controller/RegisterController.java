@@ -30,8 +30,8 @@ public class RegisterController {
             boolean isUserEmpty = registerModel.isUserEmpty(username); //checks if user is empty
             boolean doesPassMatch = registerModel.doesPassMatch(password,reEnteredPass); //checks if password match
             boolean isError = registerView.promptError(isUserEmpty,doesPassMatch); //prompt an error if there is an error
-            registerModel.registerUser(username,password, isError);
-            registerView.successRegister(username, isError);
+            registerModel.registerUser(username,password, isError); //registers the user
+            registerView.successRegister(username, isError); //displays a successfully registered message
         });
 
         registerView.setVisible(true);
