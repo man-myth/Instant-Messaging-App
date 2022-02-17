@@ -1,17 +1,14 @@
 package client.controller;
 
 import client.model.LoginModel;
-import client.view.ClientView;
+import client.view.ExitOnCloseAdapter;
 import client.view.LoginView;
 import server.model.UserModel;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.util.Scanner;
 
 public class LoginController {
     private RegisterController register;
@@ -24,7 +21,6 @@ public class LoginController {
     ObjectOutputStream outputStream;
 
     public LoginController() {
-        loginModel = new LoginModel(inputStream, outputStream);
         loginView = new LoginView();
 
         loginView.loginButton.addActionListener(e -> {
@@ -38,6 +34,13 @@ public class LoginController {
 
             if (loginModel.isUser(username, password)) {
                 System.out.println("Logged in!");
+                try {
+                    new ClientController(inputStream, outputStream, (UserModel) inputStream.readObject()).run();
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                } catch (ClassNotFoundException ex) {
+                    ex.printStackTrace();
+                }
             } else {
                 System.out.println("Failed to log in.");
             }
@@ -57,7 +60,8 @@ public class LoginController {
             socket = new Socket("localhost", PORT);
             inputStream = new ObjectInputStream(socket.getInputStream());
             outputStream = new ObjectOutputStream(socket.getOutputStream());
-
+            loginModel = new LoginModel(inputStream, outputStream);
+            loginView.setWindowAdapter(new ExitOnCloseAdapter(socket));
             loginView.setVisible(true);
         } catch (IOException e) {
             e.printStackTrace();

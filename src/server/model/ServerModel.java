@@ -33,7 +33,7 @@ public class ServerModel {
             serverSocket = new ServerSocket(PORT);
             serverSocket.setReuseAddress(true);
             pool = Executors.newFixedThreadPool(2);
-            //System.out.println("Server Started");
+            System.out.println("[SERVER]: Started.");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -41,10 +41,8 @@ public class ServerModel {
         while (true) {
             try {
                 // Accept client connection
-                System.out.println("[SERVER]: Waiting for connection");
                 clientSocket = serverSocket.accept();
                 System.out.println("[SERVER]: Client connected: " + clientSocket);
-
                 ClientHandlerModel clientHandler = new ClientHandlerModel(clientSocket);
                 clients.add(clientHandler);
                 pool.execute(clientHandler);
@@ -53,7 +51,6 @@ public class ServerModel {
             }
 
         }
-
     }
 
     private String checkStatus(String username) {

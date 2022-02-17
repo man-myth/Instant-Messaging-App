@@ -7,9 +7,9 @@ import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
 
-public class ClientController implements Runnable {
+public class ClientController {
     private Socket socket;
-    private ObjectInputStream inputStream;
+    private transient ObjectInputStream inputStream;
     private ObjectOutputStream outputStream;
     private UserModel user;
     ClientView clientView;
@@ -24,8 +24,8 @@ public class ClientController implements Runnable {
         this.user = user;
     }
 
-    @Override
     public void run() {
+        System.out.println(user);
         clientView = new ClientView();
         clientView.setVisible(true);
 
