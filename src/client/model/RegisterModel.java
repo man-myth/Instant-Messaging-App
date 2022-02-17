@@ -20,13 +20,9 @@ public class RegisterModel {
     }
 
     //method that adds user to the server
-    public void addUser(UserModel userModel) {
-        Utility utility = new Utility();
-        List<UserModel> users = utility.readData("res/data.dat");
-        users.add(userModel);
-        utility.exportData(users);
-    }
+    public void addUser() {
 
+    }
 
     //method that registers the user
     public void registerUser(String username, String pass1, String pass2) {
@@ -34,16 +30,16 @@ public class RegisterModel {
         if (username.equals(""))
             System.out.println("Please enter a username");
 
-            //if pass1 and pass2 did not match, prompt an error
+        //if pass1 and pass2 did not match, prompt an error
         else if (!pass1.equals(pass2))
             System.out.println("Password did not match, try again.");
 
-            //if info is valid, add the user to the server
+        //if info is valid, add the user to the server
         else {
             System.out.println("Registration done.");
             UserModel userModel = new UserModel(username, pass1);
-            addUser(userModel);
         }
     }
 }
+
 
