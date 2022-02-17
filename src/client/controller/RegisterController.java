@@ -24,7 +24,14 @@ public class RegisterController {
         registerView = new RegisterView();
         registerModel = new RegisterModel(inputStream, outputStream);
         registerView.addRegisterListener(e -> {
-            registerModel.registerUser(registerView);
+            String username = registerView.getUsername();
+            String password = registerView.getPassword();
+            String reEnteredPass = registerView.getConfirmPassword();
+            boolean isUserEmpty = registerModel.isUserEmpty(username); //checks if user is empty
+            boolean doesPassMatch = registerModel.doesPassMatch(password,reEnteredPass); //checks if password match
+            boolean isError = registerView.promptError(isUserEmpty,doesPassMatch); //prompt an error if there is an error
+            registerModel.registerUser(username,password, isError);
+            registerView.successRegister(username, isError);
         });
 
         registerView.setVisible(true);

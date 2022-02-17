@@ -22,19 +22,9 @@ public class RegisterModel {
     }
 
     //method that registers the user
-    public void registerUser(RegisterView registerView) {
-        String username = registerView.getUsername();
-        String password = registerView.getPassword();
-        String reEnteredPass = registerView.getConfirmPassword();
+    public void registerUser(String username, String password, boolean isError) {
+        if(isError) return; //if there is an error, do not proceed
 
-        if (username.isEmpty()) {
-            JOptionPane.showMessageDialog(registerView.getContentPane(), "Please enter a username.", "Error", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-        if (!password.equals(reEnteredPass)) {
-            JOptionPane.showMessageDialog(registerView.getContentPane(), "Password did not match, try again.", "Error", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
         try {
             // Send request to server
             outputStream.writeObject("register");
@@ -42,16 +32,24 @@ public class RegisterModel {
 
             while (true) {
                 if (inputStream.readObject().equals("registered")) {
-                    JOptionPane.showMessageDialog(null, "Registered user " + username, "Registered", JOptionPane.INFORMATION_MESSAGE);
                     break;
                 }
             }
-            // Go back to login view
-            registerView.dispose();
         } catch (IOException | ClassNotFoundException ex) {
             ex.printStackTrace();
         }
     }
+
+    //checks if username field is empty
+    public boolean isUserEmpty(String username){
+        return username.isEmpty();
+    }
+
+    //checks if password match
+    public boolean doesPassMatch(String password, String reEnteredPass){
+        return !password.equals(reEnteredPass);
+    }
+
 }
 
 
