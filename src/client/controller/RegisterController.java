@@ -34,17 +34,17 @@ public class RegisterController {
             //checks if passwords match
             boolean doesPassMatch = registerModel.doesPassMatch(password,reEnteredPass);
 
-            //prompt an error if there is an error
-            boolean isError = registerView.promptError(isUserEmpty,doesPassMatch);
+            //gui method that displays an error if there is an empty username or password mismatch
+            boolean errorExist = registerView.promptError(isUserEmpty,doesPassMatch);
 
-            //registers the user, cancels if there is existing an error
-            boolean userValidity =registerModel.registerUser(username,password, isError);
+            //registers the user and checks if username already exist, cancels if there is existing an error
+            boolean userValidity =registerModel.registerUser(username,password, errorExist);
 
-            //checks if username already exist, cancels if there is existing an error
-            registerView.isUserValid(userValidity, isError);
+            //gui method that displays an error if username already exist, cancels if there is existing an error
+            registerView.isUserValid(userValidity, errorExist);
 
-            //displays a successfully registered message, cancels if there is existing an error
-            registerView.successRegister(username, isError, userValidity);
+            //gui method that displays a successfully registered message, cancels if there is existing an error
+            registerView.successRegister(username, errorExist, userValidity);
         });
 
         registerView.setVisible(true);

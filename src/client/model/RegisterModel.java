@@ -22,9 +22,8 @@ public class RegisterModel {
     }
 
     //method that registers the user, returns true if successfully registered
-    public boolean registerUser(String username, String password, boolean isError) {
-        if(isError) return false; //if there is an existing error, do not proceed
-
+    public boolean registerUser(String username, String password, boolean errorExist) {
+        if(errorExist) return false; //if there is an existing error, do not proceed
         try {
             // Send request to server
             outputStream.writeObject("register");

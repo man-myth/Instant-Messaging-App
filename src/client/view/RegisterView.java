@@ -64,17 +64,25 @@ public class RegisterView extends JFrame{
     }
 
     //displays an error and returns true if user inputs invalid information
-    public boolean promptError(boolean user, boolean pass){
-        if(user) {
+    public boolean promptError(boolean isUserEmpty, boolean doesPassMatch){
+        if(isUserEmpty) {
             JOptionPane.showMessageDialog(this.getContentPane(), "Please enter a username.", "Error", JOptionPane.ERROR_MESSAGE);
             return true;
         }
 
-        else if(pass) {
+        else if(doesPassMatch) {
             JOptionPane.showMessageDialog(this.getContentPane(), "Password did not match, try again.", "Error", JOptionPane.ERROR_MESSAGE);
             return true;
         }
         return false;
+    }
+
+    //displays an error if username already exist
+    public void isUserValid(boolean valid, boolean errorExist){
+        if(errorExist) return; //if there is an error, do not proceed
+
+        if(!valid)
+            JOptionPane.showMessageDialog(this.getContentPane(), "Username already exists. Try a different one.", "Error", JOptionPane.ERROR_MESSAGE);
     }
 
     //displays a message if user successfully registered
@@ -82,14 +90,6 @@ public class RegisterView extends JFrame{
         if(isError || !isUserValid) return; //if there is an error, do not proceed
         JOptionPane.showMessageDialog(null, "Registered user " + username, "Registered", JOptionPane.INFORMATION_MESSAGE);
         this.dispose();
-    }
-
-    //prompts an error if username already exist
-    public void isUserValid(boolean valid, boolean isError){
-        if(isError) return; //if there is an error, do not proceed
-
-        if(!valid)
-            JOptionPane.showMessageDialog(this.getContentPane(), "Username already exists. Try a different one.", "Error", JOptionPane.ERROR_MESSAGE);
     }
 
 }
