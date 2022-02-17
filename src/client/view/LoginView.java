@@ -2,6 +2,7 @@ package client.view;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.WindowAdapter;
 
 public class LoginView extends JFrame {
 
@@ -39,6 +40,10 @@ public class LoginView extends JFrame {
         this.setTitle("Login");
         this.pack();
         this.setLocationRelativeTo(null);
+    }
+
+    public void setWindowAdapter(WindowAdapter adapter) {
+        this.addWindowListener(adapter);
     }
 
 }
