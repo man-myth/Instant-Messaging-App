@@ -27,11 +27,11 @@ public class RegisterController {
             String username = registerView.getUsername();
             String password = registerView.getPassword();
             String reEnteredPass = registerView.getConfirmPassword();
-            boolean isUserEmpty = registerModel.isUserEmpty(username); //checks if user is empty
-            boolean doesPassMatch = registerModel.doesPassMatch(password,reEnteredPass); //checks if password match
+            boolean isUserEmpty = registerModel.isUserEmpty(username); //checks if username field is empty
+            boolean doesPassMatch = registerModel.doesPassMatch(password,reEnteredPass); //checks if passwords match
             boolean isError = registerView.promptError(isUserEmpty,doesPassMatch); //prompt an error if there is an error
-            registerModel.registerUser(username,password, isError); //registers the user
-            registerView.successRegister(username, isError); //displays a successfully registered message
+            registerModel.registerUser(username,password, isError); //registers the user, cancels if there is an error
+            registerView.successRegister(username, isError); //displays a successfully registered message, cancels if there is an error
         });
 
         registerView.setVisible(true);
