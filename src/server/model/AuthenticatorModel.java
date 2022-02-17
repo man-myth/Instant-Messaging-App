@@ -22,19 +22,10 @@ public class AuthenticatorModel {
      * @return
      */
     public boolean verifyUser(String username, String password) {
-        try {
-            while (true) {
-                for (UserModel user : users) {
-                    System.out.println(user);
-                    if (user.getUsername().compareTo(username) == 0 && user.getPassword().compareTo(password) == 0) {
-                        System.out.println("it's here");
-                        outputStream.writeObject("VERIFIED");
-                        return true;
-                    }
-                }
+        for (UserModel user : users) {
+            if (user.getUsername().compareTo(username) == 0 && user.getPassword().compareTo(password) == 0) {
+                return true;
             }
-        } catch (IOException e) {
-            e.printStackTrace();
         }
         return false;
     }

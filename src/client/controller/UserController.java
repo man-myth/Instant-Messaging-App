@@ -32,14 +32,6 @@ public class UserController {
         return model.getPassword();
     }
 
-    public void setUserType(String userType){
-        model.setUserType(userType);
-    }
-
-    public String getUserType(){
-        return model.getUserType();
-    }
-
     public void setContacts(List<UserModel> contacts){
         model.setContacts(contacts);
     }

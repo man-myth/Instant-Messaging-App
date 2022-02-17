@@ -1,5 +1,6 @@
 package client.controller;
 
+import client.view.ClientView;
 import server.model.UserModel;
 
 import java.io.*;
@@ -11,21 +12,22 @@ public class ClientController implements Runnable {
     private ObjectInputStream inputStream;
     private ObjectOutputStream outputStream;
     private UserModel user;
+    ClientView clientView;
 
     //list of connected clients
     public static ArrayList<ClientController> clientHandlerControllers = new ArrayList<>();
 
-    public ClientController() {
+
+    public ClientController(ObjectInputStream inputStream, ObjectOutputStream outputStream, UserModel user) {
+        this.inputStream = inputStream;
+        this.outputStream = outputStream;
+        this.user = user;
     }
 
     @Override
     public void run() {
-        int port = 2022;
-        try {
-            socket = new Socket("localhost", port);
-            ObjectInputStream inputStream = new ObjectInputStream(socket.getInputStream());
-            ObjectOutputStream outputStream = new ObjectOutputStream(socket.getOutputStream());
-            LoginController loginController = new LoginController(inputStream, outputStream);
+        clientView = new ClientView();
+        clientView.setVisible(true);
 
                 /*
                 System.out.println("----------Connection Succesful-------------");
@@ -40,8 +42,5 @@ public class ClientController implements Runnable {
                 }
                  */
 
-        } catch (IOException ioException) {
-            ioException.printStackTrace();
-        }
     }
 }

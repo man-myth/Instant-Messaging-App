@@ -1,9 +1,9 @@
 package server.model;
 
 import client.controller.ClientController;
+import client.model.ClientModel;
 
 import java.io.*;
-import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -12,12 +12,48 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class ServerModel {
-    List<UserModel> registeredUsers;
+    private static final int PORT = 2022;
+    private static ServerSocket serverSocket;
+    private static Socket clientSocket;
+    private static ExecutorService pool;
+
+    static List<UserModel> registeredUsers;
     List<MessageModel> chatHistory;
+    List<ClientHandlerModel> clients;
 
     public ServerModel(List<UserModel> registeredUsers, List<MessageModel> chatHistory) {
         this.registeredUsers = registeredUsers;
         this.chatHistory = chatHistory;
+    }
+
+    public void run() {
+        clients = new ArrayList<>();
+        serverSocket = null;
+        try {
+            serverSocket = new ServerSocket(PORT);
+            serverSocket.setReuseAddress(true);
+            pool = Executors.newFixedThreadPool(2);
+            //System.out.println("Server Started");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        while (true) {
+            try {
+                // Accept client connection
+                System.out.println("[SERVER]: Waiting for connection");
+                clientSocket = serverSocket.accept();
+                System.out.println("[SERVER]: Client connected: " + clientSocket);
+
+                ClientHandlerModel clientHandler = new ClientHandlerModel(clientSocket);
+                clients.add(clientHandler);
+                pool.execute(clientHandler);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+        }
+
     }
 
     private String checkStatus(String username) {
@@ -36,7 +72,7 @@ public class ServerModel {
 
     }
 
-    public List<UserModel> getRegisteredUsers() {
+    public static List<UserModel> getRegisteredUsers() {
         return registeredUsers;
     }
 
@@ -52,8 +88,9 @@ public class ServerModel {
         this.chatHistory = chatHistory;
     }
 
-    public void addRegisteredUser(UserModel user) {
-        this.registeredUsers.add(user);
+    public static void addRegisteredUser(UserModel user) {
+        registeredUsers.add(user);
     }
+
 
 }
