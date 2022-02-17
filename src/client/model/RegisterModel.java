@@ -1,9 +1,15 @@
 package client.model;
 
+import client.view.RegisterView;
 import server.model.UserModel;
+import server.model.Utility;
 
+import javax.swing.*;
+import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.OutputStream;
+import java.util.List;
 
 public class RegisterModel {
 
@@ -15,26 +21,35 @@ public class RegisterModel {
         this.outputStream = outputStream;
     }
 
-    public void addUser() {
-
-    }
-
-
     //method that registers the user
-    public void registerUser(String username, String pass1, String pass2) {
-        //if username field is empty, prompt an error
-        if (username.equals(""))
-            System.out.println("Please enter a username");
+    public void registerUser(String username, String password, boolean isError) {
+        if(isError) return; //if there is an error, do not proceed
 
-            //if pass1 and pass2 did not match, prompt an error
-        else if (!pass1.equals(pass2))
-            System.out.println("Password did not match, try again.");
+        try {
+            // Send request to server
+            outputStream.writeObject("register");
+            outputStream.writeObject(new UserModel(username, password));
 
-            //if info is valid, add the user to the server
-        else {
-            System.out.println("Registration done.");
-            UserModel userModel = new UserModel(username, pass1);
-            //todo = add userModel to the server
+            while (true) {
+                if (inputStream.readObject().equals("registered")) {
+                    break;
+                }
+            }
+        } catch (IOException | ClassNotFoundException ex) {
+            ex.printStackTrace();
         }
     }
+
+    //checks if username field is empty
+    public boolean isUserEmpty(String username){
+        return username.isEmpty();
+    }
+
+    //checks if password match
+    public boolean doesPassMatch(String password, String reEnteredPass){
+        return !password.equals(reEnteredPass);
+    }
+
 }
+
+

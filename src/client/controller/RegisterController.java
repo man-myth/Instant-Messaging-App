@@ -6,6 +6,8 @@ import client.view.RegisterView;
 import server.model.UserModel;
 
 import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -25,35 +27,14 @@ public class RegisterController {
             String username = registerView.getUsername();
             String password = registerView.getPassword();
             String reEnteredPass = registerView.getConfirmPassword();
-            if (username.isEmpty()) {
-                JOptionPane.showMessageDialog(registerView.getContentPane(), "Please enter a username.", "Error", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-            if (!password.equals(reEnteredPass)) {
-                JOptionPane.showMessageDialog(registerView.getContentPane(), "Password did not match, try again.", "Error", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-
-            try {
-                // Send request to server
-                outputStream.writeObject("register");
-                outputStream.writeObject(new UserModel(username, password));
-
-                while (true) {
-                    if (inputStream.readObject().equals("registered")) {
-                        JOptionPane.showMessageDialog(null, "Registered user " + username, "Registered", JOptionPane.INFORMATION_MESSAGE);
-                        break;
-                    }
-                }
-                // Go back to login view
-                registerView.dispose();
-            } catch (IOException | ClassNotFoundException ex) {
-                ex.printStackTrace();
-            }
+            boolean isUserEmpty = registerModel.isUserEmpty(username); //checks if username field is empty
+            boolean doesPassMatch = registerModel.doesPassMatch(password,reEnteredPass); //checks if passwords match
+            boolean isError = registerView.promptError(isUserEmpty,doesPassMatch); //prompt an error if there is an error
+            registerModel.registerUser(username,password, isError); //registers the user, cancels if there is an error
+            registerView.successRegister(username, isError); //displays a successfully registered message, cancels if there is an error
         });
 
         registerView.setVisible(true);
     }
-
 
 }

@@ -10,4 +10,6 @@ public class AdminController {
         // render the admin client
         // put all necessary lines of codes to let the admin do the things he want
     }
+
+
 }

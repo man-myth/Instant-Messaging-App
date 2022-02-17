@@ -62,4 +62,26 @@ public class RegisterView extends JFrame{
     public void addRegisterListener(ActionListener listener){
         registerButton.addActionListener(listener);
     }
+
+    //displays an error if user inputs invalid information
+    public boolean promptError(boolean user, boolean pass){
+        if(user) {
+            JOptionPane.showMessageDialog(this.getContentPane(), "Please enter a username.", "Error", JOptionPane.ERROR_MESSAGE);
+            return true;
+        }
+
+        else if(pass) {
+            JOptionPane.showMessageDialog(this.getContentPane(), "Password did not match, try again.", "Error", JOptionPane.ERROR_MESSAGE);
+            return true;
+        }
+        return false;
+    }
+
+    //displays a message if user successfully registered
+    public void successRegister(String username, boolean isError){
+        if(isError) return; //if there is an error, do not proceed
+        JOptionPane.showMessageDialog(null, "Registered user " + username, "Registered", JOptionPane.INFORMATION_MESSAGE);
+        this.dispose();
+    }
+
 }
