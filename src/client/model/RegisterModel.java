@@ -1,8 +1,10 @@
 package client.model;
 
+import client.view.RegisterView;
 import server.model.UserModel;
 import server.model.Utility;
 
+import javax.swing.*;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -19,25 +21,35 @@ public class RegisterModel {
         this.outputStream = outputStream;
     }
 
-    //method that adds user to the server
-    public void addUser() {
-
-    }
-
     //method that registers the user
-    public void registerUser(String username, String pass1, String pass2) {
-        //if username field is empty, prompt an error
-        if (username.equals(""))
-            System.out.println("Please enter a username");
+    public void registerUser(RegisterView registerView) {
+        String username = registerView.getUsername();
+        String password = registerView.getPassword();
+        String reEnteredPass = registerView.getConfirmPassword();
 
-        //if pass1 and pass2 did not match, prompt an error
-        else if (!pass1.equals(pass2))
-            System.out.println("Password did not match, try again.");
+        if (username.isEmpty()) {
+            JOptionPane.showMessageDialog(registerView.getContentPane(), "Please enter a username.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        if (!password.equals(reEnteredPass)) {
+            JOptionPane.showMessageDialog(registerView.getContentPane(), "Password did not match, try again.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        try {
+            // Send request to server
+            outputStream.writeObject("register");
+            outputStream.writeObject(new UserModel(username, password));
 
-        //if info is valid, add the user to the server
-        else {
-            System.out.println("Registration done.");
-            UserModel userModel = new UserModel(username, pass1);
+            while (true) {
+                if (inputStream.readObject().equals("registered")) {
+                    JOptionPane.showMessageDialog(null, "Registered user " + username, "Registered", JOptionPane.INFORMATION_MESSAGE);
+                    break;
+                }
+            }
+            // Go back to login view
+            registerView.dispose();
+        } catch (IOException | ClassNotFoundException ex) {
+            ex.printStackTrace();
         }
     }
 }
