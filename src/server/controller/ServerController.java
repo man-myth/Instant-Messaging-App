@@ -22,11 +22,11 @@ import java.util.concurrent.Executors;
 public class ServerController {
     public ServerModel serverModel;
 
-
     public ServerController() {
         serverModel = new ServerModel(Utility.readData("res/data.dat"), new ArrayList<>());
     }
 
     public void run() {
+        serverModel.run();
     }
 }

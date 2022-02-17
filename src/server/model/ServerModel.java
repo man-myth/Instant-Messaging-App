@@ -1,9 +1,9 @@
 package server.model;
 
 import client.controller.ClientController;
+import client.model.ClientModel;
 
 import java.io.*;
-import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -12,67 +12,44 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class ServerModel {
-    List<UserModel> registeredUsers;
-    List<MessageModel> chatHistory;
-    List<ClientController> clients;
-    private static final int port = 2022;
+    private static final int PORT = 2022;
     private static ServerSocket serverSocket;
     private static Socket clientSocket;
     private static ExecutorService pool;
 
+    static List<UserModel> registeredUsers;
+    List<MessageModel> chatHistory;
+    List<ClientHandlerModel> clients;
+
     public ServerModel(List<UserModel> registeredUsers, List<MessageModel> chatHistory) {
         this.registeredUsers = registeredUsers;
         this.chatHistory = chatHistory;
-        pool = Executors.newFixedThreadPool(2);
     }
 
     public void run() {
         clients = new ArrayList<>();
         serverSocket = null;
         try {
-            serverSocket = new ServerSocket(port);
-            System.out.println("Server Started");
+            serverSocket = new ServerSocket(PORT);
+            serverSocket.setReuseAddress(true);
+            pool = Executors.newFixedThreadPool(2);
+            //System.out.println("Server Started");
         } catch (IOException e) {
             e.printStackTrace();
         }
+
         while (true) {
-            ObjectOutputStream outputStream = null;
-            ObjectInputStream inputStream = null;
             try {
                 // Accept client connection
+                System.out.println("[SERVER]: Waiting for connection");
                 clientSocket = serverSocket.accept();
-                System.out.println("Client connected: " + clientSocket);
-                outputStream = new ObjectOutputStream(clientSocket.getOutputStream());
-                inputStream = new ObjectInputStream(clientSocket.getInputStream());
+                System.out.println("[SERVER]: Client connected: " + clientSocket);
+
+                ClientHandlerModel clientHandler = new ClientHandlerModel(clientSocket);
+                clients.add(clientHandler);
+                pool.execute(clientHandler);
             } catch (IOException e) {
                 e.printStackTrace();
-            }
-            //ClientController clientThread = new ClientController(clientSocket);
-            AuthenticatorModel authenticate;
-            Object input;
-            while (true) {
-                try {
-                    input = inputStream.readObject();
-                    if (input.equals("login")) {
-                        authenticate = new AuthenticatorModel(inputStream, outputStream, getRegisteredUsers());
-                        String username = (String) inputStream.readObject();
-                        String password = (String) inputStream.readObject();
-                        System.out.printf("Attempting to login with username:%s and password:%s\n", username, password);
-                        if (authenticate.verifyUser(username, password)) {
-                            ClientHandlerModel client = new ClientHandlerModel(clientSocket, inputStream, outputStream, getChatHistory());
-                            //clients.add(clientThread);
-                            pool.execute(client);
-                        }
-                    } else if (input.equals("register")) {
-                        System.out.println("Attempting to register.");
-                        input = inputStream.readObject();
-                        addRegisteredUser((UserModel) input);
-                        Utility.exportData(getRegisteredUsers());
-                        outputStream.writeObject("registered");
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
             }
 
         }
@@ -95,7 +72,7 @@ public class ServerModel {
 
     }
 
-    public List<UserModel> getRegisteredUsers() {
+    public static List<UserModel> getRegisteredUsers() {
         return registeredUsers;
     }
 
@@ -111,8 +88,8 @@ public class ServerModel {
         this.chatHistory = chatHistory;
     }
 
-    public void addRegisteredUser(UserModel user) {
-        this.registeredUsers.add(user);
+    public static void addRegisteredUser(UserModel user) {
+        registeredUsers.add(user);
     }
 
 

@@ -9,7 +9,6 @@ public class UserModel implements Serializable {
     String username;
     String password;
     String status;
-    String userType;
     List<UserModel> contacts;
     List<UserModel> bookmarks;
     List<ChatRoomModel> chatRooms;
@@ -19,9 +18,11 @@ public class UserModel implements Serializable {
         this.username = username;
         this.password = password;
         this.status = "";
-        this.userType = "";
         this.contacts = new ArrayList<>();
         this.chatRooms = new ArrayList<>();
+    }
+
+    public UserModel(UserModel userModel) {
     }
 
     public String getUsername() {
@@ -46,14 +47,6 @@ public class UserModel implements Serializable {
 
     public void setStatus(String status) {
         this.status = status;
-    }
-
-    public String getUserType() {
-        return userType;
-    }
-
-    public void setUserType(String userType) {
-        this.userType = userType;
     }
 
     public List<UserModel> getContacts() {
@@ -106,7 +99,6 @@ public class UserModel implements Serializable {
                 "username='" + username + '\'' +
                 ", password='" + password + '\'' +
                 ", status='" + status + '\'' +
-                ", userType='" + userType + '\'' +
                 ", contacts=" + contacts +
                 ", bookmarks=" + bookmarks +
                 ", chatRooms=" + chatRooms +
