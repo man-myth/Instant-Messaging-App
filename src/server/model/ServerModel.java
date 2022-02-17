@@ -24,6 +24,7 @@ public class ServerModel {
     public ServerModel(List<UserModel> registeredUsers, List<MessageModel> chatHistory) {
         this.registeredUsers = registeredUsers;
         this.chatHistory = chatHistory;
+        registeredUsers.add(new UserModel("user1","123"));
     }
 
     public void run() {
@@ -90,6 +91,14 @@ public class ServerModel {
 
     public static void addRegisteredUser(UserModel user) {
         registeredUsers.add(user);
+    }
+
+    public static boolean doesUsernameExist(String username){
+        for(UserModel u: registeredUsers){
+            if(u.getUsername().equals(username))
+                return true;
+        }
+        return false;
     }
 
 

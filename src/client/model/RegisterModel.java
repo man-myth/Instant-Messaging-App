@@ -21,34 +21,41 @@ public class RegisterModel {
         this.outputStream = outputStream;
     }
 
-    //method that registers the user
-    public void registerUser(String username, String password, boolean isError) {
-        if(isError) return; //if there is an error, do not proceed
+    //method that registers the user, returns true if successfully registered
+    public boolean registerUser(String username, String password, boolean isError) {
+        if(isError) return false; //if there is an existing error, do not proceed
 
         try {
             // Send request to server
             outputStream.writeObject("register");
             outputStream.writeObject(new UserModel(username, password));
+            String status = (String)inputStream.readObject();
 
             while (true) {
-                if (inputStream.readObject().equals("registered")) {
-                    break;
+                if (status.equals("registered")) {
+                    return true;
+                } else if(status.equals("invalid")){
+                    return false;
                 }
+
             }
         } catch (IOException | ClassNotFoundException ex) {
             ex.printStackTrace();
         }
+        return false;
     }
 
-    //checks if username field is empty
+    //returns true if username field is empty
     public boolean isUserEmpty(String username){
         return username.isEmpty();
     }
 
-    //checks if password match
+    //returns true if password match
     public boolean doesPassMatch(String password, String reEnteredPass){
         return !password.equals(reEnteredPass);
     }
+
+
 
 }
 

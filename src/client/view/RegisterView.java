@@ -63,7 +63,7 @@ public class RegisterView extends JFrame{
         registerButton.addActionListener(listener);
     }
 
-    //displays an error if user inputs invalid information
+    //displays an error and returns true if user inputs invalid information
     public boolean promptError(boolean user, boolean pass){
         if(user) {
             JOptionPane.showMessageDialog(this.getContentPane(), "Please enter a username.", "Error", JOptionPane.ERROR_MESSAGE);
@@ -78,10 +78,18 @@ public class RegisterView extends JFrame{
     }
 
     //displays a message if user successfully registered
-    public void successRegister(String username, boolean isError){
-        if(isError) return; //if there is an error, do not proceed
+    public void successRegister(String username, boolean isError, boolean isUserValid){
+        if(isError || !isUserValid) return; //if there is an error, do not proceed
         JOptionPane.showMessageDialog(null, "Registered user " + username, "Registered", JOptionPane.INFORMATION_MESSAGE);
         this.dispose();
+    }
+
+    //prompts an error if username already exist
+    public void isUserValid(boolean valid, boolean isError){
+        if(isError) return; //if there is an error, do not proceed
+
+        if(!valid)
+            JOptionPane.showMessageDialog(this.getContentPane(), "Username already exists. Try a different one.", "Error", JOptionPane.ERROR_MESSAGE);
     }
 
 }
