@@ -18,12 +18,15 @@ public class ServerModel {
     private static ExecutorService pool;
 
     static List<UserModel> registeredUsers;
-    List<MessageModel> chatHistory;
+    static ChatRoomModel publicChat;
     List<ClientHandlerModel> clients;
 
-    public ServerModel(List<UserModel> registeredUsers, List<MessageModel> chatHistory) {
+    public ServerModel(List<UserModel> registeredUsers, ChatRoomModel publicChat) {
         this.registeredUsers = registeredUsers;
-        this.chatHistory = chatHistory;
+        this.publicChat = publicChat;
+        for (UserModel user : registeredUsers) {
+            System.out.println(user);
+        }
     }
 
     public void run() {
@@ -49,7 +52,6 @@ public class ServerModel {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-
         }
     }
 
@@ -77,17 +79,23 @@ public class ServerModel {
         this.registeredUsers = registeredUsers;
     }
 
-    public List<MessageModel> getChatHistory() {
-        return chatHistory;
-    }
-
-    public void setChatHistory(List<MessageModel> chatHistory) {
-        this.chatHistory = chatHistory;
-    }
-
     public static void addRegisteredUser(UserModel user) {
         registeredUsers.add(user);
     }
 
+    public static ChatRoomModel getPublicChat() {
+        return publicChat;
+    }
 
+    public static void setPublicChat(ChatRoomModel newPublicChat) {
+        publicChat = newPublicChat;
+    }
+
+    public List<ClientHandlerModel> getClients() {
+        return clients;
+    }
+
+    public void setClients(List<ClientHandlerModel> clients) {
+        this.clients = clients;
+    }
 }

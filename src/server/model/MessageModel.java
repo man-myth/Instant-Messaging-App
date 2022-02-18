@@ -1,16 +1,17 @@
 package server.model;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
-public class MessageModel {
+public class MessageModel implements Serializable {
     private UserModel sender;
     private ChatRoomModel receiver;
     private String content;
     private LocalTime time;
     private LocalDate date;
 
-    MessageModel(UserModel sender, ChatRoomModel receiver, String content, LocalTime time, LocalDate date){
+    public MessageModel(UserModel sender, ChatRoomModel receiver, String content, LocalTime time, LocalDate date){
         this.sender = sender;
         this.receiver = receiver;
         this.content = content;
@@ -63,6 +64,4 @@ public class MessageModel {
     public LocalDate getDate() {
         return date;
     }
-
-
 }

@@ -1,7 +1,5 @@
 package server.model;
 
-import client.controller.ClientController;
-
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -34,6 +32,7 @@ public class ClientHandlerModel implements Runnable {
                             System.out.println("Success!");
                             outputStream.writeObject("VERIFIED");
                             outputStream.writeObject(getUserFromList(username, password));
+                            outputStream.writeObject(ServerModel.getPublicChat());
                         } else {
                             System.out.println("Failed.");
                         }
@@ -41,13 +40,21 @@ public class ClientHandlerModel implements Runnable {
                         System.out.println("Attempting to register.");
                         input = inputStream.readObject();
                         ServerModel.addRegisteredUser((UserModel) input);
-                        Utility.exportData(ServerModel.getRegisteredUsers());
+                        Utility.exportUsersData(ServerModel.getRegisteredUsers());
+
                         outputStream.writeObject("registered");
+                    } else if (input.equals("chat")) {
+                        ChatRoomModel publicChat = ServerModel.publicChat;
+                        publicChat.getChatHistory().add((MessageModel) inputStream.readObject());
+                        Utility.exportPublicChat(publicChat);
+
+                        outputStream.writeObject(publicChat);
                     }
                 }
             } catch (ClassNotFoundException e) {
+                System.out.println(clientSocket + "has disconnected.");
                 clientSocket.close();
-                e.printStackTrace();
+                //e.printStackTrace();
             }
         } catch (IOException e) {
             e.printStackTrace();
