@@ -13,7 +13,7 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Client {
+public class Client { // hello
 
     private static LoginController logInController;
     private static ClientController clientController;
