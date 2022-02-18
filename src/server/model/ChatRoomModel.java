@@ -1,11 +1,25 @@
 package server.model;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class ChatRoomModel {
+public class ChatRoomModel implements Serializable {
     private String name;
     private List<UserModel> users;
     private List<MessageModel> chatHistory;
+    /**
+     * Default Constructor
+     * @param name of the chat room
+     */
+    public ChatRoomModel(String name) {
+        this.name = name;
+    }
+
+    public ChatRoomModel(String name, List<UserModel> users, List<MessageModel> chatHistory) {
+        this.name = name;
+        this.users = users;
+        this.chatHistory = chatHistory;
+    }
 
     //returns the user if userList contains the specified user
     private UserModel searchUser(UserModel user) {
@@ -55,14 +69,5 @@ public class ChatRoomModel {
         this.chatHistory = chatHistory;
     }
 
-
-
-    /**
-     * Default Constructor
-     * @param name of the chat room
-     */
-    public ChatRoomModel(String name) {
-        this.name = name;
-    }
 
 }
