@@ -40,18 +40,6 @@ public class ClientHandlerModel implements Runnable {
                     } else if (input.equals("register")) {
                         System.out.println("Attempting to register.");
                         input = inputStream.readObject();
-
-                        ServerModel.addRegisteredUser((UserModel) input);
-                        Utility.exportUsersData(ServerModel.getRegisteredUsers());
-
-                        outputStream.writeObject("registered");
-                    } else if (input.equals("chat")) {
-                        ChatRoomModel publicChat = ServerModel.publicChat;
-                        publicChat.getChatHistory().add((MessageModel) inputStream.readObject());
-                        Utility.exportPublicChat(publicChat);
-
-                        outputStream.writeObject(publicChat);
-
                         UserModel newUser = (UserModel) input;
 
                         //if username already exists, prompt a message
@@ -64,6 +52,13 @@ public class ClientHandlerModel implements Runnable {
                             outputStream.writeObject("registered");
                         }
 
+                        outputStream.writeObject("registered");
+                    } else if (input.equals("chat")) {
+                        ChatRoomModel publicChat = ServerModel.publicChat;
+                        publicChat.getChatHistory().add((MessageModel) inputStream.readObject());
+                        Utility.exportPublicChat(publicChat);
+
+                        outputStream.writeObject(publicChat);
                     }
                 }
             } catch (ClassNotFoundException e) {
