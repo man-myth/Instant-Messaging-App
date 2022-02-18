@@ -40,10 +40,6 @@ public class ClientHandlerModel implements Runnable {
                     } else if (input.equals("register")) {
                         System.out.println("Attempting to register.");
                         input = inputStream.readObject();
-
-                        ServerModel.addRegisteredUser((UserModel) input);
-                        Utility.exportUsersData(ServerModel.getRegisteredUsers());
-
                         UserModel newUser = (UserModel) input;
 
                         //if username already exists, prompt a message
