@@ -18,6 +18,7 @@ import java.awt.event.WindowAdapter;
 public class ClientView extends JFrame {
 
     JPanel mainPanel, contactsPanel;
+    //Changes: Jpanel -> MembersPanel
     MembersPanel membersPanel;
     ChatPanel chatPanel;
     static Font headingFont = new Font("Calibri", Font.PLAIN, 20);

@@ -59,6 +59,8 @@ public class ClientHandlerModel implements Runnable {
                         Utility.exportPublicChat(publicChat);
 
                         outputStream.writeObject(publicChat);
+
+                        //Testing
                     } else if (input.equals("get contacts")) {
                         List<UserModel> contacts = currentUser.getContacts();
                         // testing only
@@ -69,6 +71,8 @@ public class ClientHandlerModel implements Runnable {
                             outputStream.writeObject(u.getUsername());
                         }
                         outputStream.writeObject("done");
+
+                        //Adding contact to room
                     } else if (input.equals("add contact to room")) {
                         outputStream.writeObject("done");
                         // to do add user to chat room

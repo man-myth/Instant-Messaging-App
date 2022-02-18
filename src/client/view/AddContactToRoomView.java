@@ -6,7 +6,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
-
+//Adding contact to room
 public class AddContactToRoomView extends JFrame {
     JButton addButton = new JButton("Add");
     JComboBox comboBox;
