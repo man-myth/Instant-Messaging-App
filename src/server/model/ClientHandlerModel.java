@@ -21,6 +21,7 @@ public class ClientHandlerModel implements Runnable {
 
             try {
                 Object input;
+                UserModel currentUser = null;
                 while (true) {
                     input = inputStream.readObject();
                     System.out.println(input);
@@ -33,6 +34,7 @@ public class ClientHandlerModel implements Runnable {
                             System.out.println("Success!");
                             outputStream.writeObject("VERIFIED");
                             outputStream.writeObject(getUserFromList(username, password));
+                            currentUser = getUserFromList(username,password);
                             outputStream.writeObject(ServerModel.getPublicChat());
                         } else {
                             System.out.println("Failed.");
@@ -57,6 +59,18 @@ public class ClientHandlerModel implements Runnable {
                         Utility.exportPublicChat(publicChat);
 
                         outputStream.writeObject(publicChat);
+                    } else if (input.equals("get contacts")){
+                        List<UserModel> contacts = currentUser.getContacts();
+                        //todo: this new added contacts are for testing purposes only, delete if complete
+                        contacts.add(new UserModel("matts","123"));
+                        contacts.add(new UserModel("milo","123"));
+                        for(UserModel u: contacts){
+                            outputStream.writeObject(u.getUsername());
+                        }
+                        outputStream.writeObject("done");
+                    } else if(input.equals("add contact to room")){
+                        //todo add user to chat room
+                        outputStream.writeObject("done");
                     }
                 }
             } catch (ClassNotFoundException e) {

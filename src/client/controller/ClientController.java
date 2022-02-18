@@ -6,14 +6,10 @@ import server.model.ChatRoomModel;
 import server.model.MessageModel;
 import server.model.UserModel;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.*;
 import java.net.Socket;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.List;
 
 public class ClientController {
     private Socket socket;
@@ -22,6 +18,7 @@ public class ClientController {
     private UserModel user;
     ChatRoomModel currentRoom;
     ClientView clientView;
+
 
     public ClientController(Socket socket, ObjectInputStream inputStream, ObjectOutputStream outputStream, UserModel user, ChatRoomModel publicChat) {
         this.socket = socket;
@@ -35,6 +32,9 @@ public class ClientController {
         System.out.println("Logged in with user: " + user);
         clientView = new ClientView(user, currentRoom);
         clientView.setWindowAdapter(new ExitOnCloseAdapter(socket));
+        clientView.actionListenerAdd(e -> {
+            AddContactToRoomController addToContact = new AddContactToRoomController(inputStream,outputStream);
+        });
         clientView.setMessageListener(e -> {
             String message = clientView.getMessage();
             if (message.isEmpty()) {
@@ -53,3 +53,4 @@ public class ClientController {
         clientView.setVisible(true);
     }
 }
+

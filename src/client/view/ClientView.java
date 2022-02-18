@@ -18,7 +18,8 @@ import java.awt.event.WindowAdapter;
 
 public class ClientView extends JFrame {
 
-    JPanel mainPanel, contactsPanel, membersPanel;
+    JPanel mainPanel, contactsPanel;
+    MembersPanel membersPanel;
     ChatPanel chatPanel;
     static Font headingFont = new Font("Calibri", Font.PLAIN, 20);
 
@@ -37,6 +38,7 @@ public class ClientView extends JFrame {
         this.setLocationRelativeTo(null);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setResizable(false);
+
     }
 
     public String getMessage() {
@@ -80,6 +82,9 @@ public class ClientView extends JFrame {
         chatPanel.addMessage(msg);
     }
 
+    public void actionListenerAdd(ActionListener listener){
+        membersPanel.actionListenerAdd(listener);
+    }
 
     class ChatPanel extends JPanel {
         JLabel roomName;
@@ -266,5 +271,9 @@ public class ClientView extends JFrame {
                 this.setBackground(Color.WHITE);
             }
         }
+        public void actionListenerAdd(ActionListener listener){
+            addButton.addActionListener(listener);
+        }
+
     }
 }
