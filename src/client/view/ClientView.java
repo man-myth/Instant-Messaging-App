@@ -76,14 +76,16 @@ public class ClientView extends JFrame {
         return imageIcon;
     }
 
+    public void addMessage(MessageModel msg) {
+        chatPanel.addMessage(msg);
+    }
+
 
     class ChatPanel extends JPanel {
-        JPanel panel;
         JLabel roomName;
         JTextPane content;
         public JTextField messageTextArea;
         JScrollPane scrollPane;
-        final CardLayout cl = new CardLayout();
 
         ChatPanel(ChatRoomModel chatRoom) {
             content = new JTextPane();
@@ -99,14 +101,19 @@ public class ClientView extends JFrame {
 
             this.roomName = new JLabel(chatRoom.getName(), SwingConstants.CENTER);
             this.roomName.setFont(ClientView.headingFont);
-            panel = new JPanel();
-            panel.setLayout(new BorderLayout());
-            panel.add(this.roomName, BorderLayout.NORTH);
-            panel.add(this.scrollPane, BorderLayout.CENTER);
-            panel.add(this.messageTextArea, BorderLayout.SOUTH);
-            panel.setPreferredSize(new Dimension(550, 420));
-            this.setLayout(cl);
-            this.add(panel);
+            this.setLayout(new BorderLayout());
+            this.add(this.roomName, BorderLayout.NORTH);
+            this.add(this.scrollPane, BorderLayout.CENTER);
+            this.add(this.messageTextArea, BorderLayout.SOUTH);
+            this.setPreferredSize(new Dimension(550, 420));
+        }
+
+        public void addMessage(MessageModel message) {
+            this.remove(scrollPane);
+            addText(content, message.getSender().getUsername() + ": " + message.getContent());
+            scrollPane = new JScrollPane(content);
+            this.add(scrollPane, BorderLayout.CENTER);
+            this.revalidate();
         }
 
         public void updateChatbox(ChatRoomModel chatRoom) {

@@ -41,10 +41,11 @@ public class ClientController {
                 return;
             }
             try {
-                outputStream.writeObject("chat");
-                outputStream.writeObject(new MessageModel(user, currentRoom, message, LocalTime.now(), LocalDate.now()));
-                clientView.updateChatBox((ChatRoomModel) inputStream.readObject());
-            } catch (IOException | ClassNotFoundException ex) {
+                outputStream.writeObject("broadcast");
+                MessageModel msg = new MessageModel(user, currentRoom, message, LocalTime.now(), LocalDate.now());
+                outputStream.writeObject(msg);
+                clientView.addMessage(msg);
+            } catch (IOException ex) {
                 ex.printStackTrace();
             }
             clientView.clearTextArea();
