@@ -5,8 +5,8 @@ import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 
 import server.model.UserModel;
-
-public class AddToContactRoomModel {
+//Adding contact to room
+public class AddContactToRoomModel {
     UserModel user = new UserModel("rawr", "123");
 
     public void addUser(ObjectInputStream inputStream, ObjectOutputStream outputStream, String userName) {
