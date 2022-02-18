@@ -15,7 +15,6 @@ import java.awt.event.ActionListener;
 import java.util.List;
 import java.awt.event.WindowAdapter;
 
-
 public class ClientView extends JFrame {
 
     JPanel mainPanel, contactsPanel;
@@ -38,7 +37,6 @@ public class ClientView extends JFrame {
         this.setLocationRelativeTo(null);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setResizable(false);
-
     }
 
     public String getMessage() {
@@ -82,8 +80,8 @@ public class ClientView extends JFrame {
         chatPanel.addMessage(msg);
     }
 
-    public void actionListenerAdd(ActionListener listener){
-        membersPanel.actionListenerAdd(listener);
+    public void actionListenerAdd(ActionListener listener) {
+        membersPanel.actionListener(listener);
     }
 
     class ChatPanel extends JPanel {
@@ -184,7 +182,6 @@ public class ClientView extends JFrame {
             this.setMaximumSize(new Dimension(200, 500));
         }
 
-
         class ContactButton extends JButton {
             ImageIcon imageIcon;
 
@@ -226,7 +223,6 @@ public class ClientView extends JFrame {
 
             scrollPane = new JScrollPane(panel);
             scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-
 
             settingsPanel = new JPanel(new GridLayout());
             addButton = new JButton(ClientView.scaleIcon("res/graphics/add-user.png"));
@@ -271,9 +267,9 @@ public class ClientView extends JFrame {
                 this.setBackground(Color.WHITE);
             }
         }
-        public void actionListenerAdd(ActionListener listener){
+
+        public void actionListener(ActionListener listener) {
             addButton.addActionListener(listener);
         }
-
     }
 }

@@ -11,33 +11,31 @@ public class AddContactToRoomView extends JFrame {
     JButton addButton = new JButton("Add");
     JComboBox comboBox;
 
-    public AddContactToRoomView(String[] contacts){
-        //Combo box
-        comboBox = new JComboBox(contacts);
+    public AddContactToRoomView(String[] strings) {
+        // Combo box
+        comboBox = new JComboBox(strings);
 
-        //button
         addButton.setFocusable(false);
-
-        //frame details 1
-        this.setPreferredSize(new Dimension(300,100));
+        // frame details 1
+        this.setPreferredSize(new Dimension(300, 100));
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setLayout(new FlowLayout());
 
-        //add to frame
+        // add to frame
         this.add(comboBox);
         this.add(addButton);
 
-        //frame details 2
+        // frame details 2
         this.pack();
         this.setVisible(true);
         this.setLocationRelativeTo(null);
     }
 
-    public void addActionListener(ActionListener listener){
+    public void addActionListener(ActionListener listener) {
         addButton.addActionListener(listener);
     }
 
-    public String getSelected(){
+    public String getSelected() {
         return comboBox.getSelectedItem().toString();
     }
 }
