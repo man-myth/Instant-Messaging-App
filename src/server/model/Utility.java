@@ -6,9 +6,11 @@ import java.util.List;
 
 public class Utility {
 
+
     public static void exportUsersData(List<UserModel> users) {
         try (
                 ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream("res/data.dat"));
+
         ) {
             for (UserModel user : users) {
                 outputStream.writeObject(user);
@@ -18,6 +20,7 @@ public class Utility {
             e.printStackTrace();
         }
     }
+
 
     public static List<UserModel> readUsersData(String filename) {
         List<UserModel> users = new ArrayList<>();

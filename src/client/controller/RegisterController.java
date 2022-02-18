@@ -20,18 +20,31 @@ public class RegisterController {
     private final RegisterModel registerModel;
 
     //Constructor for register controller
-    public RegisterController(ObjectInputStream inputStream, ObjectOutputStream outputStream) {
+    public RegisterController(ObjectInputStream inputStream, ObjectOutputStream outputStream){
         registerView = new RegisterView();
         registerModel = new RegisterModel(inputStream, outputStream);
         registerView.addRegisterListener(e -> {
             String username = registerView.getUsername();
             String password = registerView.getPassword();
             String reEnteredPass = registerView.getConfirmPassword();
-            boolean isUserEmpty = registerModel.isUserEmpty(username); //checks if username field is empty
-            boolean doesPassMatch = registerModel.doesPassMatch(password,reEnteredPass); //checks if passwords match
-            boolean isError = registerView.promptError(isUserEmpty,doesPassMatch); //prompt an error if there is an error
-            registerModel.registerUser(username,password, isError); //registers the user, cancels if there is an error
-            registerView.successRegister(username, isError); //displays a successfully registered message, cancels if there is an error
+
+            //checks if username field is empty
+            boolean isUserEmpty = registerModel.isUserEmpty(username);
+
+            //checks if passwords match
+            boolean doesPassMatch = registerModel.doesPassMatch(password,reEnteredPass);
+
+            //gui method that displays an error if there is an empty username or password mismatch
+            boolean errorExist = registerView.promptError(isUserEmpty,doesPassMatch);
+
+            //registers the user and checks if username already exist, cancels if there is existing an error
+            boolean userValidity =registerModel.registerUser(username,password, errorExist);
+
+            //gui method that displays an error if username already exist, cancels if there is existing an error
+            registerView.isUserValid(userValidity, errorExist);
+
+            //gui method that displays a successfully registered message, cancels if there is existing an error
+            registerView.successRegister(username, errorExist, userValidity);
         });
 
         registerView.setVisible(true);

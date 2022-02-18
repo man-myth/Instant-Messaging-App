@@ -95,6 +95,15 @@ public class ServerModel {
         return clients;
     }
 
+    public static boolean doesUsernameExist(String username){
+        for(UserModel u: registeredUsers){
+            if(u.getUsername().equals(username))
+                return true;
+        }
+        return false;
+    }
+
+
     public void setClients(List<ClientHandlerModel> clients) {
         this.clients = clients;
     }

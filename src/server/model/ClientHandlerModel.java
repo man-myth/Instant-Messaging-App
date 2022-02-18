@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.List;
 
 public class ClientHandlerModel implements Runnable {
     private final Socket clientSocket;
@@ -39,6 +40,7 @@ public class ClientHandlerModel implements Runnable {
                     } else if (input.equals("register")) {
                         System.out.println("Attempting to register.");
                         input = inputStream.readObject();
+
                         ServerModel.addRegisteredUser((UserModel) input);
                         Utility.exportUsersData(ServerModel.getRegisteredUsers());
 
@@ -49,6 +51,19 @@ public class ClientHandlerModel implements Runnable {
                         Utility.exportPublicChat(publicChat);
 
                         outputStream.writeObject(publicChat);
+
+                        UserModel newUser = (UserModel) input;
+
+                        //if username already exists, prompt a message
+                        if (ServerModel.doesUsernameExist(newUser.getUsername()))
+                            outputStream.writeObject("invalid");
+
+                        else {
+                            ServerModel.addRegisteredUser(newUser);
+                            Utility.exportUsersData(ServerModel.getRegisteredUsers());
+                            outputStream.writeObject("registered");
+                        }
+
                     }
                 }
             } catch (ClassNotFoundException e) {
