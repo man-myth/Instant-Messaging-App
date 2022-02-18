@@ -3,12 +3,14 @@ package client.controller;
 import client.model.LoginModel;
 import client.view.ExitOnCloseAdapter;
 import client.view.LoginView;
+import server.model.ChatRoomModel;
 import server.model.UserModel;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.List;
 
 public class LoginController {
     private RegisterController register;
@@ -22,33 +24,6 @@ public class LoginController {
 
     public LoginController() {
         loginView = new LoginView();
-
-        loginView.loginButton.addActionListener(e -> {
-            try {
-                outputStream.writeObject("login");
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            }
-            String username = loginView.usernameTextField.getText();
-            String password = loginView.passwordTextField.getText();
-
-            if (loginModel.isUser(username, password)) {
-                System.out.println("Logged in!");
-                try {
-                    new ClientController(inputStream, outputStream, (UserModel) inputStream.readObject()).run();
-                } catch (IOException ex) {
-                    ex.printStackTrace();
-                } catch (ClassNotFoundException ex) {
-                    ex.printStackTrace();
-                }
-            } else {
-                System.out.println("Failed to log in.");
-            }
-        });
-
-        loginView.registerButton.addActionListener(e -> {
-            register = new RegisterController(inputStream, outputStream);
-        });
         //log in
         //if the users clicked the register button, open the registerController
         // then show the Login GUI again
@@ -61,6 +36,36 @@ public class LoginController {
             inputStream = new ObjectInputStream(socket.getInputStream());
             outputStream = new ObjectOutputStream(socket.getOutputStream());
             loginModel = new LoginModel(inputStream, outputStream);
+
+            loginView.loginButton.addActionListener(e -> {
+                try {
+                    outputStream.writeObject("login");
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
+                String username = loginView.usernameTextField.getText();
+                String password = loginView.passwordTextField.getText();
+
+                if (loginModel.isUser(username, password)) {
+                    System.out.println("Logged in!");
+                    try {
+                        loginView.dispose();
+                        ClientController clientController = new ClientController(socket, inputStream, outputStream, (UserModel) inputStream.readObject(), (ChatRoomModel) inputStream.readObject());
+                        clientController.run();
+                    } catch (IOException ex) {
+                        ex.printStackTrace();
+                    } catch (ClassNotFoundException ex) {
+                        ex.printStackTrace();
+                    }
+                } else {
+                    System.out.println("Failed to log in.");
+                }
+            });
+
+            loginView.registerButton.addActionListener(e -> {
+                register = new RegisterController(inputStream, outputStream);
+            });
+
             loginView.setWindowAdapter(new ExitOnCloseAdapter(socket));
             loginView.setVisible(true);
         } catch (IOException e) {

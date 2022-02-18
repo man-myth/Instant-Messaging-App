@@ -6,11 +6,13 @@ import java.util.List;
 
 public class Utility {
 
-    public static void exportData(List<UserModel> users){
-        try(
-                ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream(new File("res/data.dat")));
+
+    public static void exportUsersData(List<UserModel> users) {
+        try (
+                ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream("res/data.dat"));
+
         ) {
-            for(UserModel user: users){
+            for (UserModel user : users) {
                 outputStream.writeObject(user);
             }
 
@@ -19,17 +21,18 @@ public class Utility {
         }
     }
 
-    public static List<UserModel> readData(String filename){
+
+    public static List<UserModel> readUsersData(String filename) {
         List<UserModel> users = new ArrayList<>();
-        try(
-                ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(new File(filename)));
+        try (
+                ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(filename));
         ) {
             UserModel u;
-            while (true){
+            while (true) {
                 try {
-                    u = (UserModel)inputStream.readObject();
+                    u = (UserModel) inputStream.readObject();
                     users.add(u);
-                } catch (EOFException e){
+                } catch (EOFException e) {
                     break;
                 }
             }
@@ -37,5 +40,23 @@ public class Utility {
             e.printStackTrace();
         }
         return users;
+    }
+
+    public static ChatRoomModel readPublicChat(String filename) {
+        ChatRoomModel publicChat = null;
+        try (ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(filename))) {
+            publicChat = (ChatRoomModel) inputStream.readObject();
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return publicChat;
+    }
+
+    public static void exportPublicChat(ChatRoomModel publicChat) {
+        try (ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream("res/publicChat.dat"))) {
+            outputStream.writeObject(publicChat);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
