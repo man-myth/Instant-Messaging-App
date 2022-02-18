@@ -4,14 +4,14 @@ import server.model.UserModel;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
 public class AddContactToRoomView extends JFrame {
     JButton addButton = new JButton("Add");
 
-    AddContactToRoomView(){
+    AddContactToRoomView(String contacts){
         //Combo box
-        UserModel[] user = {new UserModel("matt","hi"),new UserModel("wat","low")};
         String[] test = {"hi", "hello"};
         JComboBox comboBox = new JComboBox(test);
 
@@ -30,9 +30,8 @@ public class AddContactToRoomView extends JFrame {
         this.setLocationRelativeTo(null);
     }
 
-    public static void main(String[] args) {
-        AddContactToRoomView view = new AddContactToRoomView();
-
+    public void addActionListener(ActionListener listener){
+        addButton.addActionListener(listener);
     }
 
 }
