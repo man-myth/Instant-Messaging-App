@@ -17,6 +17,7 @@ public class AddContactToRoomController {
         view.addActionListener((e) -> {
             String username = view.getSelected();
             model.addUser(inputStream, outputStream, username);
+            view.successMessage();
         });
     }
 

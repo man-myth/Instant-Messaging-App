@@ -3,16 +3,12 @@ package client.model;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
-
-import server.model.UserModel;
 //Adding contact to room
 public class AddContactToRoomModel {
-    UserModel user = new UserModel("rawr", "123");
-
     public void addUser(ObjectInputStream inputStream, ObjectOutputStream outputStream, String userName) {
         try {
             outputStream.writeObject("add contact to room");
-            // to do ; add user to chat room
+            //todo ; add user to chat room
             if (inputStream.readObject().equals("done")) {
                 System.out.println("rawr");
             }

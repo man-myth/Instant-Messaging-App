@@ -15,10 +15,11 @@ public class AddContactToRoomView extends JFrame {
         // Combo box
         comboBox = new JComboBox(strings);
 
+        //buttons
         addButton.setFocusable(false);
+
         // frame details 1
         this.setPreferredSize(new Dimension(300, 100));
-        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setLayout(new FlowLayout());
 
         // add to frame
@@ -29,10 +30,16 @@ public class AddContactToRoomView extends JFrame {
         this.pack();
         this.setVisible(true);
         this.setLocationRelativeTo(null);
+        this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
     }
 
     public void addActionListener(ActionListener listener) {
         addButton.addActionListener(listener);
+    }
+
+    public void successMessage(){
+        JOptionPane.showMessageDialog(null, "Successfully added user "+getSelected(), "Added", JOptionPane.INFORMATION_MESSAGE);
+        this.dispose();
     }
 
     public String getSelected() {
