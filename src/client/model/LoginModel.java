@@ -19,6 +19,7 @@ public class LoginModel {
             String message = "";
             outputStream.writeObject(username);
             outputStream.writeObject(password);
+            System.out.println("hellooooooo");
             while (true) {
                 message = (String) inputStream.readObject();
                 if (message.equals("VERIFIED")) {

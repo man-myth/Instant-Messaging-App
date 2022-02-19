@@ -1,25 +1,7 @@
-import client.controller.ClientController;
 import client.controller.LoginController;
-import client.model.ClientModel;
-import server.model.ChatRoomModel;
-import server.model.MessageModel;
-import server.model.UserModel;
-import server.controller.AdminController;
-import server.model.Utility;
 
-import java.net.Socket;
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.List;
 
-public class Client { // hello
-
-    private static LoginController logInController;
-    private static ClientController clientController;
-    private static AdminController adminController;
-    private static UserModel user;
-    private static Socket socket;
+public class Client {
 
     public static void main(String[] args) {
         //List users = new ArrayList<>();

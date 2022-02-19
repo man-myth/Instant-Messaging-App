@@ -6,11 +6,8 @@ import client.view.LoginView;
 import server.model.ChatRoomModel;
 import server.model.UserModel;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.net.Socket;
-import java.util.List;
 
 public class LoginController {
     private RegisterController register;
@@ -33,8 +30,11 @@ public class LoginController {
     public void run() {
         try {
             socket = new Socket("localhost", PORT);
-            inputStream = new ObjectInputStream(socket.getInputStream());
+            socket.setTcpNoDelay(true);
             outputStream = new ObjectOutputStream(socket.getOutputStream());
+            outputStream.flush();
+            inputStream = new ObjectInputStream(socket.getInputStream());
+
             loginModel = new LoginModel(inputStream, outputStream);
 
             loginView.loginButton.addActionListener(e -> {
