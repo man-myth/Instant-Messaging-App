@@ -46,6 +46,7 @@ public class Utility {
         ChatRoomModel publicChat = null;
         try (ObjectInputStream inputStream = new ObjectInputStream(new BufferedInputStream(new FileInputStream(filename)))) {
             publicChat = (ChatRoomModel) inputStream.readObject();
+            publicChat.setUsers(readUsersData("res/data.dat"));
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
         }
