@@ -1,5 +1,6 @@
 package server.model;
 
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -17,10 +18,9 @@ public class ClientHandlerModel implements Runnable {
         try (ObjectOutputStream outputStream = new ObjectOutputStream(clientSocket.getOutputStream());
                 ObjectInputStream inputStream = new ObjectInputStream(clientSocket.getInputStream());) {
             AuthenticatorModel authenticate;
-
+            UserModel currentUser = new UserModel();
             try {
                 Object input;
-                UserModel currentUser = null;
                 while (true) {
                     input = inputStream.readObject();
                     System.out.println(input);
@@ -30,6 +30,7 @@ public class ClientHandlerModel implements Runnable {
                         String username = (String) inputStream.readObject();
                         String password = (String) inputStream.readObject();
                         System.out.printf("Attempting to login with username:%s and password:%s\n", username, password);
+
                         if (authenticate.verifyUser(username, password)) {
                             System.out.println("Success!");
                             outputStream.writeObject("VERIFIED");
@@ -82,9 +83,14 @@ public class ClientHandlerModel implements Runnable {
                 System.out.println(clientSocket + "has disconnected.");
                 clientSocket.close();
                 // e.printStackTrace();
+            } catch (EOFException e1){
+                System.out.println(clientSocket + "has disconnected.");
+                clientSocket.close();
+                currentUser.setActive(false);
             }
         } catch (IOException e) {
             e.printStackTrace();
+
         }
     }
 

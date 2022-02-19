@@ -24,7 +24,8 @@ public class UserModel implements Serializable {
         this.isActive = false;
     }
 
-    public UserModel(UserModel userModel) {
+    public UserModel() {
+
     }
 
     public String getUsername() {
