@@ -77,9 +77,11 @@ public class ClientHandlerModel implements Runnable {
                     UserModel user = (UserModel) inputStream.readObject();
                     outputStream.writeObject("done adding contact");
                     // to do add user to chat room
+                } else if (input.equals("add contact")) {
+                    String username = (String) inputStream.readObject();
                 }
 
-                // Changes: removed input.equals("get contacts") since ClientModel.user already has a contact list
+                // Changes: Removed input.equals("get contacts") since ClientModel.user already has a contact list
 
             }
         } catch (ClassNotFoundException | IOException e) {
