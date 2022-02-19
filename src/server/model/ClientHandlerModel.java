@@ -8,7 +8,7 @@ public class ClientHandlerModel implements Runnable {
     private final Socket clientSocket;
     ObjectOutputStream outputStream;
     ObjectInputStream inputStream;
-    private UserModel currentUser ;
+
     public ClientHandlerModel(Socket socket) {
         this.clientSocket = socket;
         try {
@@ -22,7 +22,7 @@ public class ClientHandlerModel implements Runnable {
     }
 
     public void run() {
-        currentUser = new UserModel();
+        UserModel currentUser = new UserModel();
         try {
             while (true) {
                 Object input;
