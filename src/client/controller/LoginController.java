@@ -48,6 +48,7 @@ public class LoginController {
 
                 if (loginModel.isUser(username, password)) {
                     System.out.println("Logged in!");
+                    loginView.dispose();
                     try {
                         loginView.dispose();
                         ClientController clientController = new ClientController(socket, inputStream, outputStream, (UserModel) inputStream.readObject(), (ChatRoomModel) inputStream.readObject());
