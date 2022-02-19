@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.stream.*;
 
 public class ServerModel {
     private static final int PORT = 2022;
@@ -102,8 +103,15 @@ public class ServerModel {
         return false;
     }
 
-
     public void setClients(List<ClientHandlerModel> clients) {
         this.clients = clients;
     }
+    // Method to find a member based on username and returns a list
+    public List<UserModel> findMember(String search, List<UserModel> user){
+        return registeredUsers.stream().filter(userModel -> checkStringForMatches(userModel.getUsername(), search)).toList();
+    }
+    private boolean checkStringForMatches(String word, String substring){
+        return word.toLowerCase().contains(substring.toLowerCase());
+    }
+
 }
