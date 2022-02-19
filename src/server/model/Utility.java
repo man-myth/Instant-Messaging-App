@@ -25,7 +25,7 @@ public class Utility {
     public static List<UserModel> readUsersData(String filename) {
         List<UserModel> users = new ArrayList<>();
         try (
-                ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(filename));
+                ObjectInputStream inputStream = new ObjectInputStream(new BufferedInputStream(new FileInputStream(filename)));
         ) {
             UserModel u;
             while (true) {
@@ -44,7 +44,7 @@ public class Utility {
 
     public static ChatRoomModel readPublicChat(String filename) {
         ChatRoomModel publicChat = null;
-        try (ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(filename))) {
+        try (ObjectInputStream inputStream = new ObjectInputStream(new BufferedInputStream(new FileInputStream(filename)))) {
             publicChat = (ChatRoomModel) inputStream.readObject();
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();

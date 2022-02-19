@@ -48,14 +48,6 @@ public class ClientView extends JFrame {
         chatPanel.getMessageTextArea().setText("");
     }
 
-    public void updateChatBox(ChatRoomModel chatRoom) {
-        mainPanel.remove(chatPanel);
-        chatPanel = new ChatPanel(chatRoom);
-        mainPanel.add(chatPanel, BorderLayout.CENTER);
-        mainPanel.revalidate();
-        mainPanel.repaint();
-    }
-
     public void setWindowAdapter(WindowAdapter adapter) {
         this.addWindowListener(adapter);
     }
@@ -118,12 +110,6 @@ public class ClientView extends JFrame {
             scrollPane = new JScrollPane(content);
             this.add(scrollPane, BorderLayout.CENTER);
             this.revalidate();
-        }
-
-        public void updateChatbox(ChatRoomModel chatRoom) {
-
-            this.removeAll();
-
         }
 
         public void addText(JTextPane pane, String text) {

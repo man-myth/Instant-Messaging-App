@@ -4,6 +4,7 @@ import client.controller.ClientController;
 import client.model.ClientModel;
 
 import java.io.*;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -19,15 +20,11 @@ public class ServerModel {
 
     static List<UserModel> registeredUsers;
     static ChatRoomModel publicChat;
-    List<ClientHandlerModel> clients;
-    List<String> activeUsers;
+    static List<ClientHandlerModel> clients;
 
     public ServerModel(List<UserModel> registeredUsers, ChatRoomModel publicChat) {
         this.registeredUsers = registeredUsers;
         this.publicChat = publicChat;
-        for (UserModel user : registeredUsers) {
-            System.out.println(user);
-        }
     }
 
     public void run() {
@@ -36,7 +33,7 @@ public class ServerModel {
         try {
             serverSocket = new ServerSocket(PORT);
             serverSocket.setReuseAddress(true);
-            pool = Executors.newFixedThreadPool(2);
+            pool = Executors.newFixedThreadPool(50);
             System.out.println("[SERVER]: Started.");
         } catch (IOException e) {
             e.printStackTrace();
@@ -46,12 +43,11 @@ public class ServerModel {
             try {
                 // Accept client connection
                 clientSocket = serverSocket.accept();
+                //clientSocket.setTcpNoDelay(true);
                 System.out.println("[SERVER]: Client connected: " + clientSocket);
                 ClientHandlerModel clientHandler = new ClientHandlerModel(clientSocket);
                 clients.add(clientHandler);
-                //activeUsers.add(clientHandler.getUsername());
                 pool.execute(clientHandler);
-
             } catch (IOException e) {
                 e.printStackTrace();
             }
