@@ -15,10 +15,11 @@ import java.awt.event.ActionListener;
 import java.util.List;
 import java.awt.event.WindowAdapter;
 
-
 public class ClientView extends JFrame {
 
-    JPanel mainPanel, contactsPanel, membersPanel;
+    JPanel mainPanel, contactsPanel;
+    //Changes: Jpanel -> MembersPanel
+    MembersPanel membersPanel;
     ChatPanel chatPanel;
     static Font headingFont = new Font("Calibri", Font.PLAIN, 20);
 
@@ -80,6 +81,9 @@ public class ClientView extends JFrame {
         chatPanel.addMessage(msg);
     }
 
+    public void actionListenerAdd(ActionListener listener) {
+        membersPanel.actionListener(listener);
+    }
 
     class ChatPanel extends JPanel {
         JLabel roomName;
@@ -179,7 +183,6 @@ public class ClientView extends JFrame {
             this.setMaximumSize(new Dimension(200, 500));
         }
 
-
         class ContactButton extends JButton {
             ImageIcon imageIcon;
 
@@ -221,7 +224,6 @@ public class ClientView extends JFrame {
 
             scrollPane = new JScrollPane(panel);
             scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-
 
             settingsPanel = new JPanel(new GridLayout());
             addButton = new JButton(ClientView.scaleIcon("res/graphics/add-user.png"));
@@ -265,6 +267,10 @@ public class ClientView extends JFrame {
                 this.setHorizontalAlignment(SwingConstants.LEFT);
                 this.setBackground(Color.WHITE);
             }
+        }
+
+        public void actionListener(ActionListener listener) {
+            addButton.addActionListener(listener);
         }
     }
 }
