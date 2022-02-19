@@ -18,10 +18,13 @@ public class ClientHandlerModel implements Runnable {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
     }
 
     public void run() {
+        for (UserModel user : ServerModel.getRegisteredUsers()) {
+            System.out.println(user);
+        }
+
         UserModel currentUser = new UserModel();
         try {
             while (true) {
@@ -40,7 +43,7 @@ public class ClientHandlerModel implements Runnable {
                         writeObject(ServerModel.getPublicChat());
                     } else {
                         System.out.println("Failed.");
-                        outputStream.writeObject(" ");
+                        outputStream.writeObject("FAILED");
                     }
                 } else if (input.equals("register")) {
                     System.out.println("Attempting to register.");
@@ -68,25 +71,15 @@ public class ClientHandlerModel implements Runnable {
                         }
                         client.writeObject("broadcast");
                         client.writeObject(newMessage);
-
                     }
                     // Testing
-                } else if (input.equals("get contacts")) {
-                    List<UserModel> contacts = currentUser.getContacts();
-                    // testing only
-                    contacts.add(new UserModel("testing", "123"));
-                    contacts.add(new UserModel("testing1", "123"));
-                    contacts.add(new UserModel("testing2", "123"));
-                    for (UserModel u : contacts) {
-                        outputStream.writeObject(u.getUsername());
-                    }
-                    outputStream.writeObject("done");
-
-                    //Adding contact to room
                 } else if (input.equals("add contact to room")) {
-                    outputStream.writeObject("done");
+                    UserModel user = (UserModel) inputStream.readObject();
+                    outputStream.writeObject("done adding contact");
                     // to do add user to chat room
                 }
+
+                // Changes: removed input.equals("get contacts") since ClientModel.user already has a contact list
 
             }
         } catch (ClassNotFoundException | IOException e) {
