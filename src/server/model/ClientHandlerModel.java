@@ -26,13 +26,10 @@ public class ClientHandlerModel implements Runnable {
             while (true) {
                 Object input;
                 input = inputStream.readObject();
-                System.out.print("read: ");
-                System.out.println(input);
+                UserModel currentUser = null;
 
                 if (input.equals("login")) {
-                    System.out.println("at");
-                    AuthenticatorModel authenticate;
-                    authenticate = new AuthenticatorModel(inputStream, outputStream, ServerModel.getRegisteredUsers());
+                    AuthenticatorModel authenticate = new AuthenticatorModel(inputStream, outputStream, ServerModel.getRegisteredUsers());
                     String username = (String) inputStream.readObject();
                     String password = (String) inputStream.readObject();
                     System.out.printf("Attempting to login with username:%s and password:%s\n", username, password);
@@ -40,6 +37,7 @@ public class ClientHandlerModel implements Runnable {
                         System.out.println("Success!");
                         writeObject("VERIFIED");
                         writeObject(getUserFromList(username, password));
+                        currentUser = getUserFromList(username, password);
                         writeObject(ServerModel.getPublicChat());
                     } else {
                         System.out.println("Failed.");
@@ -47,20 +45,16 @@ public class ClientHandlerModel implements Runnable {
                 } else if (input.equals("register")) {
                     System.out.println("Attempting to register.");
                     input = inputStream.readObject();
-
-                    ServerModel.addRegisteredUser((UserModel) input);
-                    Utility.exportUsersData(ServerModel.getRegisteredUsers());
-
                     UserModel newUser = (UserModel) input;
 
-                    //if username already exists, prompt a message
+                    // if username already exists, prompt a message
                     if (ServerModel.doesUsernameExist(newUser.getUsername()))
-                        writeObject("invalid");
+                        outputStream.writeObject("invalid");
 
                     else {
                         ServerModel.addRegisteredUser(newUser);
                         Utility.exportUsersData(ServerModel.getRegisteredUsers());
-                        writeObject("registered");
+                        outputStream.writeObject("registered");
                     }
                 } else if (input.equals("broadcast")) {
                     ChatRoomModel publicChat = ServerModel.publicChat;
@@ -74,8 +68,24 @@ public class ClientHandlerModel implements Runnable {
                         }
                         client.writeObject("broadcast");
                         client.writeObject(newMessage);
+
                     }
-                    //outputStream.writeObject(publicChat);
+                    // Testing
+                } else if (input.equals("get contacts")) {
+                    List<UserModel> contacts = currentUser.getContacts();
+                    // testing only
+                    contacts.add(new UserModel("testing", "123"));
+                    contacts.add(new UserModel("testing1", "123"));
+                    contacts.add(new UserModel("testing2", "123"));
+                    for (UserModel u : contacts) {
+                        outputStream.writeObject(u.getUsername());
+                    }
+                    outputStream.writeObject("done");
+
+                    //Adding contact to room
+                } else if (input.equals("add contact to room")) {
+                    outputStream.writeObject("done");
+                    // to do add user to chat room
                 }
 
 
@@ -107,6 +117,8 @@ public class ClientHandlerModel implements Runnable {
 
 
     public UserModel getUserFromList(String username, String password) {
-        return ServerModel.registeredUsers.stream().filter(user -> username.equals(user.getUsername()) && password.equals(user.password)).findAny().orElse(null);
+        return ServerModel.registeredUsers.stream()
+                .filter(user -> username.equals(user.getUsername()) && password.equals(user.password)).findAny()
+                .orElse(null);
     }
 }

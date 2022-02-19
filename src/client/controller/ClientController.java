@@ -25,7 +25,8 @@ public class ClientController {
     ClientView clientView;
     ClientModel clientModel;
 
-    public ClientController(Socket socket, ObjectInputStream inputStream, ObjectOutputStream outputStream, UserModel user, ChatRoomModel publicChat) {
+    public ClientController(Socket socket, ObjectInputStream inputStream, ObjectOutputStream outputStream,
+            UserModel user, ChatRoomModel publicChat) {
         this.socket = socket;
         this.inputStream = inputStream;
         this.outputStream = outputStream;
@@ -37,6 +38,9 @@ public class ClientController {
         System.out.println("Logged in with user: " + clientModel.getUser());
         clientView = new ClientView(clientModel.getUser(), currentRoom);
         clientView.setWindowAdapter(new ExitOnCloseAdapter(socket));
+        clientView.actionListenerAdd(e -> {
+            AddContactToRoomController addContact = new AddContactToRoomController(inputStream, outputStream);
+        });
         clientView.setMessageListener(e -> {
             addMessage();
         });
