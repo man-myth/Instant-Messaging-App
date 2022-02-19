@@ -31,7 +31,7 @@ public class AddContactToRoomView extends JFrame {
         this.setLocationRelativeTo(null);
     }
 
-    public void addActionListener(ActionListener listener) {
+    public void setAddButtonActionListener(ActionListener listener) {
         addButton.addActionListener(listener);
     }
 

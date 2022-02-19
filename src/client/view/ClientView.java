@@ -2,7 +2,6 @@ package client.view;
 
 import server.model.ChatRoomModel;
 import server.model.MessageModel;
-import server.model.ServerModel;
 import server.model.UserModel;
 
 import javax.swing.*;
@@ -73,8 +72,8 @@ public class ClientView extends JFrame {
         chatPanel.addMessage(msg);
     }
 
-    public void actionListenerAdd(ActionListener listener) {
-        membersPanel.actionListener(listener);
+    public void setAddButtonActionListener(ActionListener listener) {
+        membersPanel.setAddButtonActionListener(listener);
     }
 
     class ChatPanel extends JPanel {
@@ -255,7 +254,7 @@ public class ClientView extends JFrame {
             }
         }
 
-        public void actionListener(ActionListener listener) {
+        public void setAddButtonActionListener(ActionListener listener) {
             addButton.addActionListener(listener);
         }
     }
