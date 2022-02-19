@@ -90,7 +90,7 @@ public class ClientHandlerModel implements Runnable {
 
     public UserModel getUserFromList(String username, String password) {
         return ServerModel.registeredUsers.stream()
-                .filter(user -> username.equals(user.getUsername()) && password.equals(user.password)).findAny()
+                .filter(user -> username.equals(user.getUsername()) && password.equals(user.getPassword())).findAny()
                 .orElse(null);
     }
 }

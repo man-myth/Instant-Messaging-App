@@ -18,12 +18,13 @@ public class AuthenticatorModel {
     }
 
     /***
-     * Checks if user is in the database
+     * This method checks if login credentials are valid
      * @return
      */
     public boolean verifyUser(String username, String password) {
         for (UserModel user : users) {
-            if (user.getUsername().compareTo(username) == 0 && user.getPassword().compareTo(password) == 0) {
+            if (user.getUsername().compareTo(username) == 0 && user.getPassword().compareTo(password) == 0 & !user.isActive()){
+                user.setActive(true);
                 return true;
             }
         }

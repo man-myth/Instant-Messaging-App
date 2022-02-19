@@ -6,13 +6,14 @@ import java.util.Comparator;
 import java.util.List;
 
 public class UserModel implements Serializable {
-    String username;
-    String password;
-    String status;
-    List<UserModel> contacts;
-    List<UserModel> bookmarks;
-    List<ChatRoomModel> chatRooms;
-    List<MessageModel> unreadMessages;
+    private String username;
+    private String password;
+    private String status;
+    private Boolean isActive;
+    private List<UserModel> contacts;
+    private List<UserModel> bookmarks;
+    private List<ChatRoomModel> chatRooms;
+    private List<MessageModel> unreadMessages;
 
     public UserModel(String username, String password) {
         this.username = username;
@@ -20,6 +21,7 @@ public class UserModel implements Serializable {
         this.status = "";
         this.contacts = new ArrayList<>();
         this.chatRooms = new ArrayList<>();
+        this.isActive = false;
     }
 
     public UserModel(UserModel userModel) {
@@ -79,6 +81,14 @@ public class UserModel implements Serializable {
 
     public void setUnreadMessages(List<MessageModel> unreadMessages) {
         this.unreadMessages = unreadMessages;
+    }
+
+    public Boolean isActive() {
+        return isActive;
+    }
+
+    public void setActive(Boolean active) {
+        isActive = active;
     }
 
     //sorts the names of the given list

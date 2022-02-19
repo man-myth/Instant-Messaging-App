@@ -1,6 +1,7 @@
 package server.model;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 public class ChatRoomModel implements Serializable {
@@ -13,6 +14,8 @@ public class ChatRoomModel implements Serializable {
      */
     public ChatRoomModel(String name) {
         this.name = name;
+        this.users = new ArrayList<>();
+        this.chatHistory = new ArrayList<>();
     }
 
     public ChatRoomModel(String name, List<UserModel> users, List<MessageModel> chatHistory) {

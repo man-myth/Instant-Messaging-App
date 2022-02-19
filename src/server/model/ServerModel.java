@@ -20,6 +20,7 @@ public class ServerModel {
     static List<UserModel> registeredUsers;
     static ChatRoomModel publicChat;
     List<ClientHandlerModel> clients;
+    List<String> activeUsers;
 
     public ServerModel(List<UserModel> registeredUsers, ChatRoomModel publicChat) {
         this.registeredUsers = registeredUsers;
@@ -48,7 +49,9 @@ public class ServerModel {
                 System.out.println("[SERVER]: Client connected: " + clientSocket);
                 ClientHandlerModel clientHandler = new ClientHandlerModel(clientSocket);
                 clients.add(clientHandler);
+                //activeUsers.add(clientHandler.getUsername());
                 pool.execute(clientHandler);
+
             } catch (IOException e) {
                 e.printStackTrace();
             }
