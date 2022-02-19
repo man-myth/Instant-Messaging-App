@@ -8,7 +8,7 @@ public class ClientHandlerModel implements Runnable {
     private final Socket clientSocket;
     ObjectOutputStream outputStream;
     ObjectInputStream inputStream;
-
+    private UserModel currentUser ;
     public ClientHandlerModel(Socket socket) {
         this.clientSocket = socket;
         try {
@@ -22,11 +22,12 @@ public class ClientHandlerModel implements Runnable {
     }
 
     public void run() {
+        currentUser = new UserModel();
         try {
             while (true) {
                 Object input;
                 input = inputStream.readObject();
-                UserModel currentUser = null;
+                //UserModel currentUser = null;
 
                 if (input.equals("login")) {
                     AuthenticatorModel authenticate = new AuthenticatorModel(inputStream, outputStream, ServerModel.getRegisteredUsers());
@@ -88,22 +89,21 @@ public class ClientHandlerModel implements Runnable {
                     // to do add user to chat room
                 }
 
-
             }
         } catch (ClassNotFoundException | IOException e) {
             System.out.println(clientSocket + "has disconnected.");
+            currentUser.setActive(false);
             //e.printStackTrace();
             try {
                 clientSocket.close();
             } catch (IOException ex) {
                 ex.printStackTrace();
                 // e.printStackTrace();
-            } catch (EOFException e1){
-                System.out.println(clientSocket + "has disconnected.");
-                clientSocket.close();
-                currentUser.setActive(false);
             }
-        }
+        } /*catch (EOFException e1){
+            System.out.println(clientSocket + "has disconnected.");
+            currentUser.setActive(false);
+        }*/
 
     }
 
