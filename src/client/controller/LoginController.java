@@ -6,11 +6,8 @@ import client.view.LoginView;
 import server.model.ChatRoomModel;
 import server.model.UserModel;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.net.Socket;
-import java.util.List;
 
 public class LoginController {
     private RegisterController register;
@@ -33,8 +30,11 @@ public class LoginController {
     public void run() {
         try {
             socket = new Socket("localhost", PORT);
-            inputStream = new ObjectInputStream(socket.getInputStream());
+            socket.setTcpNoDelay(true);
             outputStream = new ObjectOutputStream(socket.getOutputStream());
+            outputStream.flush();
+            inputStream = new ObjectInputStream(socket.getInputStream());
+
             loginModel = new LoginModel(inputStream, outputStream);
 
             loginView.loginButton.addActionListener(e -> {
@@ -48,8 +48,8 @@ public class LoginController {
 
                 if (loginModel.isUser(username, password)) {
                     System.out.println("Logged in!");
+                    loginView.dispose();
                     try {
-                        loginView.dispose();
                         ClientController clientController = new ClientController(socket, inputStream, outputStream, (UserModel) inputStream.readObject(), (ChatRoomModel) inputStream.readObject());
                         clientController.run();
                     } catch (IOException ex) {
@@ -59,6 +59,9 @@ public class LoginController {
                     }
                 } else {
                     System.out.println("Failed to log in.");
+                    loginView.dispose();
+                    LoginController login = new LoginController();
+                    login.run();
                 }
             });
 

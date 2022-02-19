@@ -2,6 +2,7 @@ package client.model;
 
 import client.controller.LoginController;
 import server.model.MessageModel;
+import server.model.UserModel;
 
 import java.io.*;
 import java.net.Socket;
@@ -13,21 +14,21 @@ public class ClientModel implements Runnable {
     final private Socket clientSocket;
     private ObjectInputStream inputStream;
     final private ObjectOutputStream outputStream;
-    List<MessageModel> chatHistory;
+    UserModel user;
 
-
-    public ClientModel(Socket clientSocket, ObjectInputStream inputStream, ObjectOutputStream outputStream, List<MessageModel> chatHistory) {
+    public ClientModel(Socket clientSocket, ObjectInputStream inputStream, ObjectOutputStream outputStream, UserModel user) {
         this.clientSocket = clientSocket;
         this.inputStream = inputStream;
         this.outputStream = outputStream;
-        this.chatHistory = chatHistory;
+        this.user = user;
     }
 
     @Override
     public void run() {
         //MessageModel messageReceived;
-        String msg;
-        /*
+        Object msg;
+        System.out.println("hi!");
+
         while (true) {
             try {
                 // receive the string
@@ -41,22 +42,19 @@ public class ClientModel implements Runnable {
 //                    this.clientSocket.close();
 //                    break;
 //                }
-                msg = (String) inputStream.readObject();
+                msg = inputStream.readObject();
 
-                System.out.println(clientSocket.getInetAddress() +": " + msg);
             } catch (IOException | ClassNotFoundException e) {
                 e.printStackTrace();
             }
         }
+    }
 
-         */
+    public UserModel getUser() {
+        return user;
+    }
 
-//        try {
-//            inputStream.close();
-//            outputStream.close();
-//
-//        }catch(IOException e){
-//            e.printStackTrace();
-//        }
+    public void setUser(UserModel user) {
+        this.user = user;
     }
 }

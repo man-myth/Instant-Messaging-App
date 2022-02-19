@@ -4,12 +4,14 @@ import client.controller.ClientController;
 import client.model.ClientModel;
 
 import java.io.*;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.stream.*;
 
 public class ServerModel {
     private static final int PORT = 2022;
@@ -19,14 +21,11 @@ public class ServerModel {
 
     static List<UserModel> registeredUsers;
     static ChatRoomModel publicChat;
-    List<ClientHandlerModel> clients;
+    static List<ClientHandlerModel> clients;
 
     public ServerModel(List<UserModel> registeredUsers, ChatRoomModel publicChat) {
         this.registeredUsers = registeredUsers;
         this.publicChat = publicChat;
-        for (UserModel user : registeredUsers) {
-            System.out.println(user);
-        }
     }
 
     public void run() {
@@ -35,7 +34,7 @@ public class ServerModel {
         try {
             serverSocket = new ServerSocket(PORT);
             serverSocket.setReuseAddress(true);
-            pool = Executors.newFixedThreadPool(2);
+            pool = Executors.newFixedThreadPool(50);
             System.out.println("[SERVER]: Started.");
         } catch (IOException e) {
             e.printStackTrace();
@@ -45,6 +44,7 @@ public class ServerModel {
             try {
                 // Accept client connection
                 clientSocket = serverSocket.accept();
+                //clientSocket.setTcpNoDelay(true);
                 System.out.println("[SERVER]: Client connected: " + clientSocket);
                 ClientHandlerModel clientHandler = new ClientHandlerModel(clientSocket);
                 clients.add(clientHandler);
@@ -103,8 +103,15 @@ public class ServerModel {
         return false;
     }
 
-
     public void setClients(List<ClientHandlerModel> clients) {
         this.clients = clients;
     }
+    // Method to find a member based on username and returns a list
+    public List<UserModel> findMember(String search, List<UserModel> user){
+        return registeredUsers.stream().filter(userModel -> checkStringForMatches(userModel.getUsername(), search)).toList();
+    }
+    private boolean checkStringForMatches(String word, String substring){
+        return word.toLowerCase().contains(substring.toLowerCase());
+    }
+
 }
