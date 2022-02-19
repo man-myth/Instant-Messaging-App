@@ -16,16 +16,14 @@ public class LoginModel {
 
     public boolean isUser(String username, String password) {
         try {
-            String message = "";
             outputStream.writeObject(username);
             outputStream.writeObject(password);
-            System.out.println("hellooooooo");
-            while (true) {
-                message = (String) inputStream.readObject();
-                if (message.equals("VERIFIED")) {
-                    return true;
-                }
+            String message = (String) inputStream.readObject();
+            if (message.equals("VERIFIED")) {
+                System.out.println("hellooooooo");
+                return true;
             }
+
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
         }

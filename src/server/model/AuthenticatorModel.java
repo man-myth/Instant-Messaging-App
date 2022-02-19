@@ -21,7 +21,7 @@ public class AuthenticatorModel {
      * This method checks if login credentials are valid
      * @return
      */
-    public boolean verifyUser(String username, String password) {
+    public boolean verifyUser(String username, String password) throws IOException {
         for (UserModel user : users) {
             if (user.getUsername().compareTo(username) == 0 && user.getPassword().compareTo(password) == 0 & !user.isActive()){
                 user.setActive(true);

@@ -27,8 +27,6 @@ public class ClientHandlerModel implements Runnable {
             while (true) {
                 Object input;
                 input = inputStream.readObject();
-                //UserModel currentUser = null;
-
                 if (input.equals("login")) {
                     AuthenticatorModel authenticate = new AuthenticatorModel(inputStream, outputStream, ServerModel.getRegisteredUsers());
                     String username = (String) inputStream.readObject();
@@ -36,12 +34,13 @@ public class ClientHandlerModel implements Runnable {
                     System.out.printf("Attempting to login with username:%s and password:%s\n", username, password);
                     if (authenticate.verifyUser(username, password)) {
                         System.out.println("Success!");
-                        writeObject("VERIFIED");
+                        outputStream.writeObject("VERIFIED");
                         writeObject(getUserFromList(username, password));
                         currentUser = getUserFromList(username, password);
                         writeObject(ServerModel.getPublicChat());
                     } else {
                         System.out.println("Failed.");
+                        outputStream.writeObject(" ");
                     }
                 } else if (input.equals("register")) {
                     System.out.println("Attempting to register.");
@@ -100,11 +99,7 @@ public class ClientHandlerModel implements Runnable {
                 ex.printStackTrace();
                 // e.printStackTrace();
             }
-        } /*catch (EOFException e1){
-            System.out.println(clientSocket + "has disconnected.");
-            currentUser.setActive(false);
-        }*/
-
+        }
     }
 
     public void writeObject(Object object) {
