@@ -109,8 +109,12 @@ public class ClientModel{
     }
 
 /*--- SETTINGS MODEL ---*/
-    public void changeUsername(String newName){
-        //todo = change the username
+    public boolean changeUsername(String newName){
+        if(newName.length() !=0 ){
+            user.setUsername(newName);
+            return true;
+        }
+        return false;
     }
 
     public boolean isPassValid(String pass, String rePass){

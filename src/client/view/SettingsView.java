@@ -61,7 +61,7 @@ public class SettingsView extends JFrame {
     public static class AskNewName extends JFrame{
         //-Fields
         JButton change = new JButton("change");
-        JPasswordField textField = new HintPasswordField("New username");
+        JTextField textField = new HintTextField("New username");
         JLabel label = new JLabel("Enter new username");
 
         //-Constructor
@@ -93,6 +93,15 @@ public class SettingsView extends JFrame {
         //gets the input text from text field
         public String getText(){
             return textField.getText();
+        }
+
+        public void changeSuccess(String oldName, String newName, boolean isDone){
+            if(isDone) {
+                JOptionPane.showMessageDialog(null, "Changed " + oldName + " to " + newName,
+                        "Username Changed", JOptionPane.INFORMATION_MESSAGE);
+                dispose();
+            }else
+                JOptionPane.showMessageDialog(this.getContentPane(), "Please enter a username.", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }//end of AskNewName
 

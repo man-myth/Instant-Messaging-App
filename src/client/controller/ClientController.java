@@ -53,8 +53,9 @@ public class ClientController implements Runnable{
                 newName = new SettingsView.AskNewName(); //access the AskNewName class from SettingsView
                 newName.changeListener(f -> { //action listener for the button in AskNewNAme
                     String enteredName = newName.getText();
-                    clientModel.changeUsername(enteredName);
-                    System.out.println(enteredName);
+                    String oldName = clientModel.getUser().getUsername();
+                    boolean isChanged = clientModel.changeUsername(enteredName);
+                    newName.changeSuccess(oldName,enteredName,isChanged);
                 });
             });
 
