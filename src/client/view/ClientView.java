@@ -11,6 +11,8 @@ import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
 import java.awt.*;
 import java.awt.event.ActionListener;
+import java.lang.reflect.Member;
+import java.util.ArrayList;
 import java.util.List;
 import java.awt.event.WindowAdapter;
 
@@ -20,9 +22,18 @@ public class ClientView extends JFrame {
     //Changes: Jpanel -> MembersPanel
     MembersPanel membersPanel;
     ChatPanel chatPanel;
+    JMenuBar menuBar;
+    JMenu menu;
+    JMenuItem logOut;
     static Font headingFont = new Font("Calibri", Font.PLAIN, 20);
 
     public ClientView(UserModel user, ChatRoomModel publicChat) {
+        menuBar = new JMenuBar();
+        menu = new JMenu("Menu");
+        logOut = new JMenuItem("Log Out");
+        menu.add(logOut);
+        menuBar.add(menu);
+
         mainPanel = new JPanel(new BorderLayout());
         contactsPanel = new ContactsPanel(user.getContacts());
         chatPanel = new ChatPanel(publicChat);
@@ -32,7 +43,8 @@ public class ClientView extends JFrame {
         mainPanel.add(membersPanel, BorderLayout.EAST);
         mainPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         this.add(mainPanel);
-        this.setTitle("Messenger");
+        this.setJMenuBar(menuBar);
+        this.setTitle(user.getUsername());
         this.pack();
         this.setLocationRelativeTo(null);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -59,6 +71,13 @@ public class ClientView extends JFrame {
 
     }
 
+    public void updateContacts(List<UserModel> users) {
+        mainPanel.remove(contactsPanel);
+        contactsPanel = new ContactsPanel(users);
+        mainPanel.add(contactsPanel, BorderLayout.WEST);
+        mainPanel.revalidate();
+    }
+
     public static ImageIcon scaleIcon(String filename) {
         ImageIcon imageIcon = new ImageIcon(filename);
         Image image = imageIcon.getImage();
@@ -66,6 +85,10 @@ public class ClientView extends JFrame {
         imageIcon = new ImageIcon(scaledImage);
 
         return imageIcon;
+    }
+
+    public void setMemberButtonsActionListener(ActionListener listener) {
+        membersPanel.setMemberButtonsActionListener(listener);
     }
 
     public void addMessage(MessageModel msg) {
@@ -143,6 +166,7 @@ public class ClientView extends JFrame {
     class ContactsPanel extends JPanel {
         JPanel panel;
         JTextField searchBar;
+        JScrollPane scrollPane;
 
         public ContactsPanel(List<UserModel> users) {
             JLabel contactsLabel = new JLabel("Contacts", SwingConstants.CENTER);
@@ -154,14 +178,15 @@ public class ClientView extends JFrame {
             for (UserModel user : users) {
                 panel.add(new ContactButton(user.getUsername(), user.getUnreadMessages() == null));
             }
-            panel.setPreferredSize(new Dimension(100, 430));
+            scrollPane = new JScrollPane(panel);
+            scrollPane.setPreferredSize(new Dimension(100, 430));
 
             searchBar = new HintTextField("Search Contacts");
             searchBar.setPreferredSize(new Dimension(200, 35));
 
             this.setLayout(new BorderLayout());
             this.add(contactsLabel, BorderLayout.NORTH);
-            this.add(new JScrollPane(panel), BorderLayout.CENTER);
+            this.add(scrollPane, BorderLayout.CENTER);
             this.add(searchBar, BorderLayout.SOUTH);
             this.setMinimumSize(new Dimension(200, 500));
             this.setPreferredSize(new Dimension(200, 500));
@@ -195,6 +220,7 @@ public class ClientView extends JFrame {
         JButton addButton, kickButton, settingsButton;
         JScrollPane scrollPane;
         JTextField searchBar;
+        List<MemberButton> memberButtons;
 
         public MembersPanel(List<UserModel> users) {
             searchBar = new HintTextField("Search Members");
@@ -202,9 +228,11 @@ public class ClientView extends JFrame {
 
             panel = new JPanel();
             panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-
+            memberButtons = new ArrayList<>();
             for (UserModel user : users) {
-                panel.add(new MemberButton(user.getUsername()));
+                MemberButton button = new MemberButton(user.getUsername());
+                memberButtons.add(button);
+                panel.add(button);
             }
 
             scrollPane = new JScrollPane(panel);
@@ -251,6 +279,12 @@ public class ClientView extends JFrame {
                 this.setIcon(imageIcon);
                 this.setHorizontalAlignment(SwingConstants.LEFT);
                 this.setBackground(Color.WHITE);
+            }
+        }
+
+        public void setMemberButtonsActionListener(ActionListener listener) {
+            for (MemberButton button : memberButtons) {
+                button.addActionListener(listener);
             }
         }
 
