@@ -7,6 +7,7 @@ import client.view.ExitOnCloseAdapter;
 import server.model.ChatRoomModel;
 import server.model.MessageModel;
 import server.model.UserModel;
+
 import java.util.List;
 import javax.swing.*;
 import java.awt.*;
@@ -29,7 +30,7 @@ public class ClientController {
     // Changes: Moved code from AddContactToRoomController to run method
 
     public ClientController(Socket socket, ObjectInputStream inputStream, ObjectOutputStream outputStream,
-            UserModel user, ChatRoomModel publicChat) {
+                            UserModel user, ChatRoomModel publicChat) {
         this.socket = socket;
         this.inputStream = inputStream;
         this.outputStream = outputStream;
@@ -42,13 +43,8 @@ public class ClientController {
         clientView = new ClientView(clientModel.getUser(), currentRoom);
         clientView.setWindowAdapter(new ExitOnCloseAdapter(socket));
         clientView.setAddButtonActionListener(e -> {
-            List<UserModel> contacts = new ArrayList<>();
-            contacts.add(new UserModel("testing", "123"));
-            contacts.add(new UserModel("testing1", "123"));
-            contacts.add(new UserModel("testing2", "123"));
-
-            //String[] contactUsernames = clientModel.getUser().getContacts().stream().map(user -> user.getUsername()).toArray(String[]::new);
-            String[] contactUsernames = contacts.stream().map(user -> user.getUsername()).toArray(String[]::new);
+            String[] contactUsernames = clientModel.getUser().getContacts().stream().map(user -> user.getUsername()).toArray(String[]::new);
+            //String[] contactUsernames = contacts.stream().map(user -> user.getUsername()).toArray(String[]::new);
             AddContactToRoomView addContactView = new AddContactToRoomView(contactUsernames);
 
             addContactView.setAddButtonActionListener(e1 -> {
@@ -62,6 +58,16 @@ public class ClientController {
 
 
             });
+
+        });
+        clientView.setMemberButtonsActionListener(e -> {
+            try {
+                outputStream.writeObject("add contact");
+                String username = ((JButton) e.getSource()).getText();
+                outputStream.writeObject(username);
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
 
         });
         clientView.setMessageListener(e -> {
@@ -80,6 +86,12 @@ public class ClientController {
 
                     } else if (msg.equals("done adding contact")) {
 
+                    } else if (msg.equals("contact added")) {
+                        UserModel newUser = (UserModel) inputStream.readObject();
+                        clientModel.getUser().getContacts().add(newUser);
+
+                        System.out.println(newUser.getUsername());
+                        clientView.updateContacts(clientModel.getUser().getContacts());
                     }
                 } catch (IOException | ClassNotFoundException e) {
                     e.printStackTrace();

@@ -4,9 +4,9 @@ import client.controller.LoginController;
 public class Client {
 
     public static void main(String[] args) {
-        //List users = new ArrayList<>();
-        //users.add(new UserModel("admin", "root"));
-        //Utility.exportData(users);
+        // List users = new ArrayList<>();
+        // users.add(new UserModel("admin", "root"));
+        // Utility.exportData(users);
         // Start client
         LoginController logInController = new LoginController();
         logInController.run();
