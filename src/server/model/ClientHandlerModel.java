@@ -9,7 +9,6 @@ public class ClientHandlerModel implements Runnable {
     ObjectOutputStream outputStream;
     ObjectInputStream inputStream;
 
-
     public ClientHandlerModel(Socket socket) {
         this.clientSocket = socket;
         try {
@@ -32,7 +31,8 @@ public class ClientHandlerModel implements Runnable {
                 Object input;
                 input = inputStream.readObject();
                 if (input.equals("login")) {
-                    AuthenticatorModel authenticate = new AuthenticatorModel(inputStream, outputStream, ServerModel.getRegisteredUsers());
+                    AuthenticatorModel authenticate = new AuthenticatorModel(inputStream, outputStream,
+                            ServerModel.getRegisteredUsers());
                     String username = (String) inputStream.readObject();
                     String password = (String) inputStream.readObject();
                     System.out.printf("Attempting to login with username:%s and password:%s\n", username, password);
@@ -75,7 +75,10 @@ public class ClientHandlerModel implements Runnable {
                     }
                 } else if (input.equals("add contact to room")) {
                     UserModel user = (UserModel) inputStream.readObject();
-                    //todo add user to chat room
+                    // todo add user to chat room
+
+                } else if (input.equals("kick contact from room")) {
+
                 } else if (input.equals("add contact")) {
                     String username = (String) inputStream.readObject();
                     UserModel user = getUserFromList(username);
@@ -87,13 +90,14 @@ public class ClientHandlerModel implements Runnable {
 
                 }
 
-                // Changes: Removed input.equals("get contacts") since ClientModel.user already has a contact list
+                // Changes: Removed input.equals("get contacts") since ClientModel.user already
+                // has a contact list
 
             }
         } catch (ClassNotFoundException | IOException e) {
             System.out.println(clientSocket + "has disconnected.");
             currentUser.setActive(false);
-            //e.printStackTrace();
+            // e.printStackTrace();
             try {
                 clientSocket.close();
             } catch (IOException ex) {
