@@ -82,7 +82,7 @@ public class ClientController {
 
                     }
                 } catch (IOException | ClassNotFoundException e) {
-                    e.printStackTrace();
+                    //e.printStackTrace();
                 }
             }
         }).start();

@@ -33,7 +33,7 @@ public class AdminView extends JFrame {
         mainPanel.add(membersPanel, BorderLayout.EAST);
         mainPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         this.add(mainPanel);
-        this.setTitle("Messenger");
+        this.setTitle("Admin");
         this.pack();
         this.setLocationRelativeTo(null);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

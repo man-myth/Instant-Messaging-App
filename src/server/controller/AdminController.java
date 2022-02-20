@@ -32,21 +32,16 @@ public class AdminController {
     AdminModel adminModel;
 
 
-    public AdminController(){
-        try{
-            this.socket = new Socket("localhost", 2022);
-            this.inputStream = new ObjectInputStream(socket.getInputStream());
-            this.outputStream = new ObjectOutputStream(socket.getOutputStream());
-            this.outputStream.flush();
-            this.admin = new UserModel("admin", "admin");
-            this.adminModel = new AdminModel(this.socket, this.inputStream,
-                    this.outputStream, this.admin);
-        } catch (UnknownHostException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    public AdminController(Socket socket, ObjectInputStream inputStream, ObjectOutputStream outputStream,
+                           UserModel user, ChatRoomModel publicChat) {
+        this.socket = socket;
+        this.inputStream = inputStream;
+        this.outputStream = outputStream;
+        this.currentRoom = publicChat;
+        this.adminModel = new AdminModel(socket, inputStream, outputStream, user);
     }
+
+
 
     public void run() {
         System.out.println("Logged in with user: " + adminModel.getUser());

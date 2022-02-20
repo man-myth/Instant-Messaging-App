@@ -19,11 +19,9 @@ public class ServerController {
 
     public ServerController() {
         serverModel = new ServerModel(Utility.readUsersData("res/data.dat"), Utility.readPublicChat("res/publicChat.dat"));
-        adminController = new AdminController();
     }
 
     public void run() {
         serverModel.run();
-        adminController.run();
     }
 }

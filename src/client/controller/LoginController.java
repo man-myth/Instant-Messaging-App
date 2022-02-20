@@ -3,6 +3,7 @@ package client.controller;
 import client.model.LoginModel;
 import client.view.ExitOnCloseAdapter;
 import client.view.LoginView;
+import server.controller.AdminController;
 import server.model.ChatRoomModel;
 import server.model.UserModel;
 
@@ -49,10 +50,17 @@ public class LoginController {
                 if (loginModel.isUser(username, password)) {
                     System.out.println("Logged in!");
                     loginView.dispose();
+
                     try {
-                        ClientController clientController = new ClientController(socket, inputStream, outputStream,
-                                (UserModel) inputStream.readObject(), (ChatRoomModel) inputStream.readObject());
-                        clientController.run();
+                        UserModel userModel = (UserModel) inputStream.readObject();
+                        if (userModel.getUsername().equals("admin"))
+                            new AdminController(socket, inputStream, outputStream,
+                                    userModel, (ChatRoomModel) inputStream.readObject()).run();
+                        else{
+                            ClientController clientController = new ClientController(socket, inputStream,
+                                    outputStream, userModel, (ChatRoomModel) inputStream.readObject());
+                            clientController.run();
+                        }
                     } catch (IOException ex) {
                         ex.printStackTrace();
                     } catch (ClassNotFoundException ex) {
