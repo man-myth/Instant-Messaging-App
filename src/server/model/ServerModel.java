@@ -41,6 +41,7 @@ public class ServerModel {
         }
 
         while (true) {
+
             try {
                 // Accept client connection
                 clientSocket = serverSocket.accept();
@@ -48,7 +49,9 @@ public class ServerModel {
                 System.out.println("[SERVER]: Client connected: " + clientSocket);
                 ClientHandlerModel clientHandler = new ClientHandlerModel(clientSocket);
                 clients.add(clientHandler);
+
                 pool.execute(clientHandler);
+
             } catch (IOException e) {
                 e.printStackTrace();
             }

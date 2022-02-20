@@ -31,6 +31,7 @@ public class Utility {
             while (true) {
                 try {
                     u = (UserModel) inputStream.readObject();
+                    u.setActive(false);
                     users.add(u);
                 } catch (EOFException e) {
                     break;

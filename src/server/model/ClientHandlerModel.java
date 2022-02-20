@@ -9,6 +9,7 @@ public class ClientHandlerModel implements Runnable {
     ObjectOutputStream outputStream;
     ObjectInputStream inputStream;
 
+
     public ClientHandlerModel(Socket socket) {
         this.clientSocket = socket;
         try {
@@ -38,8 +39,8 @@ public class ClientHandlerModel implements Runnable {
                     if (authenticate.verifyUser(username, password)) {
                         System.out.println("Success!");
                         outputStream.writeObject("VERIFIED");
-                        writeObject(getUserFromList(username, password));
                         currentUser = getUserFromList(username, password);
+                        writeObject(currentUser);
                         writeObject(ServerModel.getPublicChat());
                     } else {
                         System.out.println("Failed.");
@@ -77,6 +78,13 @@ public class ClientHandlerModel implements Runnable {
                     //todo add user to chat room
                 } else if (input.equals("add contact")) {
                     String username = (String) inputStream.readObject();
+                    UserModel user = getUserFromList(username);
+                    if (user != null) {
+                        currentUser.getContacts().add(user);
+                        outputStream.writeObject("contact added");
+                        outputStream.writeObject(user);
+                    }
+
                 }
 
                 // Changes: Removed input.equals("get contacts") since ClientModel.user already has a contact list
@@ -108,6 +116,11 @@ public class ClientHandlerModel implements Runnable {
         return this.clientSocket.equals(another.clientSocket);
     }
 
+    public UserModel getUserFromList(String username) {
+        return ServerModel.registeredUsers.stream()
+                .filter(user -> username.equals(user.getUsername())).findAny()
+                .orElse(null);
+    }
 
     public UserModel getUserFromList(String username, String password) {
         return ServerModel.registeredUsers.stream()

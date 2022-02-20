@@ -84,6 +84,17 @@ public class ClientController implements Runnable{
 
                 }catch (Exception e){
                     e.printStackTrace();
+                    } else if (msg.equals("done adding contact")) {
+
+                    } else if (msg.equals("contact added")) {
+                        UserModel newUser = (UserModel) inputStream.readObject();
+                        clientModel.getUser().getContacts().add(newUser);
+
+                        System.out.println(newUser.getUsername());
+                        clientView.updateContacts(clientModel.getUser().getContacts());
+                    }
+                } catch (IOException | ClassNotFoundException e) {
+                    //e.printStackTrace();
                 }
             }
         });
