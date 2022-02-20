@@ -4,7 +4,7 @@ import client.model.ClientModel;
 import client.view.AddContactToRoomView;
 import client.view.ClientView;
 import client.view.ExitOnCloseAdapter;
-import client.view.KickContactFromRoomview;
+import client.view.KickContactFromRoomView;
 import client.view.SettingsView;
 import server.model.ChatRoomModel;
 import server.model.MessageModel;
@@ -15,7 +15,6 @@ import java.io.*;
 import java.net.Socket;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.ArrayList;
 
 //this class will now implement Runnable
 public class ClientController implements Runnable {
@@ -25,7 +24,7 @@ public class ClientController implements Runnable {
     ClientView clientView;
     ClientModel clientModel;
     AddContactToRoomView addToRoomView;
-    KickContactFromRoomview kickUserView;
+    KickContactFromRoomView kickUserView;
     SettingsView settingsView;
     SettingsView.AskNewName newName;
     SettingsView.AskNewPass newPass;
@@ -86,21 +85,26 @@ public class ClientController implements Runnable {
             addToRoomView = new AddContactToRoomView(contactArray);
 
             // calls the addContactToRoom method from client model if add button is clicked
+            //todo kick gui will error after clicking add button, fix getContact returns null @2213277
             addToRoomView.setAddButtonActionListener(e1 -> {
                 String username = addToRoomView.getSelected();
-                clientModel.addContactToRoom(username);
+                UserModel newUser = clientModel.getContact(username);
+                currentRoom.addUser(newUser);
+                addToRoomView.successMessage();
             });
         });
 
         // kick user from the room
-        clientView.setAddButtonActionListener(e -> {
+        clientView.setKickButtonActionListener(e -> {
             currentRoom.getUsers().add(new UserModel("mat", "123"));
-            String[] contactArray = currentRoom.getUsers().toArray(new String[0]);
-            kickUserView = new KickContactFromRoomview(contactArray);
+            currentRoom.getUsers().add(new UserModel("lmao", "123"));
+            String[] contactArray = clientModel.contactsToStringArr(currentRoom.getUsers());
+            kickUserView = new KickContactFromRoomView(contactArray);
 
             kickUserView.setKickButtonActionListener(e1 -> {
                 String username = kickUserView.getSelected();
                 currentRoom.kickUser(username);
+                kickUserView.successMessage();
             });
         });
 

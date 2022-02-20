@@ -50,9 +50,9 @@ public class ClientModel {
         this.user = user;
     }
 
-    /*------------------------------- MODELS -------------------------------*/
+/*------------------------------- MODELS -------------------------------*/
 
-    /*--- BROADCASTING OF MESSAGE MODEL ---*/
+/*--- BROADCASTING OF MESSAGE MODEL ---*/
     // added; method that gets message from stream
     public MessageModel getMessageFromStream() throws Exception {
         return (MessageModel) inputStream.readObject();
@@ -76,7 +76,7 @@ public class ClientModel {
         return true;
     }
 
-    /*--- ADDING CONTACT MODEL ---*/
+/*--- ADDING CONTACT MODEL ---*/
 
     // adds the new user to contact list
     public void addContact() throws Exception {
@@ -85,11 +85,19 @@ public class ClientModel {
         getUser().getContacts().add(newUser);
     }
 
-    /*--- ADDING OF CONTACT TO CHAT ROOM MODEL ---*/
+/*--- ADDING/KICKING OF CONTACT TO CHAT ROOM MODEL ---*/
 
-    public void addContactToRoom(String username) {
+    public UserModel getContact(String username) {
+        for(UserModel u: user.getContacts()){
+            if(u.getUsername().equals(username))
+                return u;
+        }
+        return new UserModel("null","null");
+    }
+
+    public void kickContactFromRoom(String username) {
         try {
-            outputStream.writeObject("add contact to room");
+            outputStream.writeObject("kick contact from room");
             outputStream.writeObject(username);
         } catch (IOException ex) {
             ex.printStackTrace();
@@ -101,6 +109,9 @@ public class ClientModel {
     public String[] contactsToStringArr(List<UserModel> list) {
         List<String> contacts = new ArrayList<>();
         for (UserModel u : list) {
+            //continue if username is equals your username/admin
+            if(u.getUsername().equals(user.getUsername()) || u.getUsername().equals("admin"))
+                continue;
             contacts.add(u.getUsername());
             System.out.println(u.getUsername());
         }
@@ -108,7 +119,8 @@ public class ClientModel {
         return contacts.toArray(String[]::new);
     }
 
-    /*--- SETTINGS MODEL ---*/
+/*--- SETTINGS MODEL ---*/
+    //todo: update changes in dat file @2213277
     public boolean changeUsername(String newName) {
         if (newName.length() != 0) {
             user.setUsername(newName);
@@ -124,17 +136,7 @@ public class ClientModel {
     public void changePassword(String pass, boolean isValid) {
         if (isValid) {
             System.out.println(pass);
-            // todo change password
-        }
-    }
-
-    /*--- Removing OF CONTActs from CHAT ROOM MODEL ---*/
-    public void kickContactFromRoom(String username) {
-        try {
-            outputStream.writeObject("kick contact from room");
-            outputStream.writeObject(username);
-        } catch (IOException ex) {
-            ex.printStackTrace();
+            // todo change password @2213277
         }
     }
 
