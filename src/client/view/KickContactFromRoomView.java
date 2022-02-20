@@ -6,11 +6,11 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
 //Adding contact to room
-public class KickContactFromRoomview extends JFrame {
+public class KickContactFromRoomView extends JFrame {
     JButton kickButton = new JButton("Kick");
     JComboBox comboBox;
 
-    public KickContactFromRoomview(String[] strings) {
+    public KickContactFromRoomView(String[] strings) {
         // Combo box
         comboBox = new JComboBox(strings);
 

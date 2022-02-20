@@ -40,22 +40,13 @@ public class ChatRoomModel implements Serializable {
     }
 
     // adds user to the list of users
-    private void addUser(String user) {
-        for (UserModel u : users) {
-            if (u.getUsername().equals(user)) {
-                users.add(u);
-            }
-        }
+    public void addUser(UserModel user) {
+        users.add(user);
     }
 
     // removes the user from list of users
     public void kickUser(String user) {
-        for (UserModel u : users) {
-            if (u.getUsername().equals(user)) {
-                users.remove(u);
-            }
-        }
-
+        users.removeIf(u -> u.getUsername().equals(user));
     }
 
     // Setters
