@@ -6,6 +6,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+
 //Adding contact to room
 public class AddContactToRoomView extends JFrame {
     JButton addButton = new JButton("Add");
@@ -15,7 +16,7 @@ public class AddContactToRoomView extends JFrame {
         // Combo box
         comboBox = new JComboBox(strings);
 
-        //buttons
+        // buttons
         addButton.setFocusable(false);
 
         // frame details 1
@@ -30,15 +31,16 @@ public class AddContactToRoomView extends JFrame {
         this.pack();
         this.setVisible(true);
         this.setLocationRelativeTo(null);
-        this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        this.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
     }
 
     public void setAddButtonActionListener(ActionListener listener) {
         addButton.addActionListener(listener);
     }
 
-    public void successMessage(){
-        JOptionPane.showMessageDialog(null, "Successfully added user "+getSelected(), "Added", JOptionPane.INFORMATION_MESSAGE);
+    public void successMessage() {
+        JOptionPane.showMessageDialog(null, "Successfully added user " + getSelected(), "Added",
+                JOptionPane.INFORMATION_MESSAGE);
         this.dispose();
     }
 

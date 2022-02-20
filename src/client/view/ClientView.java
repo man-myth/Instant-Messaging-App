@@ -19,7 +19,7 @@ import java.awt.event.WindowAdapter;
 public class ClientView extends JFrame {
 
     JPanel mainPanel, contactsPanel;
-    //Changes: Jpanel -> MembersPanel
+    // Changes: Jpanel -> MembersPanel
     MembersPanel membersPanel;
     ChatPanel chatPanel;
     JMenuBar menuBar;
@@ -99,7 +99,7 @@ public class ClientView extends JFrame {
         membersPanel.setAddButtonActionListener(listener);
     }
 
-    public void settingsButtonListener(ActionListener listener){
+    public void settingsButtonListener(ActionListener listener) {
         membersPanel.settingsButtonListener(listener);
     }
 
@@ -296,7 +296,11 @@ public class ClientView extends JFrame {
             addButton.addActionListener(listener);
         }
 
-        public void settingsButtonListener(ActionListener listener){
+        public void setButtonActionListener(ActionListener listener) {
+            addButton.addActionListener(listener);
+        }
+
+        public void settingsButtonListener(ActionListener listener) {
             settingsButton.addActionListener(listener);
         }
     }
