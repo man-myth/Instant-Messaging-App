@@ -107,9 +107,13 @@ public class ClientController implements Runnable{
             while (true){
                 try {
                     String event = clientModel.doEvent();
-                    receiveMessage(event); //call if event = "broadcast"
-                    addContacts(event); //call if event = "contact added"
-
+                    if(event.equals("broadcast")){ //do this if event = "broadcast"
+                        MessageModel message = clientModel.getMessageFromStream();
+                        clientView.addMessage(message);
+                    }else if(event.equals("contact added")){ //do this if event = "contact added"
+                        clientModel.addContact();
+                        clientView.updateContacts(clientModel.getUser().getContacts());
+                    }
                 }catch (Exception e){
                     e.printStackTrace();
                 }
@@ -117,19 +121,5 @@ public class ClientController implements Runnable{
         }).start();
     }//end of run method
 
-    //calls the getMessageFromStream() method from model and adds the message to view
-    public void receiveMessage(String event) throws Exception {
-        if(event.equals("broadcast")){
-            MessageModel message = clientModel.getMessageFromStream();
-            clientView.addMessage(message);
-        }
-    }
 
-    //calls the getContact() method from model and updates the view
-    public void addContacts(String event) throws Exception{
-        if(event.equals("contact added")){
-            clientModel.addContact();
-            clientView.updateContacts(clientModel.getUser().getContacts());
-        }
-    }
 }//END OF CLIENT CONTROLLER

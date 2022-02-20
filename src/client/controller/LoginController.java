@@ -52,7 +52,7 @@ public class LoginController {
                     loginView.dispose();
 
                     try {
-                        UserModel userModel = (UserModel) inputStream.readObject();
+                        UserModel userModel = loginModel.getUserModel();
                         if (userModel.getUsername().equals("admin"))
                             new AdminController(socket, inputStream, outputStream,
                                     userModel, (ChatRoomModel) inputStream.readObject()).run();
@@ -61,9 +61,7 @@ public class LoginController {
                                     outputStream, userModel, (ChatRoomModel) inputStream.readObject());
                             clientController.run();
                         }
-                    } catch (IOException ex) {
-                        ex.printStackTrace();
-                    } catch (ClassNotFoundException ex) {
+                    } catch (Exception ex) {
                         ex.printStackTrace();
                     }
                 } else {
