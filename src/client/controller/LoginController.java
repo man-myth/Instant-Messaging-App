@@ -50,7 +50,8 @@ public class LoginController {
                     System.out.println("Logged in!");
                     loginView.dispose();
                     try {
-                        ClientController clientController = new ClientController(socket, inputStream, outputStream, (UserModel) inputStream.readObject(), (ChatRoomModel) inputStream.readObject());
+                        ClientController clientController = new ClientController(socket, inputStream, outputStream,
+                                (UserModel) inputStream.readObject(), (ChatRoomModel) inputStream.readObject());
                         clientController.run();
                     } catch (IOException ex) {
                         ex.printStackTrace();
