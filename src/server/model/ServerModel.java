@@ -108,7 +108,7 @@ public class ServerModel {
     }
     // Method to find a member based on username and returns a list
     public List<UserModel> findMember(String search, List<UserModel> user){
-        return registeredUsers.stream().filter(userModel -> checkStringForMatches(userModel.getUsername(), search)).toList();
+        return registeredUsers.stream().filter(userModel -> checkStringForMatches(userModel.getUsername(), search)).collect(Collectors.toList());
     }
     private boolean checkStringForMatches(String word, String substring){
         return word.toLowerCase().contains(substring.toLowerCase());

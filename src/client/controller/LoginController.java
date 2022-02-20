@@ -59,9 +59,9 @@ public class LoginController {
                     }
                 } else {
                     System.out.println("Failed to log in.");
-                    loginView.dispose();
-                    LoginController login = new LoginController();
-                    login.run();
+                    //loginView.dispose();
+                    //LoginController login = new LoginController();
+                    //login.run();
                 }
             });
 

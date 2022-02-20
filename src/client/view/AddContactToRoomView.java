@@ -33,7 +33,7 @@ public class AddContactToRoomView extends JFrame {
         this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
     }
 
-    public void addActionListener(ActionListener listener) {
+    public void setAddButtonActionListener(ActionListener listener) {
         addButton.addActionListener(listener);
     }
 
