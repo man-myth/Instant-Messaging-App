@@ -49,6 +49,9 @@ public class ClientModel{
         this.user = user;
     }
 
+/*------------------------------- MODELS -------------------------------*/
+
+/*--- BROADCASTING OF MESSAGE MODEL ---*/
     //added; method that gets message from stream
     public MessageModel getMessageFromStream() throws Exception {
         return (MessageModel) inputStream.readObject();
@@ -72,6 +75,16 @@ public class ClientModel{
         return true;
     }
 
+/*--- ADDING CONTACT MODEL ---*/
+
+    //adds the new user to contact list
+    public void addContact() throws Exception{
+        UserModel newUser = (UserModel) inputStream.readObject();
+        System.out.println(newUser.getUsername());
+        getUser().getContacts().add(newUser);
+    }
+
+/*--- ADDING OF CONTACT TO CHAT ROOM MODEL ---*/
 
     public void addContactToRoom(String username){
         try {
@@ -82,17 +95,33 @@ public class ClientModel{
         }
     }
 
-    /*
-    takes the list of contacts and put their usernames in a String array
-    for combo box view
-    */
+
+    //takes the list of contacts and put their usernames in a String array
+    //for combo box view
     public String[] contactsToStringArr(List<UserModel> list){
-        ArrayList<String> contacts = new ArrayList<>();
+        List<String> contacts = new ArrayList<>();
         for(UserModel u: list){
             contacts.add(u.getUsername());
+            System.out.println(u.getUsername());
         }
-        contacts.add("test");
-        return contacts.toArray(new String[0]);
+        contacts.add("test lang po boss");
+        return contacts.toArray(String[]::new);
     }
 
-}
+/*--- SETTINGS MODEL ---*/
+    public void changeUsername(String newName){
+        //todo = change the username
+    }
+
+    public boolean isPassValid(String pass, String rePass){
+        return pass.equals(rePass);
+    }
+
+    public void changePassword(String pass, boolean isValid){
+        if(isValid){
+            System.out.println(pass);
+            //todo change password
+        }
+    }
+
+}//END OF CLIENT MODEL

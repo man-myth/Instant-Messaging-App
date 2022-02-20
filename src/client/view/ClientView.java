@@ -99,6 +99,10 @@ public class ClientView extends JFrame {
         membersPanel.setAddButtonActionListener(listener);
     }
 
+    public void settingsButtonListener(ActionListener listener){
+        membersPanel.settingsButtonListener(listener);
+    }
+
     class ChatPanel extends JPanel {
         JLabel roomName;
         JTextPane content;
@@ -290,6 +294,10 @@ public class ClientView extends JFrame {
 
         public void setAddButtonActionListener(ActionListener listener) {
             addButton.addActionListener(listener);
+        }
+
+        public void settingsButtonListener(ActionListener listener){
+            settingsButton.addActionListener(listener);
         }
     }
 }
