@@ -72,11 +72,9 @@ public class ClientHandlerModel implements Runnable {
                         client.writeObject("broadcast");
                         client.writeObject(newMessage);
                     }
-                    // Testing
                 } else if (input.equals("add contact to room")) {
                     UserModel user = (UserModel) inputStream.readObject();
-                    outputStream.writeObject("done adding contact");
-                    // to do add user to chat room
+                    //todo add user to chat room
                 } else if (input.equals("add contact")) {
                     String username = (String) inputStream.readObject();
                 }
