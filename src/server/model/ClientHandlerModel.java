@@ -9,6 +9,7 @@ public class ClientHandlerModel implements Runnable {
     ObjectOutputStream outputStream;
     ObjectInputStream inputStream;
 
+
     public ClientHandlerModel(Socket socket) {
         this.clientSocket = socket;
         try {

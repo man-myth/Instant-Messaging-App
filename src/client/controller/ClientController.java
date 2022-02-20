@@ -94,7 +94,7 @@ public class ClientController {
                         clientView.updateContacts(clientModel.getUser().getContacts());
                     }
                 } catch (IOException | ClassNotFoundException e) {
-                    e.printStackTrace();
+                    //e.printStackTrace();
                 }
             }
         }).start();
