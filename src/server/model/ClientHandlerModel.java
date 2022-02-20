@@ -70,10 +70,9 @@ public class ClientHandlerModel implements Runnable {
                         client.writeObject(newMessage);
 
                     }
-                    // Testing
-                } else if (input.equals("get contacts")) {
+                } else if (input.equals("get contacts")) { // Testing
                     List<UserModel> contacts = currentUser.getContacts();
-                    // testing only
+                    //todo: testing only, remove once completed
                     contacts.add(new UserModel("testing", "123"));
                     contacts.add(new UserModel("testing1", "123"));
                     contacts.add(new UserModel("testing2", "123"));
@@ -82,10 +81,10 @@ public class ClientHandlerModel implements Runnable {
                     }
                     outputStream.writeObject("done");
 
-                    //Adding contact to room
-                } else if (input.equals("add contact to room")) {
+
+                } else if (input.equals("add contact to room")) { //Adding contact to room
                     outputStream.writeObject("done");
-                    // to do add user to chat room
+                    //todo add user to chat room
                 }
 
             }

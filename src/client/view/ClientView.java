@@ -2,7 +2,6 @@ package client.view;
 
 import server.model.ChatRoomModel;
 import server.model.MessageModel;
-import server.model.ServerModel;
 import server.model.UserModel;
 
 import javax.swing.*;
@@ -22,7 +21,6 @@ public class ClientView extends JFrame {
     MembersPanel membersPanel;
     ChatPanel chatPanel;
     static Font headingFont = new Font("Calibri", Font.PLAIN, 20);
-
     public ClientView(UserModel user, ChatRoomModel publicChat) {
         mainPanel = new JPanel(new BorderLayout());
         contactsPanel = new ContactsPanel(user.getContacts());
@@ -74,7 +72,11 @@ public class ClientView extends JFrame {
     }
 
     public void actionListenerAdd(ActionListener listener) {
-        membersPanel.actionListener(listener);
+        membersPanel.actionListenerAdd(listener);
+    }
+
+    public void actionListenerSettings(ActionListener listener){
+        membersPanel.actionListenerSettings(listener);
     }
 
     class ChatPanel extends JPanel {
@@ -255,8 +257,12 @@ public class ClientView extends JFrame {
             }
         }
 
-        public void actionListener(ActionListener listener) {
+        public void actionListenerAdd(ActionListener listener) {
             addButton.addActionListener(listener);
+        }
+
+        public void actionListenerSettings(ActionListener listener){
+            settingsButton.addActionListener(listener);
         }
     }
 }

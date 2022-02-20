@@ -21,7 +21,7 @@ public class RegisterModel {
         this.outputStream = outputStream;
     }
 
-    //method that registers the user, returns true if successfully registered
+    //method that checks if username already exists, if not, registers the user; returns true if successfully registered
     public boolean registerUser(String username, String password, boolean errorExist) {
         if(errorExist) return false; //if there is an existing error, do not proceed
         try {
