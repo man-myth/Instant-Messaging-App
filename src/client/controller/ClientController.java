@@ -10,6 +10,7 @@ import server.model.ChatRoomModel;
 import server.model.MessageModel;
 import server.model.UserModel;
 
+import javax.swing.*;
 import java.awt.*;
 import java.io.*;
 import java.net.Socket;
@@ -40,7 +41,6 @@ public class ClientController implements Runnable {
     // -Methods
 
     // run method when calling client controller
-    @Override
     public void run() {
         System.out.println("Logged in with user: " + clientModel.getUser());
         clientView = new ClientView(clientModel.getUser(), currentRoom);
@@ -119,23 +119,37 @@ public class ClientController implements Runnable {
                 clientView.clearTextArea();
             }
         });
+
+        // Set ActionListener for member button popup menu
+        clientView.setAddItemActionListener(e -> {
+            JMenuItem menuItem = (JMenuItem) e.getSource();
+            JPopupMenu popupMenu = (JPopupMenu) menuItem.getParent();
+            JButton invokerButton = (JButton) popupMenu.getInvoker();
+            String username = invokerButton.getText();
+            clientModel.addContact(username);
+        });
+
+        // Separate thread for GUI
         EventQueue.invokeLater(() -> clientView.setVisible(true));
 
-        // -loop for broadcasting messages
+        // Thread for receiving responses from the server
         new Thread(() -> {
-            while (true) {
-                try {
-                    String event = clientModel.doEvent();
+            try {
+                while (true) {
+                    String event = clientModel.getEvent();
+                    System.out.println(event);
                     if (event.equals("broadcast")) { // do this if event = "broadcast"
                         MessageModel message = clientModel.getMessageFromStream();
                         clientView.addMessage(message);
                     } else if (event.equals("contact added")) { // do this if event = "contact added"
-                        clientModel.addContact();
+                        clientModel.receiveContact();
+                        System.out.println(clientModel.getUser().getContacts());
                         clientView.updateContacts(clientModel.getUser().getContacts());
                     }
-                } catch (Exception e) {
-                    e.printStackTrace();
                 }
+            } catch (Exception e) {
+                System.out.println(socket + "has disconnected.");
+                //e.printStackTrace();
             }
         }).start();
     }// end of run method
