@@ -67,6 +67,12 @@ public class ClientView extends JFrame {
         chatPanel.getMessageTextArea().addActionListener(a);
     }
 
+    public void setAddItemActionListener(ActionListener listener) {
+        for (MembersPanel.MemberButton button : membersPanel.getMemberButtons()) {
+            button.getPopupMenu().setAddItemActionListener(listener);
+        }
+    }
+
     public void setRoom(String roomName) {
 
     }
@@ -99,7 +105,7 @@ public class ClientView extends JFrame {
         membersPanel.addButton.addActionListener(listener);
     }
 
-    public void setKickButtonActionListener(ActionListener listener){
+    public void setKickButtonActionListener(ActionListener listener) {
         membersPanel.kickButton.addActionListener(listener);
     }
 
@@ -272,12 +278,16 @@ public class ClientView extends JFrame {
 
         class MemberButton extends JButton {
             ImageIcon imageIcon;
+            MemberPopupMenu popupMenu;
 
             public MemberButton(String memberName) {
                 this.setMinimumSize(new Dimension(175, 35));
                 this.setPreferredSize(new Dimension(200, 35));
                 this.setMaximumSize(new Dimension(200, 35));
                 this.setText(memberName);
+
+                popupMenu = new MemberPopupMenu();
+                this.setComponentPopupMenu(popupMenu);
 
                 imageIcon = new ImageIcon("res/graphics/user.png");
 
@@ -288,12 +298,33 @@ public class ClientView extends JFrame {
                 this.setHorizontalAlignment(SwingConstants.LEFT);
                 this.setBackground(Color.WHITE);
             }
+
+            public MemberPopupMenu getPopupMenu() {
+                return popupMenu;
+            }
         }
 
         public void setMemberButtonsActionListener(ActionListener listener) {
             for (MemberButton button : memberButtons) {
                 button.addActionListener(listener);
             }
+        }
+
+        public List<MemberButton> getMemberButtons() {
+            return memberButtons;
+        }
+    }
+
+    class MemberPopupMenu extends JPopupMenu {
+        JMenuItem add;
+
+        public MemberPopupMenu() {
+            add = new JMenuItem("Add contact");
+            this.add(add);
+        }
+
+        public void setAddItemActionListener(ActionListener listener) {
+            add.addActionListener(listener);
         }
     }
 }
