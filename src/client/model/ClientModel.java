@@ -68,7 +68,7 @@ public class ClientModel {
     public boolean receiveMessage() {
         try {
             MessageModel newMessage = getMessageFromStream();
-            newMessage.getReceiver().getName();
+            return newMessage.getReceiver().getName().equalsIgnoreCase(currentRoom.getName());
         } catch (ClassNotFoundException | IOException e) {
             e.printStackTrace();
         }

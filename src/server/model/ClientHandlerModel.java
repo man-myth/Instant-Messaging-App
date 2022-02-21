@@ -120,8 +120,6 @@ public class ClientHandlerModel implements Runnable {
                             if (client.currentUser == null || client.equals(this)) {
                                 continue;
                             }
-
-                            System.out.println(client.currentUser.getUsername());
                             if (client.currentUser.getUsername().equals(user.getUsername())) {
                                 client.currentUser = getUserFromList(user.getUsername());
                                 client.writeObject("contact added");
@@ -137,6 +135,7 @@ public class ClientHandlerModel implements Runnable {
                     ChatRoomModel chatRoom = roomName.equals("Public Chat") ? ServerModel.getPublicChat() : getChatRoomFromList(currentUser, roomName);
                     outputStream.writeObject(chatRoom);
                 } else if (input.equals("send message")) {
+                    currentUser = getUserFromList(currentUser.getUsername());
                     MessageModel newMessage = (MessageModel) inputStream.readObject();
                     String roomName = newMessage.getReceiver().getName();
 
@@ -164,11 +163,22 @@ public class ClientHandlerModel implements Runnable {
                     Utility.exportUsersData(ServerModel.getRegisteredUsers());
                     ServerModel.setRegisteredUsers(Utility.readUsersData("res/data.dat"));
                     currentUser = getUserFromList(currentUser.getUsername());
+
+                    // Update GUI of receiver if logged in
                     for (ClientHandlerModel client : ServerModel.clients) {
-                        if (client.equals(this)) {
+                        if (client.currentUser == null || client.equals(this)) {
                             continue;
                         }
-                        outputStream.writeObject("new message");
+                        for (UserModel user : receivers) {
+                            if (client.currentUser.getUsername().equals(user.getUsername())) {
+                                client.writeObject("new message");
+                                if (senderChatRoom.getUsers().size() == 2) {
+                                    newMessage.getReceiver().setName(currentUser.getUsername());
+                                }
+                                client.writeObject(newMessage);
+                                break;
+                            }
+                        }
                     }
 
                 } else if (input.equals("update username")) {

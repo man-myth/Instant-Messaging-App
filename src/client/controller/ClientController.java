@@ -59,11 +59,11 @@ public class ClientController implements Runnable {
                     String enteredName = newName.getText();
                     String oldName = clientModel.getUser().getUsername();
                     boolean isChanged = clientModel.changeUsername(enteredName, oldName);
-                    if(isChanged) {
+                    if (isChanged) {
                         clientView.changeUsername(oldName, enteredName); //change button text of username
                         clientModel.getCurrentRoom().searchUser(oldName).setUsername(enteredName); //change the username from chatroom list
                         newName.changeSuccess(oldName, enteredName);
-                    }else{
+                    } else {
                         newName.promptError();
                     }
                 });
@@ -84,9 +84,8 @@ public class ClientController implements Runnable {
             });
 
 
-
-        settingsView.helpActionListener(e3 -> {
-             helpModule = new SettingsView.HelpModule(); // access the HelpModule class from SettingsView
+            settingsView.helpActionListener(e3 -> {
+                helpModule = new SettingsView.HelpModule(); // access the HelpModule class from SettingsView
 
             });
         });
@@ -114,7 +113,7 @@ public class ClientController implements Runnable {
                         clientView.addNewMember(newMember);
                         addToRoomView.successMessage();
                     }
-                }catch (NullPointerException error){
+                } catch (NullPointerException error) {
                     addToRoomView.errorInvalidAction();
                 }
             });
@@ -176,16 +175,18 @@ public class ClientController implements Runnable {
 
                         // Re-set action listeners
                         clientView.setContactButtonsActionListener(new ContactButtonActionListener());
-                    } else if (event.equals("new message")) {
-                        if (clientModel.receiveMessage()) {
-
-                        }
                     } else if (event.equals("return room")) {
                         clientModel.receiveRoom();
                         clientView.updateRoom(clientModel.getCurrentRoom());
 
                         // Re-set action listeners
                         clientView.setMessageListener(new MessageListener());
+                    } else if (event.equals("new message")) {
+                        // Update GUI
+                        MessageModel message = clientModel.getMessageFromStream();
+                        if (message.getReceiver().getName().equalsIgnoreCase(clientModel.getCurrentRoom().getName())) {
+                            clientView.addMessage(message);
+                        }
                     }
                 }
             } catch (Exception e) {
