@@ -158,6 +158,15 @@ public class SettingsView extends JFrame {
                 JOptionPane.showMessageDialog(this.getContentPane(), "Password did not match, try again.", "Error",
                         JOptionPane.ERROR_MESSAGE);
         }
+
+        public void changeSuccess(boolean isDone) {
+            if (isDone) {
+                JOptionPane.showMessageDialog(null, "Password successfully changed",
+                        "Password Changed", JOptionPane.INFORMATION_MESSAGE);
+                dispose();
+            }
+        }
     }// end of AskNewPass
+
 
 }// end of SettingsView
