@@ -65,22 +65,6 @@ public class AdminController {
 
             });
 
-            adminView.setKickButtonActionListener(e -> {
-                String[] contactArray = clientModel.listToStringArrayAdd(currentRoom.getUsers());
-                kickUserView = new KickContactFromRoomView(contactArray);
-
-                kickUserView.setKickButtonActionListener(e1 -> {
-                    try {
-                        String username = kickUserView.getSelected();
-                        UserModel roomMember = currentRoom.searchUser(username);
-                        currentRoom.kickUser(roomMember);
-                        clientView.kickMember(roomMember);
-                        kickUserView.successMessage();
-                    } catch (NullPointerException error) {
-                        kickUserView.errorInvalidAction();
-                    }
-                });
-
         });
         adminView.setMessageListener(e -> {
             broadcastMessage();
