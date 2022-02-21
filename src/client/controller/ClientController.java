@@ -30,6 +30,7 @@ public class ClientController implements Runnable {
     SettingsView settingsView;
     SettingsView.AskNewName newName;
     SettingsView.AskNewPass newPass;
+    SettingsView.HelpModule helpModule;
 
     // -Constructor
     public ClientController(Socket socket, ObjectInputStream inputStream, ObjectOutputStream outputStream,
@@ -81,6 +82,12 @@ public class ClientController implements Runnable {
                 });
             });
 
+
+
+        settingsView.helpActionListener(e3 -> {
+             helpModule = new SettingsView.HelpModule(); // access the HelpModule class from SettingsView
+
+            });
         });
 
 
