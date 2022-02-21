@@ -56,9 +56,13 @@ public class ClientController implements Runnable {
                     String enteredName = newName.getText();
                     String oldName = clientModel.getUser().getUsername();
                     boolean isChanged = clientModel.changeUsername(enteredName, oldName);
-                    clientView.changeUsername(oldName,enteredName); //change button text of username
-                    currentRoom.searchUser(oldName).setUsername(enteredName); //change the username from chatroom list
-                    newName.changeSuccess(oldName, enteredName, isChanged);
+                    if(isChanged) {
+                        clientView.changeUsername(oldName, enteredName); //change button text of username
+                        currentRoom.searchUser(oldName).setUsername(enteredName); //change the username from chatroom list
+                        newName.changeSuccess(oldName, enteredName);
+                    }else{
+                        newName.promptError();
+                    }
                 });
             });
 
@@ -93,7 +97,7 @@ public class ClientController implements Runnable {
                 try {
                     String username = addToRoomView.getSelected();
                     UserModel newMember = clientModel.getUser().searchUserInContact(username);
-                    boolean isUserHere = currentRoom.isUserHere(newMember);
+                    boolean isUserHere = currentRoom.isUserHere(username);
                     if (isUserHere)
                         addToRoomView.errorUserIsHere();
                     else {

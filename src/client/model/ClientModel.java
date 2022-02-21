@@ -108,7 +108,6 @@ public class ClientModel {
             if(u.getUsername().equals(user.getUsername()) || u.getUsername().equals("admin"))
                 continue;
             contacts.add(u.getUsername());
-            System.out.println(u.getUsername());
         }
         return contacts.toArray(String[]::new);
     }

@@ -37,8 +37,12 @@ public class ChatRoomModel implements Serializable {
     }
 
     // checks if user is in the chat room
-    public boolean isUserHere(UserModel user) {
-        return users.contains(user);
+    public boolean isUserHere(String username) {
+        for(UserModel u: users){
+            if(u.getUsername().equals(username))
+                return true;
+        }
+        return false;
     }
 
     // adds user to the list of users
