@@ -1,8 +1,6 @@
 package server.controller;
 
-import client.view.AddContactToRoomView;
-import client.view.ClientView;
-import client.view.ExitOnCloseAdapter;
+import client.view.*;
 import client.model.ClientModel;
 import server.model.*;
 
@@ -17,7 +15,6 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import client.view.LoginView;
 import server.model.UserModel;
 import server.view.AdminView;
 
@@ -66,8 +63,23 @@ public class AdminController {
                     ex.printStackTrace();
                 }
 
-
             });
+
+            adminView.setKickButtonActionListener(e -> {
+                String[] contactArray = clientModel.listToStringArrayAdd(currentRoom.getUsers());
+                kickUserView = new KickContactFromRoomView(contactArray);
+
+                kickUserView.setKickButtonActionListener(e1 -> {
+                    try {
+                        String username = kickUserView.getSelected();
+                        UserModel roomMember = currentRoom.searchUser(username);
+                        currentRoom.kickUser(roomMember);
+                        clientView.kickMember(roomMember);
+                        kickUserView.successMessage();
+                    } catch (NullPointerException error) {
+                        kickUserView.errorInvalidAction();
+                    }
+                });
 
         });
         adminView.setMessageListener(e -> {
@@ -92,6 +104,7 @@ public class AdminController {
                 }
             }
         }).start();
+
     }
 
     public void receiveMessage(MessageModel message) {

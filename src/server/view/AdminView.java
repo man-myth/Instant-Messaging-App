@@ -112,6 +112,9 @@ public class AdminView extends JFrame {
             this.revalidate();
         }
 
+        public void setKickButtonActionListener(ActionListener listener){
+            membersPanel.kickButton.addActionListener(listener);
+        }
         public void addText(JTextPane pane, String text) {
             StyledDocument doc = pane.getStyledDocument();
 
