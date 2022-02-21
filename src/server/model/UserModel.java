@@ -1,9 +1,7 @@
 package server.model;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 public class UserModel implements Serializable {
     private String username;
@@ -125,5 +123,10 @@ public class UserModel implements Serializable {
                 ", chatRooms=" + chatRooms +
                 ", unreadMessages=" + unreadMessages +
                 '}';
+    }
+    public void bookmarkingUser(String username) {
+        UserModel user= searchUserInContact(username);
+        bookmarks.add(user);
+
     }
 }

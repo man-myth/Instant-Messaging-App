@@ -23,9 +23,9 @@ public class Client {
 //        users.add(new UserModel("user6", "pass6"));
 //        Utility.exportUsersData(users);
 //        List<MessageModel> messages = new ArrayList<>();
-//        messages.add(new MessageModel(new UserModel("test", "test"), new ChatRoomModel("test"), "Hello!", LocalTime.now(), LocalDate.now()));
-//        messages.add(new MessageModel(new UserModel("test", "test"), new ChatRoomModel("test"), "Hi!", LocalTime.now(), LocalDate.now()));
-//        messages.add(new MessageModel(new UserModel("test", "test"), new ChatRoomModel("test"), "shhh", LocalTime.now(), LocalDate.now()));
+//        messages.add(new MessageModel(new UserModel("test", "test"), new ChatRoomModel("test", "admin"), "Hello!", LocalTime.now(), LocalDate.now()));
+//        messages.add(new MessageModel(new UserModel("test", "test"), new ChatRoomModel("test", "admin"), "Hi!", LocalTime.now(), LocalDate.now()));
+//        messages.add(new MessageModel(new UserModel("test", "test"), new ChatRoomModel("test", "admin"), "shhh", LocalTime.now(), LocalDate.now()));
 //        ChatRoomModel publicChat = new ChatRoomModel("", Utility.readUsersData("res/data.dat"), messages);
 //        Utility.exportPublicChat(publicChat);
 
