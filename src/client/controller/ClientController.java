@@ -143,13 +143,7 @@ public class ClientController implements Runnable {
         clientView.setMessageListener(new MessageListener());
 
         // Set ActionListener for member button popup menu
-        clientView.setAddItemActionListener(e -> {
-            JMenuItem menuItem = (JMenuItem) e.getSource();
-            JPopupMenu popupMenu = (JPopupMenu) menuItem.getParent();
-            JButton invokerButton = (JButton) popupMenu.getInvoker();
-            String username = invokerButton.getText();
-            clientModel.addContact(username);
-        });
+        clientView.setAddItemActionListener(new AddContactListener());
 
         // Set ActionListener for contact buttons
         clientView.setContactButtonsActionListener(new ContactButtonActionListener());
@@ -180,6 +174,7 @@ public class ClientController implements Runnable {
                         clientView.updateRoom(clientModel.getCurrentRoom());
 
                         // Re-set action listeners
+                        clientView.setAddItemActionListener(new AddContactListener());
                         clientView.setMessageListener(new MessageListener());
                     } else if (event.equals("new message")) {
                         // Update GUI
@@ -228,6 +223,16 @@ public class ClientController implements Runnable {
                 clientView.clearTextArea();
             }
 
+        }
+    }
+
+    class AddContactListener implements ActionListener {
+        public void actionPerformed(ActionEvent e) {
+            JMenuItem menuItem = (JMenuItem) e.getSource();
+            JPopupMenu popupMenu = (JPopupMenu) menuItem.getParent();
+            JButton invokerButton = (JButton) popupMenu.getInvoker();
+            String username = invokerButton.getText();
+            clientModel.addContact(username);
         }
     }
 
