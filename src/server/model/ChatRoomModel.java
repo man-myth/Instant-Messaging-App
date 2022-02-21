@@ -8,14 +8,18 @@ public class ChatRoomModel implements Serializable {
     private String name;
     private List<UserModel> users;
     private List<MessageModel> chatHistory;
+    private String admin;
+
+
 
     /**
      * Default Constructor
      *
      * @param name of the chat room
      */
-    public ChatRoomModel(String name) {
+    public ChatRoomModel(String name, String admin) {
         this.name = name;
+        this.admin = admin;
         this.users = new ArrayList<>();
         this.chatHistory = new ArrayList<>();
     }
@@ -74,6 +78,13 @@ public class ChatRoomModel implements Serializable {
 
     public void setChatHistory(List<MessageModel> chatHistory) {
         this.chatHistory = chatHistory;
+    }
+    public String getAdmin() {
+        return admin;
+    }
+
+    public void setAdmin(String admin) {
+        this.admin = admin;
     }
 
 }
