@@ -17,6 +17,8 @@ public class ExitOnCloseAdapter extends WindowAdapter {
             socket.shutdownOutput();
         } catch (IOException ex) {
             ex.printStackTrace();
+        } catch (NullPointerException ne){
+            System.exit(0);
         }
         System.exit(0);
     }
