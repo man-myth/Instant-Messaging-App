@@ -37,7 +37,7 @@ public class ClientView extends JFrame {
         mainPanel = new JPanel(new BorderLayout());
         contactsPanel = new ContactsPanel(user.getContacts());
         chatPanel = new ChatPanel(publicChat);
-        membersPanel = new MembersPanel(publicChat.getUsers());
+        membersPanel = new MembersPanel(user, publicChat);
         mainPanel.add(contactsPanel, BorderLayout.WEST);
         mainPanel.add(chatPanel, BorderLayout.CENTER);
         mainPanel.add(membersPanel, BorderLayout.EAST);
@@ -254,22 +254,22 @@ public class ClientView extends JFrame {
         JTextField searchBar;
         List<MemberButton> memberButtons;
 
-        public MembersPanel(List<UserModel> users) {
+        public MembersPanel(UserModel user, ChatRoomModel publicChat) {
+            List<UserModel> users =  publicChat.getUsers();
             searchBar = new HintTextField("Search Members");
             searchBar.setPreferredSize(new Dimension(200, 25));
 
             panel = new JPanel();
             panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
             memberButtons = new ArrayList<>();
-            for (UserModel user : users) {
-                MemberButton button = new MemberButton(user.getUsername());
+            for (UserModel u : users) {
+                MemberButton button = new MemberButton(u.getUsername());
                 memberButtons.add(button);
                 panel.add(button);
             }
 
             scrollPane = new JScrollPane(panel);
             scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-
             settingsPanel = new JPanel(new GridLayout());
             addButton = new JButton(ClientView.scaleIcon("res/graphics/add-user.png"));
             addButton.setBackground(Color.WHITE);
@@ -277,12 +277,13 @@ public class ClientView extends JFrame {
             kickButton.setBackground(Color.WHITE);
             settingsButton = new JButton(ClientView.scaleIcon("res/graphics/gear.png"));
             settingsButton.setBackground(Color.WHITE);
-
             settingsPanel.add(addButton);
             settingsPanel.add(kickButton);
             settingsPanel.add(settingsButton);
             settingsPanel.setPreferredSize(new Dimension(200, 35));
-
+            if(!user.getUsername().equals(publicChat.getAdmin())){
+                kickButton.setVisible(false);
+            }
             this.setLayout(new BorderLayout());
             this.setBackground(Color.GREEN);
 
