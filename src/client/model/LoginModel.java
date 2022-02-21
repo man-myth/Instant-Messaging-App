@@ -1,5 +1,7 @@
 package client.model;
 
+import server.model.UserModel;
+
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -27,5 +29,9 @@ public class LoginModel {
             e.printStackTrace();
         }
         return false;
+    }
+
+    public UserModel getUserModel() throws Exception{
+        return (UserModel) inputStream.readObject();
     }
 }

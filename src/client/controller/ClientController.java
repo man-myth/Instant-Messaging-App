@@ -4,119 +4,140 @@ import client.model.ClientModel;
 import client.view.AddContactToRoomView;
 import client.view.ClientView;
 import client.view.ExitOnCloseAdapter;
+import client.view.KickContactFromRoomView;
+import client.view.SettingsView;
 import server.model.ChatRoomModel;
 import server.model.MessageModel;
 import server.model.UserModel;
 
-import java.util.List;
-import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.*;
 import java.net.Socket;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.ArrayList;
 
-public class ClientController {
-    private Socket socket;
-    private ObjectInputStream inputStream;
-    private ObjectOutputStream outputStream;
+//this class will now implement Runnable
+public class ClientController implements Runnable {
+    // -Fields
+    private final Socket socket;
     ChatRoomModel currentRoom;
     ClientView clientView;
     ClientModel clientModel;
+    AddContactToRoomView addToRoomView;
+    KickContactFromRoomView kickUserView;
+    SettingsView settingsView;
+    SettingsView.AskNewName newName;
+    SettingsView.AskNewPass newPass;
 
-    // Changes: Moved code from AddContactToRoomController to run method
-
+    // -Constructor
     public ClientController(Socket socket, ObjectInputStream inputStream, ObjectOutputStream outputStream,
                             UserModel user, ChatRoomModel publicChat) {
         this.socket = socket;
-        this.inputStream = inputStream;
-        this.outputStream = outputStream;
         this.currentRoom = publicChat;
         this.clientModel = new ClientModel(socket, inputStream, outputStream, user);
     }
 
+    // -Methods
+
+    // run method when calling client controller
+    @Override
     public void run() {
         System.out.println("Logged in with user: " + clientModel.getUser());
         clientView = new ClientView(clientModel.getUser(), currentRoom);
         clientView.setWindowAdapter(new ExitOnCloseAdapter(socket));
-        clientView.setAddButtonActionListener(e -> {
-            String[] contactUsernames = clientModel.getUser().getContacts().stream().map(user -> user.getUsername()).toArray(String[]::new);
-            //String[] contactUsernames = contacts.stream().map(user -> user.getUsername()).toArray(String[]::new);
-            AddContactToRoomView addContactView = new AddContactToRoomView(contactUsernames);
 
-            addContactView.setAddButtonActionListener(e1 -> {
-                try {
-                    outputStream.writeObject("add contact to room");
-                    String username = addContactView.getSelected();
-                    outputStream.writeObject(username);
-                } catch (IOException ex) {
-                    ex.printStackTrace();
-                }
+        // -action for settings button
+        clientView.settingsButtonListener(e -> {
+            SettingsView settingsView = new SettingsView();
+            // Action Listener for asking new username
+            settingsView.changeNameActionListener(e1 -> {
+                newName = new SettingsView.AskNewName(); // access the AskNewName class from SettingsView
+                newName.changeListener(f -> { // action listener for the button in AskNewNAme
+                    String enteredName = newName.getText();
+                    String oldName = clientModel.getUser().getUsername();
+                    boolean isChanged = clientModel.changeUsername(enteredName);
+                    newName.changeSuccess(oldName, enteredName, isChanged);
+                });
+            });
 
-
+            // Action Listener for asking new password
+            settingsView.changePassActionListener(e2 -> {
+                newPass = new SettingsView.AskNewPass(); // access the AskNewPass class from SettingsView
+                newPass.changeListener(f -> { // action listener for the button in AskNewPass
+                    String enteredPass = newPass.getPass();
+                    String reEnteredPass = newPass.getRePass();
+                    boolean isPassValid = clientModel.isPassValid(enteredPass, reEnteredPass); // checks if passwords
+                    // match
+                    newPass.promptError(isPassValid); // prompt an error if passwords do not match
+                    clientModel.changePassword(enteredPass, isPassValid); // else, change password
+                });
             });
 
         });
-        clientView.setMemberButtonsActionListener(e -> {
-            try {
-                outputStream.writeObject("add contact");
-                String username = ((JButton) e.getSource()).getText();
-                outputStream.writeObject(username);
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            }
 
+        // -action for adding of contact to a room
+        clientView.setAddButtonActionListener(e -> {
+            /*
+             * once the add button to room is clicked,
+             * get the contacts of the user and put it in the combo box view
+             */
+            String[] contactArray = clientModel.contactsToStringArr(clientModel.getUser().getContacts());
+            addToRoomView = new AddContactToRoomView(contactArray);
+
+            // calls the addContactToRoom method from client model if add button is clicked
+            //todo kick gui will error after clicking add button, fix getContact returns null @2213277
+            addToRoomView.setAddButtonActionListener(e1 -> {
+                String username = addToRoomView.getSelected();
+                UserModel newUser = clientModel.getContact(username);
+                currentRoom.addUser(newUser);
+                addToRoomView.successMessage();
+            });
         });
+
+        // kick user from the room
+        clientView.setKickButtonActionListener(e -> {
+            currentRoom.getUsers().add(new UserModel("mat", "123"));
+            currentRoom.getUsers().add(new UserModel("lmao", "123"));
+            String[] contactArray = clientModel.contactsToStringArr(currentRoom.getUsers());
+            kickUserView = new KickContactFromRoomView(contactArray);
+
+            kickUserView.setKickButtonActionListener(e1 -> {
+                String username = kickUserView.getSelected();
+                currentRoom.kickUser(username);
+                kickUserView.successMessage();
+            });
+        });
+
+        // -action for broadcasting messages
         clientView.setMessageListener(e -> {
-            broadcastMessage();
+            String message = clientView.getMessage();
+            MessageModel msg = new MessageModel(clientModel.getUser(), currentRoom, message, LocalTime.now(),
+                    LocalDate.now());
+            boolean doBroadcast = clientModel.broadcastMessage(message, msg);
+            if (doBroadcast) {
+                clientView.addMessage(msg);
+                clientView.clearTextArea();
+            }
         });
         EventQueue.invokeLater(() -> clientView.setVisible(true));
 
+        // -loop for broadcasting messages
         new Thread(() -> {
-            Object msg;
             while (true) {
                 try {
-                    msg = inputStream.readObject();
-                    if (msg.equals("broadcast")) {
-                        receiveMessage((MessageModel) inputStream.readObject());
-                    } else if (msg.equals("return contacts")) {
-
-                    } else if (msg.equals("done adding contact")) {
-
-                    } else if (msg.equals("contact added")) {
-                        UserModel newUser = (UserModel) inputStream.readObject();
-                        clientModel.getUser().getContacts().add(newUser);
-
-                        System.out.println(newUser.getUsername());
+                    String event = clientModel.doEvent();
+                    if (event.equals("broadcast")) { // do this if event = "broadcast"
+                        MessageModel message = clientModel.getMessageFromStream();
+                        clientView.addMessage(message);
+                    } else if (event.equals("contact added")) { // do this if event = "contact added"
+                        clientModel.addContact();
                         clientView.updateContacts(clientModel.getUser().getContacts());
                     }
-                } catch (IOException | ClassNotFoundException e) {
-                    //e.printStackTrace();
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             }
         }).start();
-    }
+    }// end of run method
 
-    public void receiveMessage(MessageModel message) {
-        clientView.addMessage(message);
-    }
-
-    public void broadcastMessage() {
-        String message = clientView.getMessage();
-        if (message.isEmpty()) {
-            return;
-        }
-        try {
-            outputStream.writeObject("broadcast");
-            MessageModel msg = new MessageModel(clientModel.getUser(), currentRoom, message, LocalTime.now(), LocalDate.now());
-            outputStream.writeObject(msg);
-            clientView.addMessage(msg);
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
-        clientView.clearTextArea();
-    }
-}
+}// END OF CLIENT CONTROLLER

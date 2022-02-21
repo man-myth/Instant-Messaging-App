@@ -1,23 +1,21 @@
 package client.view;
 
-import server.model.UserModel;
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
 //Adding contact to room
-public class AddContactToRoomView extends JFrame {
-    JButton addButton = new JButton("Add");
+public class KickContactFromRoomView extends JFrame {
+    JButton kickButton = new JButton("Kick");
     JComboBox comboBox;
 
-    public AddContactToRoomView(String[] strings) {
+    public KickContactFromRoomView(String[] strings) {
         // Combo box
         comboBox = new JComboBox(strings);
 
         // buttons
-        addButton.setFocusable(false);
+        kickButton.setFocusable(false);
 
         // frame details 1
         this.setPreferredSize(new Dimension(300, 100));
@@ -25,7 +23,7 @@ public class AddContactToRoomView extends JFrame {
 
         // add to frame
         this.add(comboBox);
-        this.add(addButton);
+        this.add(kickButton);
 
         // frame details 2
         this.pack();
@@ -34,12 +32,12 @@ public class AddContactToRoomView extends JFrame {
         this.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
     }
 
-    public void setAddButtonActionListener(ActionListener listener) {
-        addButton.addActionListener(listener);
+    public void setKickButtonActionListener(ActionListener listener) {
+        kickButton.addActionListener(listener);
     }
 
     public void successMessage() {
-        JOptionPane.showMessageDialog(null, "Successfully added user " + getSelected(), "Added",
+        JOptionPane.showMessageDialog(null, "Successfully kicked user " + getSelected(), "Kicked",
                 JOptionPane.INFORMATION_MESSAGE);
         this.dispose();
     }
