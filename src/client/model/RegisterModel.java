@@ -1,15 +1,11 @@
 package client.model;
 
-import client.view.RegisterView;
-import server.model.UserModel;
-import server.model.Utility;
 
-import javax.swing.*;
+//import server.model.UserModel;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.OutputStream;
-import java.util.List;
+
 
 public class RegisterModel {
 
@@ -27,7 +23,9 @@ public class RegisterModel {
         try {
             // Send request to server
             outputStream.writeObject("register");
-            outputStream.writeObject(new UserModel(username, password));
+            outputStream.writeObject(username);
+            outputStream.writeObject(password);
+            //outputStream.writeObject(new UserModel(username, password));
             String status = (String)inputStream.readObject();
 
             while (true) {

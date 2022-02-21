@@ -88,7 +88,7 @@ public class AdminController {
 
                     }
                 } catch (IOException | ClassNotFoundException e) {
-                    e.printStackTrace();
+                    System.out.println("User Disconnected");
                 }
             }
         }).start();
