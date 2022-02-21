@@ -95,14 +95,16 @@ public class SettingsView extends JFrame {
             return textField.getText();
         }
 
-        public void changeSuccess(String oldName, String newName, boolean isDone) {
-            if (isDone) {
-                JOptionPane.showMessageDialog(null, "Changed " + oldName + " to " + newName,
-                        "Username Changed", JOptionPane.INFORMATION_MESSAGE);
-                dispose();
-            } else
-                JOptionPane.showMessageDialog(this.getContentPane(), "Please enter a username.", "Error",
-                        JOptionPane.ERROR_MESSAGE);
+        public void changeSuccess(String oldName, String newName) {
+            JOptionPane.showMessageDialog(null, "Changed " + oldName + " to " + newName,
+                    "Username Changed", JOptionPane.INFORMATION_MESSAGE);
+            dispose();
+
+        }
+
+        public void promptError(){
+            JOptionPane.showMessageDialog(this.getContentPane(), "Please enter a username.", "Error",
+                    JOptionPane.ERROR_MESSAGE);
         }
     }// end of AskNewName
 

@@ -8,7 +8,7 @@ import java.util.ArrayList;
 //Adding contact to room
 public class KickContactFromRoomView extends JFrame {
     JButton kickButton = new JButton("Kick");
-    JLabel label = new JLabel("Kick a contact from this room");
+    JLabel label = new JLabel("Kick a member from this room");
     JComboBox comboBox;
 
     public KickContactFromRoomView(String[] strings) {
