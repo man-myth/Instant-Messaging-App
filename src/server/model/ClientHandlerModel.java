@@ -2,13 +2,16 @@ package server.model;
 
 import java.io.*;
 import java.net.Socket;
-import java.util.List;
 
+/**
+ * Handles client connected to the server
+ */
 public class ClientHandlerModel implements Runnable {
     private final Socket clientSocket;
     ObjectOutputStream outputStream;
     ObjectInputStream inputStream;
 
+    // constructor
     public ClientHandlerModel(Socket socket) {
         this.clientSocket = socket;
         try {

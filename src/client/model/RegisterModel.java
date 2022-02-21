@@ -1,15 +1,11 @@
 package client.model;
 
-import client.view.RegisterView;
-import server.model.UserModel;
-import server.model.Utility;
 
-import javax.swing.*;
+import server.model.UserModel;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.OutputStream;
-import java.util.List;
+
 
 public class RegisterModel {
 

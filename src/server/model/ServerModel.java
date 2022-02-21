@@ -1,10 +1,6 @@
 package server.model;
 
-import client.controller.ClientController;
-import client.model.ClientModel;
-
 import java.io.*;
-import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -13,6 +9,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.*;
 
+/**
+ * This will initialize and run the server
+ */
 public class ServerModel {
     private static final int PORT = 2022;
     private static ServerSocket serverSocket;
