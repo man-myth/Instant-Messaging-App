@@ -40,6 +40,16 @@ public class ChatRoomModel implements Serializable {
 
     }
 
+    // returns the message if message contains a specified text
+    public MessageModel searchMessage(String message) {
+        for(MessageModel c: chatHistory){
+            if(c.getContent().equalsIgnoreCase(message))
+                return c;
+        }
+        return null;
+
+    }
+
     // checks if user is in the chat room
     public boolean isUserHere(String username) {
         for(UserModel u: users){
