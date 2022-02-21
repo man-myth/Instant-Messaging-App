@@ -8,6 +8,7 @@ import client.view.KickContactFromRoomView;
 import client.view.SettingsView;
 import server.model.ChatRoomModel;
 import server.model.MessageModel;
+import server.model.ServerModel;
 import server.model.UserModel;
 
 import javax.swing.*;
@@ -114,14 +115,16 @@ public class ClientController implements Runnable {
             kickUserView = new KickContactFromRoomView(contactArray);
 
             kickUserView.setKickButtonActionListener(e1 -> {
-                try {
-                    String username = kickUserView.getSelected();
-                    UserModel roomMember = currentRoom.searchUser(username);
-                    currentRoom.kickUser(roomMember);
-                    clientView.kickMember(roomMember);
-                    kickUserView.successMessage();
-                }catch (NullPointerException error){
-                    kickUserView.errorInvalidAction();
+                if(currentRoom.getAdmin().equals(clientModel.getUser().getUsername())) {
+                    try {
+                        String username = kickUserView.getSelected();
+                        UserModel roomMember = currentRoom.searchUser(username);
+                        currentRoom.kickUser(roomMember);
+                        clientView.kickMember(roomMember);
+                        kickUserView.successMessage();
+                    } catch (NullPointerException error) {
+                        kickUserView.errorInvalidAction();
+                    }
                 }
             });
         });
