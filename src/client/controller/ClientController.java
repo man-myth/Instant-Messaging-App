@@ -177,7 +177,9 @@ public class ClientController implements Runnable {
                         // Re-set action listeners
                         clientView.setContactButtonsActionListener(new ContactButtonActionListener());
                     } else if (event.equals("new message")) {
+                        if (clientModel.receiveMessage()) {
 
+                        }
                     } else if (event.equals("return room")) {
                         clientModel.receiveRoom();
                         clientView.updateRoom(clientModel.getCurrentRoom());

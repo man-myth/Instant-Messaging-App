@@ -61,8 +61,18 @@ public class ClientModel {
 
 /*--- BROADCASTING OF MESSAGE MODEL ---*/
     // added; method that gets message from stream
-    public MessageModel getMessageFromStream() throws Exception {
+    public MessageModel getMessageFromStream() throws ClassNotFoundException, IOException {
         return (MessageModel) inputStream.readObject();
+    }
+
+    public boolean receiveMessage() {
+        try {
+            MessageModel newMessage = getMessageFromStream();
+            newMessage.getReceiver().getName();
+        } catch (ClassNotFoundException | IOException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
     /*
