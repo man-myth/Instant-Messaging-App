@@ -8,14 +8,18 @@ public class ChatRoomModel implements Serializable {
     private String name;
     private List<UserModel> users;
     private List<MessageModel> chatHistory;
+    private String admin;
+
+
 
     /**
      * Default Constructor
      *
      * @param name of the chat room
      */
-    public ChatRoomModel(String name) {
+    public ChatRoomModel(String name, String admin) {
         this.name = name;
+        this.admin = admin;
         this.users = new ArrayList<>();
         this.chatHistory = new ArrayList<>();
     }
@@ -27,16 +31,32 @@ public class ChatRoomModel implements Serializable {
     }
 
     // returns the user if userList contains the specified user
-    private UserModel searchUser(UserModel user) {
-        if (users.contains(user))
-            return user;
-        else
-            return null;
+    public UserModel searchUser(String username) {
+        for(UserModel u: users){
+            if(u.getUsername().equals(username))
+                return u;
+        }
+        return null;
+
+    }
+
+    // returns the message if message contains a specified text
+    public MessageModel searchMessage(String message) {
+        for(MessageModel c: chatHistory){
+            if(c.getContent().equalsIgnoreCase(message))
+                return c;
+        }
+        return null;
+
     }
 
     // checks if user is in the chat room
-    private boolean isUserHere(UserModel user) {
-        return users.contains(user);
+    public boolean isUserHere(String username) {
+        for(UserModel u: users){
+            if(u.getUsername().equals(username))
+                return true;
+        }
+        return false;
     }
 
     // adds user to the list of users
@@ -45,8 +65,8 @@ public class ChatRoomModel implements Serializable {
     }
 
     // removes the user from list of users
-    public void kickUser(String user) {
-        users.removeIf(u -> u.getUsername().equals(user));
+    public void kickUser(UserModel user) {
+        users.remove(user);
     }
 
     // Setters
@@ -72,6 +92,13 @@ public class ChatRoomModel implements Serializable {
 
     public void setChatHistory(List<MessageModel> chatHistory) {
         this.chatHistory = chatHistory;
+    }
+    public String getAdmin() {
+        return admin;
+    }
+
+    public void setAdmin(String admin) {
+        this.admin = admin;
     }
 
 }

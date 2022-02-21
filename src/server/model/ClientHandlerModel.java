@@ -5,12 +5,16 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Handles client connected to the server
+ */
 public class ClientHandlerModel implements Runnable {
     private final Socket clientSocket;
     ObjectOutputStream outputStream;
     ObjectInputStream inputStream;
     UserModel currentUser;
 
+    // constructor
     public ClientHandlerModel(Socket socket) {
         this.clientSocket = socket;
         try {
@@ -49,8 +53,9 @@ public class ClientHandlerModel implements Runnable {
                     }
                 } else if (input.equals("register")) {
                     System.out.println("Attempting to register.");
-                    input = inputStream.readObject();
-                    UserModel newUser = (UserModel) input;
+                    String username = (String) inputStream.readObject();
+                    String password = (String) inputStream.readObject();
+                    UserModel newUser = new UserModel(username, password);
 
                     // if username already exists, prompt a message
                     if (ServerModel.doesUsernameExist(newUser.getUsername()))
@@ -76,11 +81,6 @@ public class ClientHandlerModel implements Runnable {
                         client.writeObject("broadcast");
                         client.writeObject(newMessage);
                     }
-                } else if (input.equals("add contact to room")) {
-                    UserModel user = (UserModel) inputStream.readObject();
-                    // todo add user to chat room
-                } else if (input.equals("kick contact from room")) {
-
                 } else if (input.equals("add contact")) {
                     String username = (String) inputStream.readObject();
                     UserModel user = getUserFromList(username);
@@ -155,7 +155,25 @@ public class ClientHandlerModel implements Runnable {
                         }
                         outputStream.writeObject("new message");
                     }
+                } else if (input.equals("update username")) {
+                    String[] names = (String[]) inputStream.readObject();
+                    for (UserModel u : ServerModel.registeredUsers) {
+                        if (u.getUsername().equals(names[0]))
+                            u.setUsername(names[1]);
+                    }
+                    Utility.exportUsersData(ServerModel.getRegisteredUsers());
+                    System.out.println("username changed for " + names[1]);
+                } else if (input.equals("update password")) {
+                    String name = (String) inputStream.readObject();
+                    String password = (String) inputStream.readObject();
+                    for (UserModel u : ServerModel.registeredUsers) {
+                        if (u.getUsername().equals(name))
+                            u.setPassword(password);
+                    }
+                    Utility.exportUsersData(ServerModel.getRegisteredUsers());
+                    System.out.println("password changed for " + name);
                 }
+
 
                 // Changes: Removed input.equals("get contacts") since ClientModel.user already
                 // has a contact list

@@ -7,6 +7,7 @@ import server.controller.AdminController;
 import server.model.ChatRoomModel;
 import server.model.UserModel;
 
+import javax.swing.*;
 import java.io.*;
 import java.net.Socket;
 
@@ -35,52 +36,54 @@ public class LoginController {
             outputStream = new ObjectOutputStream(socket.getOutputStream());
             outputStream.flush();
             inputStream = new ObjectInputStream(socket.getInputStream());
-
-            loginModel = new LoginModel(inputStream, outputStream);
-
-            loginView.loginButton.addActionListener(e -> {
-                try {
-                    outputStream.writeObject("login");
-                } catch (IOException ex) {
-                    ex.printStackTrace();
-                }
-                String username = loginView.usernameTextField.getText();
-                String password = loginView.passwordTextField.getText();
-
-                if (loginModel.isUser(username, password)) {
-                    System.out.println("Logged in!");
-                    loginView.dispose();
-
-                    try {
-                        UserModel userModel = loginModel.getUserModel();
-                        if (userModel.getUsername().equals("admin"))
-                            new AdminController(socket, inputStream, outputStream,
-                                    userModel, (ChatRoomModel) inputStream.readObject()).run();
-                        else{
-                            ClientController clientController = new ClientController(socket, inputStream,
-                                    outputStream, userModel, (ChatRoomModel) inputStream.readObject());
-                            clientController.run();
-                        }
-                    } catch (Exception ex) {
-                        ex.printStackTrace();
-                    }
-                } else {
-                    System.out.println("Failed to log in.");
-                    //loginView.dispose();
-                    //LoginController login = new LoginController();
-                    //login.run();
-                }
-            });
-
-            loginView.registerButton.addActionListener(e -> {
-                register = new RegisterController(inputStream, outputStream);
-            });
-
-            loginView.setWindowAdapter(new ExitOnCloseAdapter(socket));
-            loginView.setVisible(true);
-        } catch (IOException e) {
+        } catch (IOException e){
             e.printStackTrace();
         }
+
+        loginModel = new LoginModel(inputStream, outputStream);
+
+        loginView.loginButton.addActionListener(e -> {
+            try {
+                outputStream.writeObject("login");
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            } catch (NullPointerException nu){
+                JOptionPane.showMessageDialog(loginView, "Oops! The server is offline. \n Please try again later", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+            String username = loginView.usernameTextField.getText();
+            String password = loginView.passwordTextField.getText();
+
+            if (loginModel.isUser(username, password)) {
+                System.out.println("Logged in!");
+                loginView.dispose();
+
+                try {
+                    UserModel userModel = loginModel.getUserModel();
+                    if (userModel.getUsername().equals("admin"))
+                        new AdminController(socket, inputStream, outputStream,
+                                userModel, (ChatRoomModel) inputStream.readObject()).run();
+                    else{
+                        ClientController clientController = new ClientController(socket, inputStream,
+                                outputStream, userModel, (ChatRoomModel) inputStream.readObject());
+                        clientController.run();
+                    }
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            } else {
+                System.out.println("Failed to log in.");
+                //loginView.dispose();
+                //LoginController login = new LoginController();
+                //login.run();
+            }
+        });
+
+        loginView.registerButton.addActionListener(e -> {
+            register = new RegisterController(inputStream, outputStream);
+        });
+
+        loginView.setWindowAdapter(new ExitOnCloseAdapter(socket));
+        loginView.setVisible(true);
     }
 
     public UserModel getUser() {

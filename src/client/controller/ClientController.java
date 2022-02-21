@@ -8,6 +8,7 @@ import client.view.KickContactFromRoomView;
 import client.view.SettingsView;
 import server.model.ChatRoomModel;
 import server.model.MessageModel;
+import server.model.ServerModel;
 import server.model.UserModel;
 
 import javax.swing.*;
@@ -31,6 +32,7 @@ public class ClientController implements Runnable {
     SettingsView settingsView;
     SettingsView.AskNewName newName;
     SettingsView.AskNewPass newPass;
+    SettingsView.HelpModule helpModule;
 
     // -Constructor
     public ClientController(Socket socket, ObjectInputStream inputStream, ObjectOutputStream outputStream,
@@ -47,69 +49,98 @@ public class ClientController implements Runnable {
         clientView = new ClientView(clientModel.getUser(), clientModel.getCurrentRoom());
         clientView.setWindowAdapter(new ExitOnCloseAdapter(socket));
 
-        // -action for settings button
+        //- settings actions
         clientView.settingsButtonListener(e -> {
+            //asking new username listener
             SettingsView settingsView = new SettingsView();
-            // Action Listener for asking new username
             settingsView.changeNameActionListener(e1 -> {
                 newName = new SettingsView.AskNewName(); // access the AskNewName class from SettingsView
                 newName.changeListener(f -> { // action listener for the button in AskNewNAme
                     String enteredName = newName.getText();
                     String oldName = clientModel.getUser().getUsername();
-                    boolean isChanged = clientModel.changeUsername(enteredName);
-                    newName.changeSuccess(oldName, enteredName, isChanged);
+                    boolean isChanged = clientModel.changeUsername(enteredName, oldName);
+                    if(isChanged) {
+                        clientView.changeUsername(oldName, enteredName); //change button text of username
+                        clientModel.getCurrentRoom().searchUser(oldName).setUsername(enteredName); //change the username from chatroom list
+                        newName.changeSuccess(oldName, enteredName);
+                    }else{
+                        newName.promptError();
+                    }
                 });
             });
 
-            // Action Listener for asking new password
+            //asking new password listener
             settingsView.changePassActionListener(e2 -> {
                 newPass = new SettingsView.AskNewPass(); // access the AskNewPass class from SettingsView
                 newPass.changeListener(f -> { // action listener for the button in AskNewPass
                     String enteredPass = newPass.getPass();
                     String reEnteredPass = newPass.getRePass();
-                    boolean isPassValid = clientModel.isPassValid(enteredPass, reEnteredPass); // checks if passwords
-                    // match
+                    boolean isPassValid = clientModel.isPassValid(enteredPass, reEnteredPass); // checks if passwords match
                     newPass.promptError(isPassValid); // prompt an error if passwords do not match
                     clientModel.changePassword(enteredPass, isPassValid); // else, change password
+                    clientModel.getCurrentRoom().searchUser(clientModel.getUser().getUsername()).setPassword(enteredPass);
+                    newPass.changeSuccess(isPassValid);
                 });
             });
 
+
+
+        settingsView.helpActionListener(e3 -> {
+             helpModule = new SettingsView.HelpModule(); // access the HelpModule class from SettingsView
+
+            });
         });
 
-        // -action for adding of contact to a room
+
+        //- adding of contact to a room actions
         clientView.setAddButtonActionListener(e -> {
             /*
              * once the add button to room is clicked,
              * get the contacts of the user and put it in the combo box view
              */
-            String[] contactArray = clientModel.contactsToStringArr(clientModel.getUser().getContacts());
+            String[] contactArray = clientModel.listToStringArrayAdd(clientModel.getUser().getContacts());
             addToRoomView = new AddContactToRoomView(contactArray);
 
             // calls the addContactToRoom method from client model if add button is clicked
-            //todo kick gui will error after clicking add button, fix getContact returns null @2213277
             addToRoomView.setAddButtonActionListener(e1 -> {
-                String username = addToRoomView.getSelected();
-                UserModel newUser = clientModel.getContact(username);
-                clientModel.getCurrentRoom().addUser(newUser);
-                addToRoomView.successMessage();
+                try {
+                    String username = addToRoomView.getSelected();
+                    UserModel newMember = clientModel.getUser().searchUserInContact(username);
+                    boolean isUserHere = clientModel.getCurrentRoom().isUserHere(username);
+                    if (isUserHere)
+                        addToRoomView.errorUserIsHere();
+                    else {
+                        clientModel.getCurrentRoom().addUser(newMember);
+                        clientView.addNewMember(newMember);
+                        addToRoomView.successMessage();
+                    }
+                }catch (NullPointerException error){
+                    addToRoomView.errorInvalidAction();
+                }
             });
         });
 
-        // kick user from the room
+
+        //- kick user from the room actions
         clientView.setKickButtonActionListener(e -> {
-            clientModel.getCurrentRoom().getUsers().add(new UserModel("mat", "123"));
-            clientModel.getCurrentRoom().getUsers().add(new UserModel("lmao", "123"));
-            String[] contactArray = clientModel.contactsToStringArr(clientModel.getCurrentRoom().getUsers());
+            String[] contactArray = clientModel.listToStringArrayAdd(clientModel.getCurrentRoom().getUsers());
             kickUserView = new KickContactFromRoomView(contactArray);
 
             kickUserView.setKickButtonActionListener(e1 -> {
-                String username = kickUserView.getSelected();
-                clientModel.getCurrentRoom().kickUser(username);
-                kickUserView.successMessage();
+                try {
+                    String username = kickUserView.getSelected();
+                    UserModel roomMember = clientModel.getCurrentRoom().searchUser(username);
+                    clientModel.getCurrentRoom().kickUser(roomMember);
+                    clientView.kickMember(roomMember);
+                    kickUserView.successMessage();
+                } catch (NullPointerException error) {
+                    kickUserView.errorInvalidAction();
+                }
             });
         });
 
-        // -action for broadcasting messages
+
+        //- broadcasting messages actions
         clientView.setMessageListener(new MessageListener());
 
         // Set ActionListener for member button popup menu

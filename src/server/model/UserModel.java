@@ -1,9 +1,7 @@
 package server.model;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 public class UserModel implements Serializable {
     private String username;
@@ -98,8 +96,9 @@ public class UserModel implements Serializable {
     }
 
     //returns the user if he/she is in the contact list
-    public UserModel searchUser(String username) {
-        for (UserModel u : contacts) {
+
+    public UserModel searchUserInContact(String username) {
+        for(UserModel u: contacts){
             if (u.getUsername().equals(username))
                 return u;
         }
@@ -132,5 +131,10 @@ public class UserModel implements Serializable {
                 ", chatRooms=" + chatRooms +
                 ", unreadMessages=" + unreadMessages +
                 '}';
+    }
+    public void bookmarkingUser(String username) {
+        UserModel user= searchUserInContact(username);
+        bookmarks.add(user);
+
     }
 }

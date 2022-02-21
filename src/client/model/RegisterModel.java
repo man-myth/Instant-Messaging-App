@@ -1,15 +1,12 @@
 package client.model;
 
-import client.view.RegisterView;
-import server.model.UserModel;
-import server.model.Utility;
 
+//import server.model.UserModel;
 import javax.swing.*;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.OutputStream;
-import java.util.List;
+
 
 public class RegisterModel {
 
@@ -22,12 +19,14 @@ public class RegisterModel {
     }
 
     //method that checks if username already exists, if not, registers the user; returns true if successfully registered
-    public boolean registerUser(String username, String password, boolean errorExist) {
+    public boolean registerUser(String username, String password, boolean errorExist) throws NullPointerException{
         if(errorExist) return false; //if there is an existing error, do not proceed
         try {
             // Send request to server
             outputStream.writeObject("register");
-            outputStream.writeObject(new UserModel(username, password));
+            outputStream.writeObject(username);
+            outputStream.writeObject(password);
+            //outputStream.writeObject(new UserModel(username, password));
             String status = (String)inputStream.readObject();
 
             while (true) {
