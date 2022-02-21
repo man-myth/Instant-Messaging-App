@@ -2,6 +2,7 @@ package client.model;
 
 import server.model.MessageModel;
 import server.model.UserModel;
+
 import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -22,24 +23,19 @@ public class ClientModel {
     }
 
     /*
-     * changed; run() -> doEvent()
+     * changed; run() -> getEvent()
      * returns a string to specify what event to do
      * controller will read the event
      * controller will tell model what method to run
      */
-    public String doEvent() {
-        Object msg;
+    public String getEvent() {
+        String msg = "none";
         try {
-            msg = inputStream.readObject();
-            if (msg.equals("broadcast")) {
-                return "broadcast";
-            } else if (msg.equals("return contacts")) {
-                return "return contacts";
-            }
+            msg = (String) inputStream.readObject();
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
         }
-        return "none";
+        return msg;
     }
 
     public UserModel getUser() {
@@ -50,9 +46,9 @@ public class ClientModel {
         this.user = user;
     }
 
-/*------------------------------- MODELS -------------------------------*/
+    /*------------------------------- MODELS -------------------------------*/
 
-/*--- BROADCASTING OF MESSAGE MODEL ---*/
+    /*--- BROADCASTING OF MESSAGE MODEL ---*/
     // added; method that gets message from stream
     public MessageModel getMessageFromStream() throws Exception {
         return (MessageModel) inputStream.readObject();
@@ -76,23 +72,39 @@ public class ClientModel {
         return true;
     }
 
-/*--- ADDING CONTACT MODEL ---*/
+    /*--- ADDING CONTACT MODEL ---*/
 
     // adds the new user to contact list
-    public void addContact() throws Exception {
-        UserModel newUser = (UserModel) inputStream.readObject();
-        System.out.println(newUser.getUsername());
-        getUser().getContacts().add(newUser);
+    public void receiveContact() {
+        UserModel newUser = null;
+        try {
+            newUser = (UserModel) inputStream.readObject();
+            System.out.println(newUser.getUsername());
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        user.getContacts().add(newUser);
     }
 
-/*--- ADDING/KICKING OF CONTACT TO CHAT ROOM MODEL ---*/
+    public void addContact(String username) {
+        try {
+            outputStream.writeObject("add contact");
+            outputStream.writeObject(username);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /*--- ADDING/KICKING OF CONTACT TO CHAT ROOM MODEL ---*/
 
     public UserModel getContact(String username) {
-        for(UserModel u: user.getContacts()){
-            if(u.getUsername().equals(username))
+        for (UserModel u : user.getContacts()) {
+            if (u.getUsername().equals(username))
                 return u;
         }
-        return new UserModel("null","null");
+        return new UserModel("null", "null");
     }
 
     public void kickContactFromRoom(String username) {
@@ -110,7 +122,7 @@ public class ClientModel {
         List<String> contacts = new ArrayList<>();
         for (UserModel u : list) {
             //continue if username is equals your username/admin
-            if(u.getUsername().equals(user.getUsername()) || u.getUsername().equals("admin"))
+            if (u.getUsername().equals(user.getUsername()) || u.getUsername().equals("admin"))
                 continue;
             contacts.add(u.getUsername());
             System.out.println(u.getUsername());
@@ -119,7 +131,7 @@ public class ClientModel {
         return contacts.toArray(String[]::new);
     }
 
-/*--- SETTINGS MODEL ---*/
+    /*--- SETTINGS MODEL ---*/
     //todo: update changes in dat file @2213277
     public boolean changeUsername(String newName) {
         if (newName.length() != 0) {
