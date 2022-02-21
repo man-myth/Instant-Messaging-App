@@ -18,7 +18,8 @@ import java.awt.event.WindowAdapter;
 
 public class ClientView extends JFrame {
 
-    JPanel mainPanel, contactsPanel;
+    JPanel mainPanel;
+    ContactsPanel contactsPanel;
     // Changes: Jpanel -> MembersPanel
     MembersPanel membersPanel;
     ChatPanel chatPanel;
@@ -35,7 +36,7 @@ public class ClientView extends JFrame {
         menuBar.add(menu);
 
         mainPanel = new JPanel(new BorderLayout());
-        contactsPanel = new ContactsPanel(user.getContacts());
+        contactsPanel = new ContactsPanel(user.getChatRooms());
         chatPanel = new ChatPanel(publicChat);
         membersPanel = new MembersPanel(publicChat.getUsers());
         mainPanel.add(contactsPanel, BorderLayout.WEST);
@@ -73,14 +74,25 @@ public class ClientView extends JFrame {
         }
     }
 
+    public void setContactButtonsActionListener(ActionListener listener) {
+        contactsPanel.setContactButtonsActionListener(listener);
+    }
+
     public void setRoom(String roomName) {
 
     }
 
-    public void updateContacts(List<UserModel> users) {
+    public void updateContacts(List<ChatRoomModel> rooms) {
         mainPanel.remove(contactsPanel);
-        contactsPanel = new ContactsPanel(users);
+        contactsPanel = new ContactsPanel(rooms);
         mainPanel.add(contactsPanel, BorderLayout.WEST);
+        mainPanel.revalidate();
+    }
+
+    public void updateRoom(ChatRoomModel room) {
+        mainPanel.remove(chatPanel);
+        chatPanel = new ChatPanel(room);
+        mainPanel.add(chatPanel, BorderLayout.CENTER);
         mainPanel.revalidate();
     }
 
@@ -179,18 +191,25 @@ public class ClientView extends JFrame {
 
     class ContactsPanel extends JPanel {
         JPanel panel;
+        List<ContactButton> buttons;
         JTextField searchBar;
         JScrollPane scrollPane;
 
-        public ContactsPanel(List<UserModel> users) {
+        public ContactsPanel(List<ChatRoomModel> rooms) {
             JLabel contactsLabel = new JLabel("Contacts", SwingConstants.CENTER);
             contactsLabel.setFont(ClientView.headingFont);
 
             panel = new JPanel();
             panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-            panel.add(new ContactButton("Public Chat", false));
-            for (UserModel user : users) {
-                panel.add(new ContactButton(user.getUsername(), user.getUnreadMessages() == null));
+            ContactButton publicChatButton = new ContactButton("Public Chat", false);
+            buttons = new ArrayList<>();
+            buttons.add(publicChatButton);
+            panel.add(publicChatButton);
+
+            for (ChatRoomModel room : rooms) {
+                ContactButton button = new ContactButton(room.getName(), false);
+                buttons.add(button);
+                panel.add(button);
             }
             scrollPane = new JScrollPane(panel);
             scrollPane.setPreferredSize(new Dimension(100, 430));
@@ -205,6 +224,12 @@ public class ClientView extends JFrame {
             this.setMinimumSize(new Dimension(200, 500));
             this.setPreferredSize(new Dimension(200, 500));
             this.setMaximumSize(new Dimension(200, 500));
+        }
+
+        public void setContactButtonsActionListener(ActionListener listener) {
+            for (ContactButton button : buttons) {
+                button.addActionListener(listener);
+            }
         }
 
         class ContactButton extends JButton {

@@ -2,6 +2,7 @@ package server.model;
 
 import java.io.*;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.List;
 
 public class ClientHandlerModel implements Runnable {
@@ -25,7 +26,6 @@ public class ClientHandlerModel implements Runnable {
         for (UserModel user : ServerModel.getRegisteredUsers()) {
             System.out.println(user);
         }
-
         // Handle requests of the client
         currentUser = new UserModel();
         try {
@@ -40,13 +40,11 @@ public class ClientHandlerModel implements Runnable {
                     String password = (String) inputStream.readObject();
                     System.out.printf("Attempting to login with username:%s and password:%s\n", username, password);
                     if (authenticate.verifyUser(username, password)) {
-                        System.out.println("Success!");
                         outputStream.writeObject("VERIFIED");
                         currentUser = getUserFromList(username, password);
                         writeObject(currentUser);
                         writeObject(ServerModel.getPublicChat());
                     } else {
-                        System.out.println("Failed.");
                         outputStream.writeObject("FAILED");
                     }
                 } else if (input.equals("register")) {
@@ -57,7 +55,6 @@ public class ClientHandlerModel implements Runnable {
                     // if username already exists, prompt a message
                     if (ServerModel.doesUsernameExist(newUser.getUsername()))
                         outputStream.writeObject("invalid");
-
                     else {
                         ServerModel.addRegisteredUser(newUser);
                         ServerModel.getPublicChat().addUser(newUser);
@@ -65,10 +62,12 @@ public class ClientHandlerModel implements Runnable {
                         outputStream.writeObject("registered");
                     }
                 } else if (input.equals("broadcast")) {
-                    ChatRoomModel publicChat = ServerModel.publicChat;
+                    ChatRoomModel publicChat = ServerModel.getPublicChat();
                     MessageModel newMessage = (MessageModel) inputStream.readObject();
                     publicChat.getChatHistory().add(newMessage);
+
                     Utility.exportPublicChat(publicChat);
+                    ServerModel.setPublicChat(Utility.readPublicChat("res/publicChat.dat"));
 
                     for (ClientHandlerModel client : ServerModel.clients) {
                         if (client.equals(this)) {
@@ -80,7 +79,6 @@ public class ClientHandlerModel implements Runnable {
                 } else if (input.equals("add contact to room")) {
                     UserModel user = (UserModel) inputStream.readObject();
                     // todo add user to chat room
-
                 } else if (input.equals("kick contact from room")) {
 
                 } else if (input.equals("add contact")) {
@@ -88,21 +86,74 @@ public class ClientHandlerModel implements Runnable {
                     UserModel user = getUserFromList(username);
                     // Run if user is not null and user is not yet a contact of current user
                     if (user != null && !currentUser.hasContact(username)) {
+                        // Contains initial list of chat room members
+                        List<UserModel> users = new ArrayList<>();
+                        users.add(currentUser);
+                        users.add(user);
+
+                        // Create new chat room for current user
+                        ChatRoomModel newChatRoom = new ChatRoomModel(username, users, new ArrayList<>());
                         currentUser.getContacts().add(user);
+                        currentUser.getChatRooms().add(newChatRoom);
+                        ServerModel.updateUser(currentUser.getUsername(), currentUser);
+                        // Add chat room for other user
                         user.getContacts().add(currentUser);
+                        newChatRoom = new ChatRoomModel(currentUser.getUsername(), users, new ArrayList<>());
+                        user.getChatRooms().add(newChatRoom);
+                        ServerModel.updateUser(user.getUsername(), user);
+
+                        // Save data
+                        Utility.exportUsersData(ServerModel.getRegisteredUsers());
+                        ServerModel.setRegisteredUsers(Utility.readUsersData("res/data.dat"));
+                        currentUser = getUserFromList(currentUser.getUsername());
+
+                        outputStream.writeObject("contact added");
+                        outputStream.writeObject(currentUser.getChatRooms());
+
+
+                        // Update client view of new contact if new contact is logged in
                         for (ClientHandlerModel client : ServerModel.clients) {
-                            if (client.equals(this)) {
+                            if (client.currentUser == null || client.equals(this)) {
                                 continue;
                             }
+
+                            System.out.println(client.currentUser.getUsername());
                             if (client.currentUser.getUsername().equals(user.getUsername())) {
+                                client.currentUser = getUserFromList(user.getUsername());
                                 client.writeObject("contact added");
-                                client.writeObject(currentUser);
+                                client.writeObject(client.currentUser.getChatRooms());
                                 break;
                             }
                         }
-                        outputStream.writeObject("contact added");
-                        outputStream.writeObject(user);
-                        Utility.exportUsersData(ServerModel.getRegisteredUsers());
+                    }
+                } else if (input.equals("get room")) {
+                    String roomName = (String) inputStream.readObject();
+                    System.out.println(roomName);
+                    outputStream.writeObject("return room");
+                    ChatRoomModel chatRoom = roomName.equals("Public Chat") ? ServerModel.getPublicChat() : getChatRoomFromList(currentUser, roomName);
+                    if (chatRoom == null) {
+                        System.out.println("Null!");
+                    }
+                    outputStream.writeObject(chatRoom);
+                } else if (input.equals("send message")) {
+                    MessageModel newMessage = (MessageModel) inputStream.readObject();
+                    ChatRoomModel chatRoom = getChatRoomFromList(currentUser, newMessage.getReceiver().getName());
+                    getUserFromList(currentUser.getUsername()).updateChatroom(chatRoom.getName(), chatRoom);
+                    List<UserModel> receivers = chatRoom.getUsers();
+                    // Update chat history for receivers
+                    for (int i = 0; i < receivers.size(); i++) {
+                    }
+                    for (UserModel user : receivers) {
+                        if (!user.getUsername().equals(currentUser.getUsername())) {
+                            getUserFromList(user.getUsername()).updateChatroom(chatRoom.getName(), chatRoom);
+                        }
+                    }
+                    Utility.exportUsersData(ServerModel.getRegisteredUsers());
+                    for (ClientHandlerModel client : ServerModel.clients) {
+                        if (client.equals(this)) {
+                            continue;
+                        }
+                        outputStream.writeObject("new message");
                     }
                 }
 
@@ -120,6 +171,8 @@ public class ClientHandlerModel implements Runnable {
                 ex.printStackTrace();
                 // e.printStackTrace();
             }
+        } finally {
+            currentUser = null;
         }
     }
 
@@ -146,5 +199,9 @@ public class ClientHandlerModel implements Runnable {
         return ServerModel.registeredUsers.stream()
                 .filter(user -> username.equals(user.getUsername()) && password.equals(user.getPassword())).findAny()
                 .orElse(null);
+    }
+
+    public ChatRoomModel getChatRoomFromList(UserModel currentUser, String roomName) {
+        return currentUser.getChatRooms().stream().filter(room -> room.getName().equals(roomName)).findAny().orElse(null);
     }
 }

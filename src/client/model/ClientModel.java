@@ -1,5 +1,6 @@
 package client.model;
 
+import server.model.ChatRoomModel;
 import server.model.MessageModel;
 import server.model.UserModel;
 
@@ -12,14 +13,16 @@ public class ClientModel {
     private Socket socket;
     private final ObjectInputStream inputStream;
     private final ObjectOutputStream outputStream;
+    ChatRoomModel currentRoom;
     UserModel user;
 
     public ClientModel(Socket clientSocket, ObjectInputStream inputStream, ObjectOutputStream outputStream,
-                       UserModel user) {
+                       UserModel user, ChatRoomModel currentRoom) {
         this.socket = clientSocket;
         this.inputStream = inputStream;
         this.outputStream = outputStream;
         this.user = user;
+        this.currentRoom = currentRoom;
     }
 
     /*
@@ -46,6 +49,14 @@ public class ClientModel {
         this.user = user;
     }
 
+    public ChatRoomModel getCurrentRoom() {
+        return currentRoom;
+    }
+
+    public void setCurrentRoom(ChatRoomModel currentRoom) {
+        this.currentRoom = currentRoom;
+    }
+
     /*------------------------------- MODELS -------------------------------*/
 
     /*--- BROADCASTING OF MESSAGE MODEL ---*/
@@ -59,8 +70,8 @@ public class ClientModel {
      * returns true to tell controller
      * to add message to client view and cleat text area
      */
-    public boolean broadcastMessage(String message, MessageModel msg) {
-        if (message.isEmpty()) {
+    public boolean broadcastMessage(MessageModel msg) {
+        if (msg.getContent().isEmpty()) {
             return false;
         }
         try {
@@ -72,20 +83,33 @@ public class ClientModel {
         return true;
     }
 
+    public void sendMessage(MessageModel msg) {
+        try {
+            outputStream.writeObject("send message");
+            outputStream.writeObject(msg);
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+    }
+
     /*--- ADDING CONTACT MODEL ---*/
 
     // adds the new user to contact list
-    public void receiveContact() {
-        UserModel newUser = null;
+    public void updateChatRooms() {
+        List<ChatRoomModel> newChatRoomList = new ArrayList<>();
         try {
-            newUser = (UserModel) inputStream.readObject();
-            System.out.println(newUser.getUsername());
+            System.out.println("Hello!");
+            newChatRoomList = (List<ChatRoomModel>) inputStream.readObject();
+
+            for (ChatRoomModel chatRooms : newChatRoomList) {
+                System.out.println(chatRooms.getName());
+            }
         } catch (IOException e) {
             e.printStackTrace();
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
-        user.getContacts().add(newUser);
+        user.setChatRooms(newChatRoomList);
     }
 
     public void addContact(String username) {
@@ -93,6 +117,24 @@ public class ClientModel {
             outputStream.writeObject("add contact");
             outputStream.writeObject(username);
         } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // Send a request to the server for the specified chat room
+    public void requestRoom(String roomName) {
+        try {
+            outputStream.writeObject("get room");
+            outputStream.writeObject(roomName);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void receiveRoom() {
+        try {
+            currentRoom = (ChatRoomModel) inputStream.readObject();
+        } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
         }
     }
@@ -125,7 +167,6 @@ public class ClientModel {
             if (u.getUsername().equals(user.getUsername()) || u.getUsername().equals("admin"))
                 continue;
             contacts.add(u.getUsername());
-            System.out.println(u.getUsername());
         }
         contacts.add("test lang po boss");
         return contacts.toArray(String[]::new);

@@ -12,6 +12,8 @@ import server.model.UserModel;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.*;
 import java.net.Socket;
 import java.time.LocalDate;
@@ -21,7 +23,7 @@ import java.time.LocalTime;
 public class ClientController implements Runnable {
     // -Fields
     private final Socket socket;
-    ChatRoomModel currentRoom;
+
     ClientView clientView;
     ClientModel clientModel;
     AddContactToRoomView addToRoomView;
@@ -34,8 +36,7 @@ public class ClientController implements Runnable {
     public ClientController(Socket socket, ObjectInputStream inputStream, ObjectOutputStream outputStream,
                             UserModel user, ChatRoomModel publicChat) {
         this.socket = socket;
-        this.currentRoom = publicChat;
-        this.clientModel = new ClientModel(socket, inputStream, outputStream, user);
+        this.clientModel = new ClientModel(socket, inputStream, outputStream, user, publicChat);
     }
 
     // -Methods
@@ -43,7 +44,7 @@ public class ClientController implements Runnable {
     // run method when calling client controller
     public void run() {
         System.out.println("Logged in with user: " + clientModel.getUser());
-        clientView = new ClientView(clientModel.getUser(), currentRoom);
+        clientView = new ClientView(clientModel.getUser(), clientModel.getCurrentRoom());
         clientView.setWindowAdapter(new ExitOnCloseAdapter(socket));
 
         // -action for settings button
@@ -89,36 +90,27 @@ public class ClientController implements Runnable {
             addToRoomView.setAddButtonActionListener(e1 -> {
                 String username = addToRoomView.getSelected();
                 UserModel newUser = clientModel.getContact(username);
-                currentRoom.addUser(newUser);
+                clientModel.getCurrentRoom().addUser(newUser);
                 addToRoomView.successMessage();
             });
         });
 
         // kick user from the room
         clientView.setKickButtonActionListener(e -> {
-            currentRoom.getUsers().add(new UserModel("mat", "123"));
-            currentRoom.getUsers().add(new UserModel("lmao", "123"));
-            String[] contactArray = clientModel.contactsToStringArr(currentRoom.getUsers());
+            clientModel.getCurrentRoom().getUsers().add(new UserModel("mat", "123"));
+            clientModel.getCurrentRoom().getUsers().add(new UserModel("lmao", "123"));
+            String[] contactArray = clientModel.contactsToStringArr(clientModel.getCurrentRoom().getUsers());
             kickUserView = new KickContactFromRoomView(contactArray);
 
             kickUserView.setKickButtonActionListener(e1 -> {
                 String username = kickUserView.getSelected();
-                currentRoom.kickUser(username);
+                clientModel.getCurrentRoom().kickUser(username);
                 kickUserView.successMessage();
             });
         });
 
         // -action for broadcasting messages
-        clientView.setMessageListener(e -> {
-            String message = clientView.getMessage();
-            MessageModel msg = new MessageModel(clientModel.getUser(), currentRoom, message, LocalTime.now(),
-                    LocalDate.now());
-            boolean doBroadcast = clientModel.broadcastMessage(message, msg);
-            if (doBroadcast) {
-                clientView.addMessage(msg);
-                clientView.clearTextArea();
-            }
-        });
+        clientView.setMessageListener(new MessageListener());
 
         // Set ActionListener for member button popup menu
         clientView.setAddItemActionListener(e -> {
@@ -129,6 +121,9 @@ public class ClientController implements Runnable {
             clientModel.addContact(username);
         });
 
+        // Set ActionListener for contact buttons
+        clientView.setContactButtonsActionListener(new ContactButtonActionListener());
+
         // Separate thread for GUI
         EventQueue.invokeLater(() -> clientView.setVisible(true));
 
@@ -137,21 +132,69 @@ public class ClientController implements Runnable {
             try {
                 while (true) {
                     String event = clientModel.getEvent();
-                    System.out.println(event);
+                    System.out.println("Event: " + event);
                     if (event.equals("broadcast")) { // do this if event = "broadcast"
                         MessageModel message = clientModel.getMessageFromStream();
-                        clientView.addMessage(message);
+                        if (clientModel.getCurrentRoom().getName().equalsIgnoreCase("Public Chat")) {
+                            clientView.addMessage(message);
+                        }
+
                     } else if (event.equals("contact added")) { // do this if event = "contact added"
-                        clientModel.receiveContact();
-                        System.out.println(clientModel.getUser().getContacts());
-                        clientView.updateContacts(clientModel.getUser().getContacts());
+                        clientModel.updateChatRooms();
+                        clientView.updateContacts(clientModel.getUser().getChatRooms());
+
+                        // Re-set action listeners
+                        clientView.setContactButtonsActionListener(new ContactButtonActionListener());
+                    } else if (event.equals("new message")) {
+
+                    } else if (event.equals("return room")) {
+                        clientModel.receiveRoom();
+                        clientView.updateRoom(clientModel.getCurrentRoom());
+
+                        // Re-set action listeners
+                        clientView.setMessageListener(new MessageListener());
                     }
                 }
             } catch (Exception e) {
-                System.out.println(socket + "has disconnected.");
-                //e.printStackTrace();
+                //System.out.println(socket + "has disconnected.");
+                e.printStackTrace();
             }
         }).start();
     }// end of run method
+
+    class ContactButtonActionListener implements ActionListener {
+
+        public void actionPerformed(ActionEvent e) {
+            String room = ((JButton) e.getSource()).getText();
+            if (room.equals(clientModel.getCurrentRoom().getName())) {
+                return;
+            }
+            clientModel.requestRoom(room);
+        }
+    }
+
+    class MessageListener implements ActionListener {
+        public void actionPerformed(ActionEvent e) {
+            String message = clientView.getMessage();
+            ChatRoomModel currentRoom = clientModel.getCurrentRoom();
+            MessageModel msg = new MessageModel(clientModel.getUser(), currentRoom, message, LocalTime.now(),
+                    LocalDate.now());
+
+            // Public chat
+            if (currentRoom.getName().equalsIgnoreCase("Public Chat")) {
+                boolean doBroadcast = clientModel.broadcastMessage(msg);
+                if (doBroadcast) {
+                    clientView.addMessage(msg);
+                    clientView.clearTextArea();
+                }
+                // Conference or Private Message
+            } else {
+                clientModel.sendMessage(msg);
+                clientView.addMessage(msg);
+                clientView.clearTextArea();
+            }
+
+        }
+    }
 
 }// END OF CLIENT CONTROLLER
