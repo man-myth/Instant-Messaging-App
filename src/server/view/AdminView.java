@@ -1,5 +1,6 @@
 package server.view;
 
+import client.view.ClientView;
 import client.view.HintTextField;
 import server.model.ChatRoomModel;
 import server.model.MessageModel;
@@ -12,6 +13,7 @@ import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
 import java.awt.*;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.util.List;
 import java.awt.event.WindowAdapter;
 
@@ -21,13 +23,16 @@ public class AdminView extends JFrame {
     //Changes: Jpanel -> MembersPanel
     MembersPanel membersPanel;
     ChatPanel chatPanel;
+    JMenuBar menuBar;
+    JMenu menu;
+    JMenuItem logOut;
     static Font headingFont = new Font("Calibri", Font.PLAIN, 20);
 
     public AdminView(UserModel user, ChatRoomModel publicChat) {
         mainPanel = new JPanel(new BorderLayout());
         contactsPanel = new ContactsPanel(user.getContacts());
         chatPanel = new ChatPanel(publicChat);
-        membersPanel = new MembersPanel(publicChat.getUsers());
+        membersPanel = new MembersPanel(user, publicChat);
         mainPanel.add(contactsPanel, BorderLayout.WEST);
         mainPanel.add(chatPanel, BorderLayout.CENTER);
         mainPanel.add(membersPanel, BorderLayout.EAST);
@@ -56,8 +61,21 @@ public class AdminView extends JFrame {
         chatPanel.getMessageTextArea().addActionListener(a);
     }
 
+    public void setAddItemActionListener(ActionListener listener) {
+        for (MembersPanel.MemberButton button : membersPanel.getMemberButtons()) {
+            button.getPopupMenu().setAddItemActionListener(listener);
+        }
+    }
+
     public void setRoom(String roomName) {
 
+    }
+
+    public void updateContacts(List<UserModel> users) {
+        mainPanel.remove(contactsPanel);
+        contactsPanel = new ContactsPanel(users);
+        mainPanel.add(contactsPanel, BorderLayout.WEST);
+        mainPanel.revalidate();
     }
 
     public static ImageIcon scaleIcon(String filename) {
@@ -69,13 +87,39 @@ public class AdminView extends JFrame {
         return imageIcon;
     }
 
+    public void setMemberButtonsActionListener(ActionListener listener) {
+        membersPanel.setMemberButtonsActionListener(listener);
+    }
+
     public void addMessage(MessageModel msg) {
         chatPanel.addMessage(msg);
     }
 
     public void setAddButtonActionListener(ActionListener listener) {
-        membersPanel.setAddButtonActionListener(listener);
+        membersPanel.addButton.addActionListener(listener);
     }
+
+    public void setKickButtonActionListener(ActionListener listener){
+        membersPanel.kickButton.addActionListener(listener);
+    }
+
+    public void settingsButtonListener(ActionListener listener) {
+        membersPanel.settingsButton.addActionListener(listener);
+    }
+
+    public void addNewMember(UserModel user){
+        membersPanel.addNewMember(user);
+    }
+
+    public void kickMember(UserModel user){
+        membersPanel.kickMember(user);
+    }
+
+    public void changeUsername(String oldName, String newName){
+        membersPanel.changeUsername(oldName,newName);
+    }
+
+    /*---------- INNER CLASSES ----------*/
 
     class ChatPanel extends JPanel {
         JLabel roomName;
@@ -194,39 +238,44 @@ public class AdminView extends JFrame {
         }
     }
 
+    /*MembersPanel Class*/
     class MembersPanel extends JPanel {
         JPanel panel, settingsPanel;
         JButton addButton, kickButton, settingsButton;
         JScrollPane scrollPane;
         JTextField searchBar;
+        List<MemberButton> memberButtons;
 
-        public MembersPanel(List<UserModel> users) {
+        public MembersPanel(UserModel user, ChatRoomModel publicChat) {
+            List<UserModel> users =  publicChat.getUsers();
             searchBar = new HintTextField("Search Members");
             searchBar.setPreferredSize(new Dimension(200, 25));
 
             panel = new JPanel();
             panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-
-            for (UserModel user : users) {
-                panel.add(new MemberButton(user.getUsername()));
+            memberButtons = new ArrayList<>();
+            for (UserModel u : users) {
+                MemberButton button = new MemberButton(u.getUsername());
+                memberButtons.add(button);
+                panel.add(button);
             }
 
             scrollPane = new JScrollPane(panel);
             scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-
             settingsPanel = new JPanel(new GridLayout());
-            addButton = new JButton(AdminView.scaleIcon("res/graphics/add-user.png"));
+            addButton = new JButton(ClientView.scaleIcon("res/graphics/add-user.png"));
             addButton.setBackground(Color.WHITE);
-            kickButton = new JButton(AdminView.scaleIcon("res/graphics/remove-user.png"));
+            kickButton = new JButton(ClientView.scaleIcon("res/graphics/remove-user.png"));
             kickButton.setBackground(Color.WHITE);
-            settingsButton = new JButton(AdminView.scaleIcon("res/graphics/gear.png"));
+            settingsButton = new JButton(ClientView.scaleIcon("res/graphics/gear.png"));
             settingsButton.setBackground(Color.WHITE);
-
             settingsPanel.add(addButton);
             settingsPanel.add(kickButton);
             settingsPanel.add(settingsButton);
             settingsPanel.setPreferredSize(new Dimension(200, 35));
-
+//            if(!user.getUsername().equals(publicChat.getAdmin())){
+//                kickButton.setVisible(false);
+//            }
             this.setLayout(new BorderLayout());
             this.setBackground(Color.GREEN);
 
@@ -240,12 +289,16 @@ public class AdminView extends JFrame {
 
         class MemberButton extends JButton {
             ImageIcon imageIcon;
+            MemberPopupMenu popupMenu;
 
             public MemberButton(String memberName) {
                 this.setMinimumSize(new Dimension(175, 35));
                 this.setPreferredSize(new Dimension(200, 35));
                 this.setMaximumSize(new Dimension(200, 35));
                 this.setText(memberName);
+
+                popupMenu = new MemberPopupMenu();
+                this.setComponentPopupMenu(popupMenu);
 
                 imageIcon = new ImageIcon("res/graphics/user.png");
 
@@ -256,10 +309,68 @@ public class AdminView extends JFrame {
                 this.setHorizontalAlignment(SwingConstants.LEFT);
                 this.setBackground(Color.WHITE);
             }
+
+            public MemberPopupMenu getPopupMenu() {
+                return popupMenu;
+            }
         }
 
-        public void setAddButtonActionListener(ActionListener listener) {
-            addButton.addActionListener(listener);
+        public void setMemberButtonsActionListener(ActionListener listener) {
+            for (MemberButton button : memberButtons) {
+                button.addActionListener(listener);
+            }
+        }
+
+        public List<MemberButton> getMemberButtons() {
+            return memberButtons;
+        }
+
+        //add a new member button
+        public void addNewMember(UserModel user){
+            MemberButton button = new MemberButton(user.getUsername());
+            memberButtons.add(button);
+            panel.add(button);
+            this.revalidate();
+        }
+
+        //remove a member button
+        public void kickMember(UserModel user){
+            String name = user.getUsername();
+            //loops to find the button with the same name
+            for(JButton b: memberButtons){
+                if(b.getText().equals(name)) {
+                    panel.remove(b);
+                    break;
+                }
+            }
+            memberButtons.removeIf(e -> e.getText().equals(name));
+            this.repaint();
+            this.revalidate();
+        }
+
+        //change username button
+        public void changeUsername(String oldName, String newName){
+            for(JButton b: memberButtons){
+                if(b.getText().equals(oldName)) {
+                    b.setText(newName);
+                    break;
+                }
+            }
+        }
+
+    }
+
+    /*MemberPopupMenu Class*/
+    class MemberPopupMenu extends JPopupMenu {
+        JMenuItem add;
+
+        public MemberPopupMenu() {
+            add = new JMenuItem("Add contact");
+            this.add(add);
+        }
+
+        public void setAddItemActionListener(ActionListener listener) {
+            add.addActionListener(listener);
         }
     }
 }
