@@ -98,13 +98,14 @@ public class UserModel implements Serializable {
     }
 
     //returns the user if he/she is in the contact list
-    public UserModel searchUser(String username) {
+    public UserModel searchUserInContact(String username) {
         for(UserModel u: contacts){
             if (u.getUsername().equals(username))
                 return u;
         }
         return null;
     }
+
 
     public boolean hasContact(String username) {
         for (UserModel user : contacts) {

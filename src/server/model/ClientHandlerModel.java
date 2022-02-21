@@ -81,12 +81,6 @@ public class ClientHandlerModel implements Runnable {
                         client.writeObject("broadcast");
                         client.writeObject(newMessage);
                     }
-                } else if (input.equals("add contact to room")) {
-                    UserModel user = (UserModel) inputStream.readObject();
-                    // todo add user to chat room
-
-                } else if (input.equals("kick contact from room")) {
-
                 } else if (input.equals("add contact")) {
                     String username = (String) inputStream.readObject();
                     UserModel user = getUserFromList(username);
@@ -108,7 +102,25 @@ public class ClientHandlerModel implements Runnable {
                         outputStream.writeObject(user);
                         Utility.exportUsersData(ServerModel.getRegisteredUsers());
                     }
+                }else if (input.equals("update username")){
+                    String[] names = (String[]) inputStream.readObject();
+                    for(UserModel u: ServerModel.registeredUsers){
+                        if(u.getUsername().equals(names[0]))
+                            u.setUsername(names[1]);
+                    }
+                    Utility.exportUsersData(ServerModel.getRegisteredUsers());
+                    System.out.println("username changed for "+names[1]);
+                }else if (input.equals("update password")){
+                    String name = (String) inputStream.readObject();
+                    String password = (String) inputStream.readObject();
+                    for(UserModel u: ServerModel.registeredUsers){
+                        if(u.getUsername().equals(name))
+                            u.setPassword(password);
+                    }
+                    Utility.exportUsersData(ServerModel.getRegisteredUsers());
+                    System.out.println("password changed for "+name);
                 }
+
 
                 // Changes: Removed input.equals("get contacts") since ClientModel.user already
                 // has a contact list

@@ -8,6 +8,7 @@ import java.util.ArrayList;
 //Adding contact to room
 public class KickContactFromRoomView extends JFrame {
     JButton kickButton = new JButton("Kick");
+    JLabel label = new JLabel("Kick a contact from this room");
     JComboBox comboBox;
 
     public KickContactFromRoomView(String[] strings) {
@@ -18,10 +19,12 @@ public class KickContactFromRoomView extends JFrame {
         kickButton.setFocusable(false);
 
         // frame details 1
-        this.setPreferredSize(new Dimension(300, 100));
+        this.setPreferredSize(new Dimension(300, 130));
         this.setLayout(new FlowLayout());
+        this.setTitle("Kick from room");
 
         // add to frame
+        this.add(label);
         this.add(comboBox);
         this.add(kickButton);
 
@@ -42,7 +45,14 @@ public class KickContactFromRoomView extends JFrame {
         this.dispose();
     }
 
+    public void errorInvalidAction(){
+        JOptionPane.showMessageDialog(this.getContentPane(), "No user found.", "Error",
+                JOptionPane.ERROR_MESSAGE);
+    }
+
+
     public String getSelected() {
         return comboBox.getSelectedItem().toString();
     }
+
 }

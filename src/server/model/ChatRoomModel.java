@@ -27,15 +27,17 @@ public class ChatRoomModel implements Serializable {
     }
 
     // returns the user if userList contains the specified user
-    private UserModel searchUser(UserModel user) {
-        if (users.contains(user))
-            return user;
-        else
-            return null;
+    public UserModel searchUser(String username) {
+        for(UserModel u: users){
+            if(u.getUsername().equals(username))
+                return u;
+        }
+        return null;
+
     }
 
     // checks if user is in the chat room
-    private boolean isUserHere(UserModel user) {
+    public boolean isUserHere(UserModel user) {
         return users.contains(user);
     }
 
@@ -45,8 +47,8 @@ public class ChatRoomModel implements Serializable {
     }
 
     // removes the user from list of users
-    public void kickUser(String user) {
-        users.removeIf(u -> u.getUsername().equals(user));
+    public void kickUser(UserModel user) {
+        users.remove(user);
     }
 
     // Setters
