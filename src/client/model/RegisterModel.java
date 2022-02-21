@@ -1,7 +1,7 @@
 package client.model;
 
 
-import server.model.UserModel;
+//import server.model.UserModel;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -23,7 +23,9 @@ public class RegisterModel {
         try {
             // Send request to server
             outputStream.writeObject("register");
-            outputStream.writeObject(new UserModel(username, password));
+            outputStream.writeObject(username);
+            outputStream.writeObject(password);
+            //outputStream.writeObject(new UserModel(username, password));
             String status = (String)inputStream.readObject();
 
             while (true) {
