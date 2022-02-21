@@ -55,9 +55,9 @@ public class SettingsView extends JFrame {
         changeStatus.addActionListener(listener);
     }
 
-    /*----- Inner Static Classes -----*/
+/*----- Inner Static Classes -----*/
 
-    // ---JFrame class that takes the new username
+    //--- NEW USERNAME VIEW
     public static class AskNewName extends JFrame {
         // -Fields
         JButton change = new JButton("change");
@@ -108,7 +108,7 @@ public class SettingsView extends JFrame {
         }
     }// end of AskNewName
 
-    // ---JFrame class that takes the new password
+    //--- NEW PASSWORD VIEW
     public static class AskNewPass extends JFrame {
         // -Fields
         JButton change = new JButton("change");
@@ -169,6 +169,37 @@ public class SettingsView extends JFrame {
             }
         }
     }// end of AskNewPass
+
+    //---STATUS VIEW
+    public static class StatusView extends JFrame {
+        public JButton button = new JButton("Set status as offline");
+
+        public StatusView(){
+            //buttons
+            button.setFocusable(false);
+
+            // frame details 1
+            this.setPreferredSize(new Dimension(200, 200));
+            this.setLayout(new FlowLayout());
+            this.setTitle("Set Status");
+
+            // frame details 2
+            this.pack();
+            this.setVisible(true);
+            this.setLocationRelativeTo(null);
+            this.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+        }
+
+        public void toOnline(){
+            button.setText("Set status as online");
+        }
+
+        public void toOffline(){
+            button.setText("Set status as offline");
+        }
+
+
+    }
 
 
 }// end of SettingsView

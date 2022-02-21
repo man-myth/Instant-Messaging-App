@@ -29,6 +29,7 @@ public class ClientController implements Runnable {
     SettingsView settingsView;
     SettingsView.AskNewName newName;
     SettingsView.AskNewPass newPass;
+    SettingsView.StatusView statusView;
 
     // -Constructor
     public ClientController(Socket socket, ObjectInputStream inputStream, ObjectOutputStream outputStream,
@@ -49,7 +50,7 @@ public class ClientController implements Runnable {
         //- settings actions
         clientView.settingsButtonListener(e -> {
             //asking new username listener
-            SettingsView settingsView = new SettingsView();
+            settingsView = new SettingsView();
             settingsView.changeNameActionListener(e1 -> {
                 newName = new SettingsView.AskNewName(); // access the AskNewName class from SettingsView
                 newName.changeListener(f -> { // action listener for the button in AskNewNAme
@@ -77,6 +78,14 @@ public class ClientController implements Runnable {
                     clientModel.changePassword(enteredPass, isPassValid); // else, change password
                     currentRoom.searchUser(clientModel.getUser().getUsername()).setPassword(enteredPass);
                     newPass.changeSuccess(isPassValid);
+                });
+            });
+
+            //set status listener
+            settingsView.changeStatusActionListener(e3 ->{
+                statusView = new SettingsView.StatusView();
+                statusView.button.addActionListener(b -> {
+                    //todo set status @2213277
                 });
             });
 
