@@ -2,6 +2,7 @@ package client.model;
 
 
 //import server.model.UserModel;
+import javax.swing.*;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -18,7 +19,7 @@ public class RegisterModel {
     }
 
     //method that checks if username already exists, if not, registers the user; returns true if successfully registered
-    public boolean registerUser(String username, String password, boolean errorExist) {
+    public boolean registerUser(String username, String password, boolean errorExist) throws NullPointerException{
         if(errorExist) return false; //if there is an existing error, do not proceed
         try {
             // Send request to server
