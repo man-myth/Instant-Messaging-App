@@ -30,6 +30,8 @@ public class ServerModel {
     public void run() {
         clients = new ArrayList<>();
         serverSocket = null;
+
+        // Start the server
         try {
             serverSocket = new ServerSocket(PORT);
             serverSocket.setReuseAddress(true);
@@ -40,7 +42,6 @@ public class ServerModel {
         }
 
         while (true) {
-
             try {
                 // Accept client connection
                 clientSocket = serverSocket.accept();

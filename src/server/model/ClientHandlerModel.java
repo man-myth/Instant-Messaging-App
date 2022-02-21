@@ -10,6 +10,7 @@ public class ClientHandlerModel implements Runnable {
     private final Socket clientSocket;
     ObjectOutputStream outputStream;
     ObjectInputStream inputStream;
+    UserModel currentUser;
 
     // constructor
     public ClientHandlerModel(Socket socket) {
@@ -28,11 +29,13 @@ public class ClientHandlerModel implements Runnable {
             System.out.println(user);
         }
 
-        UserModel currentUser = new UserModel();
+        // Handle requests of the client
+        currentUser = new UserModel();
         try {
-            while (true) {
+            while (!clientSocket.isClosed()) {
                 Object input;
                 input = inputStream.readObject();
+
                 if (input.equals("login")) {
                     AuthenticatorModel authenticate = new AuthenticatorModel(inputStream, outputStream,
                             ServerModel.getRegisteredUsers());
@@ -61,6 +64,7 @@ public class ClientHandlerModel implements Runnable {
 
                     else {
                         ServerModel.addRegisteredUser(newUser);
+                        ServerModel.getPublicChat().addUser(newUser);
                         Utility.exportUsersData(ServerModel.getRegisteredUsers());
                         outputStream.writeObject("registered");
                     }
@@ -86,12 +90,24 @@ public class ClientHandlerModel implements Runnable {
                 } else if (input.equals("add contact")) {
                     String username = (String) inputStream.readObject();
                     UserModel user = getUserFromList(username);
-                    if (user != null) {
+                    // Run if user is not null and user is not yet a contact of current user
+                    if (user != null && !currentUser.hasContact(username)) {
                         currentUser.getContacts().add(user);
+                        user.getContacts().add(currentUser);
+                        for (ClientHandlerModel client : ServerModel.clients) {
+                            if (client.equals(this)) {
+                                continue;
+                            }
+                            if (client.currentUser.getUsername().equals(user.getUsername())) {
+                                client.writeObject("contact added");
+                                client.writeObject(currentUser);
+                                break;
+                            }
+                        }
                         outputStream.writeObject("contact added");
                         outputStream.writeObject(user);
+                        Utility.exportUsersData(ServerModel.getRegisteredUsers());
                     }
-
                 }
 
                 // Changes: Removed input.equals("get contacts") since ClientModel.user already

@@ -10,7 +10,6 @@ public class Utility {
     public static void exportUsersData(List<UserModel> users) {
         try (
                 ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream("res/data.dat"));
-
         ) {
             for (UserModel user : users) {
                 outputStream.writeObject(user);
@@ -47,6 +46,7 @@ public class Utility {
         ChatRoomModel publicChat = null;
         try (ObjectInputStream inputStream = new ObjectInputStream(new BufferedInputStream(new FileInputStream(filename)))) {
             publicChat = (ChatRoomModel) inputStream.readObject();
+            publicChat.setName("Public Chat");
             publicChat.setUsers(readUsersData("res/data.dat"));
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();

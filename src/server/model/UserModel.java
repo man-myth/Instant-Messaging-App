@@ -106,12 +106,20 @@ public class UserModel implements Serializable {
         return null;
     }
 
+    public boolean hasContact(String username) {
+        for (UserModel user : contacts) {
+            if (user.getUsername().equals(username)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public String toString() {
         return "server.model.UserModel{" +
                 "username='" + username + '\'' +
                 ", password='" + password + '\'' +
                 ", status='" + status + '\'' +
-                ", contacts=" + contacts +
                 ", bookmarks=" + bookmarks +
                 ", chatRooms=" + chatRooms +
                 ", unreadMessages=" + unreadMessages +
