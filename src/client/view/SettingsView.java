@@ -9,6 +9,7 @@ public class SettingsView extends JFrame {
     JButton changeName = new JButton("Change username");
     JButton changePass = new JButton("Change password");
     JButton changeStatus = new JButton("Change status");
+    JButton help = new JButton("Need help?");
 
     // -Constructor
     public SettingsView() {
@@ -22,14 +23,18 @@ public class SettingsView extends JFrame {
         changeStatus.setFocusable(false);
         changeStatus.setPreferredSize(new Dimension(150, 50));
 
+        help.setFocusable(false);
+        help.setPreferredSize(new Dimension(150, 50));
+
         // frame details 1
-        this.setPreferredSize(new Dimension(300, 210));
+        this.setPreferredSize(new Dimension(300, 280));
         this.setLayout(new FlowLayout());
 
         // add to frame
         this.add(changeName);
         this.add(changePass);
         this.add(changeStatus);
+        this.add(help);
 
         // frame details 2
         this.pack();
@@ -55,7 +60,10 @@ public class SettingsView extends JFrame {
         changeStatus.addActionListener(listener);
     }
 
-/*----- Inner Static Classes -----*/
+    // adds action listener to help button
+    public void helpActionListener(ActionListener listener) { help.addActionListener(listener); }
+
+    /*----- Inner Static Classes -----*/
 
     //--- NEW USERNAME VIEW
     public static class AskNewName extends JFrame {
@@ -201,5 +209,35 @@ public class SettingsView extends JFrame {
 
     }
 
+    // ---JFrame class that takes the new password
+    public static class HelpModule extends JFrame{
+        // -Fields
+       String guide ="<html><body width = '%1s'><h1>Questions:</h1>"
+                +"<p><br> Q1: How to kick a user from a chatroom?<br/>"
+                +"<br> Only admin users can kick a user.<br />"
+                +"<br>Q2: How to add a user to bookmarks? <br/>"
+                +"<br>Right click on the contact you want to bookmark and press 'Add to Contact'.<br/> "
+                +"<br>Q3: How to logout?<br/>"
+                +"Click on the logout option located at Menu where you will see the logout option </html>";
+       JLabel helpLabel = new JLabel(guide);
+
+
+        // -Constructor
+        public HelpModule(){
+
+            // frame details
+            this.setLayout(new FlowLayout());
+            this.add(helpLabel);
+            helpLabel.setPreferredSize(new Dimension(250,230));
+
+            // frame details 2
+            this.setPreferredSize(new Dimension(300, 250));
+            this.pack();
+            this.setVisible(true);
+            this.setLocationRelativeTo(null);
+            this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+
+        }
+    }
 
 }// end of SettingsView

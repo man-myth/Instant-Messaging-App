@@ -13,6 +13,8 @@ import server.model.UserModel;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.*;
 import java.net.Socket;
 import java.time.LocalDate;
@@ -22,7 +24,7 @@ import java.time.LocalTime;
 public class ClientController implements Runnable {
     // -Fields
     private final Socket socket;
-    ChatRoomModel currentRoom;
+
     ClientView clientView;
     ClientModel clientModel;
     AddContactToRoomView addToRoomView;
@@ -30,14 +32,14 @@ public class ClientController implements Runnable {
     SettingsView settingsView;
     SettingsView.AskNewName newName;
     SettingsView.AskNewPass newPass;
+    SettingsView.HelpModule helpModule;
     SettingsView.StatusView statusView;
 
     // -Constructor
     public ClientController(Socket socket, ObjectInputStream inputStream, ObjectOutputStream outputStream,
                             UserModel user, ChatRoomModel publicChat) {
         this.socket = socket;
-        this.currentRoom = publicChat;
-        this.clientModel = new ClientModel(socket, inputStream, outputStream, user);
+        this.clientModel = new ClientModel(socket, inputStream, outputStream, user, publicChat);
     }
 
     // -Methods
@@ -45,7 +47,7 @@ public class ClientController implements Runnable {
     // run method when calling client controller
     public void run() {
         System.out.println("Logged in with user: " + clientModel.getUser());
-        clientView = new ClientView(clientModel.getUser(), currentRoom);
+        clientView = new ClientView(clientModel.getUser(), clientModel.getCurrentRoom());
         clientView.setWindowAdapter(new ExitOnCloseAdapter(socket));
 
         //- settings actions
@@ -58,11 +60,11 @@ public class ClientController implements Runnable {
                     String enteredName = newName.getText();
                     String oldName = clientModel.getUser().getUsername();
                     boolean isChanged = clientModel.changeUsername(enteredName, oldName);
-                    if(isChanged) {
+                    if (isChanged) {
                         clientView.changeUsername(oldName, enteredName); //change button text of username
-                        currentRoom.searchUser(oldName).setUsername(enteredName); //change the username from chatroom list
+                        clientModel.getCurrentRoom().searchUser(oldName).setUsername(enteredName); //change the username from chatroom list
                         newName.changeSuccess(oldName, enteredName);
-                    }else{
+                    } else {
                         newName.promptError();
                     }
                 });
@@ -77,7 +79,7 @@ public class ClientController implements Runnable {
                     boolean isPassValid = clientModel.isPassValid(enteredPass, reEnteredPass); // checks if passwords match
                     newPass.promptError(isPassValid); // prompt an error if passwords do not match
                     clientModel.changePassword(enteredPass, isPassValid); // else, change password
-                    currentRoom.searchUser(clientModel.getUser().getUsername()).setPassword(enteredPass);
+                    clientModel.getCurrentRoom().searchUser(clientModel.getUser().getUsername()).setPassword(enteredPass);
                     newPass.changeSuccess(isPassValid);
                 });
             });
@@ -90,6 +92,11 @@ public class ClientController implements Runnable {
                 });
             });
 
+
+            settingsView.helpActionListener(e3 -> {
+                helpModule = new SettingsView.HelpModule(); // access the HelpModule class from SettingsView
+
+            });
         });
 
 
@@ -107,15 +114,15 @@ public class ClientController implements Runnable {
                 try {
                     String username = addToRoomView.getSelected();
                     UserModel newMember = clientModel.getUser().searchUserInContact(username);
-                    boolean isUserHere = currentRoom.isUserHere(username);
+                    boolean isUserHere = clientModel.getCurrentRoom().isUserHere(username);
                     if (isUserHere)
                         addToRoomView.errorUserIsHere();
                     else {
-                        currentRoom.addUser(newMember);
+                        clientModel.getCurrentRoom().addUser(newMember);
                         clientView.addNewMember(newMember);
                         addToRoomView.successMessage();
                     }
-                }catch (NullPointerException error){
+                } catch (NullPointerException error) {
                     addToRoomView.errorInvalidAction();
                 }
             });
@@ -124,14 +131,14 @@ public class ClientController implements Runnable {
 
         //- kick user from the room actions
         clientView.setKickButtonActionListener(e -> {
-            String[] contactArray = clientModel.listToStringArrayAdd(currentRoom.getUsers());
+            String[] contactArray = clientModel.listToStringArrayAdd(clientModel.getCurrentRoom().getUsers());
             kickUserView = new KickContactFromRoomView(contactArray);
 
             kickUserView.setKickButtonActionListener(e1 -> {
                 try {
                     String username = kickUserView.getSelected();
-                    UserModel roomMember = currentRoom.searchUser(username);
-                    currentRoom.kickUser(roomMember);
+                    UserModel roomMember = clientModel.getCurrentRoom().searchUser(username);
+                    clientModel.getCurrentRoom().kickUser(roomMember);
                     clientView.kickMember(roomMember);
                     kickUserView.successMessage();
                 } catch (NullPointerException error) {
@@ -142,17 +149,13 @@ public class ClientController implements Runnable {
 
 
         //- broadcasting messages actions
-        clientView.setMessageListener(e -> {
-            String message = clientView.getMessage();
-            MessageModel msg = new MessageModel(clientModel.getUser(), currentRoom, message, LocalTime.now(),
-                    LocalDate.now());
-            boolean doBroadcast = clientModel.broadcastMessage(message, msg);
-            if (doBroadcast) {
-                clientView.addMessage(msg);
-                clientView.clearTextArea();
-            }
-        });
+        clientView.setMessageListener(new MessageListener());
 
+        // Set ActionListener for member button popup menu
+        clientView.setAddItemActionListener(new AddContactListener());
+
+        // Set ActionListener for contact buttons
+        clientView.setContactButtonsActionListener(new ContactButtonActionListener());
         // Add contact popup menu listener
         clientView.setAddItemActionListener(e -> {
             JMenuItem menuItem = (JMenuItem) e.getSource();
@@ -201,21 +204,84 @@ public class ClientController implements Runnable {
             try {
                 while (true) {
                     String event = clientModel.getEvent();
-                    System.out.println(event);
+                    System.out.println("Event: " + event);
                     if (event.equals("broadcast")) { // do this if event = "broadcast"
                         MessageModel message = clientModel.getMessageFromStream();
-                        clientView.addMessage(message);
+                        if (clientModel.getCurrentRoom().getName().equalsIgnoreCase("Public Chat")) {
+                            clientView.addMessage(message);
+                        }
+
                     } else if (event.equals("contact added")) { // do this if event = "contact added"
-                        clientModel.receiveContact();
-                        System.out.println(clientModel.getUser().getContacts());
-                        clientView.updateContacts(clientModel.getUser().getContacts());
+                        clientModel.updateChatRooms();
+                        clientView.updateContacts(clientModel.getUser().getChatRooms());
+
+                        // Re-set action listeners
+                        clientView.setContactButtonsActionListener(new ContactButtonActionListener());
+                    } else if (event.equals("return room")) {
+                        clientModel.receiveRoom();
+                        clientView.updateRoom(clientModel.getCurrentRoom());
+
+                        // Re-set action listeners
+                        clientView.setAddItemActionListener(new AddContactListener());
+                        clientView.setMessageListener(new MessageListener());
+                    } else if (event.equals("new message")) {
+                        // Update GUI
+                        MessageModel message = clientModel.getMessageFromStream();
+                        if (message.getReceiver().getName().equalsIgnoreCase(clientModel.getCurrentRoom().getName())) {
+                            clientView.addMessage(message);
+                        }
                     }
                 }
             } catch (Exception e) {
-                System.out.println(socket + "has disconnected.");
-                //e.printStackTrace();
+                //System.out.println(socket + "has disconnected.");
+                e.printStackTrace();
             }
         }).start();
     }// end of run method
+
+    class ContactButtonActionListener implements ActionListener {
+
+        public void actionPerformed(ActionEvent e) {
+            String room = ((JButton) e.getSource()).getText();
+            if (room.equals(clientModel.getCurrentRoom().getName())) {
+                return;
+            }
+            clientModel.requestRoom(room);
+        }
+    }
+
+    class MessageListener implements ActionListener {
+        public void actionPerformed(ActionEvent e) {
+            String message = clientView.getMessage();
+            ChatRoomModel currentRoom = clientModel.getCurrentRoom();
+            MessageModel msg = new MessageModel(clientModel.getUser(), currentRoom, message, LocalTime.now(),
+                    LocalDate.now());
+
+            // Public chat
+            if (currentRoom.getName().equalsIgnoreCase("Public Chat")) {
+                boolean doBroadcast = clientModel.broadcastMessage(msg);
+                if (doBroadcast) {
+                    clientView.addMessage(msg);
+                    clientView.clearTextArea();
+                }
+                // Conference or Private Message
+            } else {
+                clientModel.sendMessage(msg);
+                clientView.addMessage(msg);
+                clientView.clearTextArea();
+            }
+
+        }
+    }
+
+    class AddContactListener implements ActionListener {
+        public void actionPerformed(ActionEvent e) {
+            JMenuItem menuItem = (JMenuItem) e.getSource();
+            JPopupMenu popupMenu = (JPopupMenu) menuItem.getParent();
+            JButton invokerButton = (JButton) popupMenu.getInvoker();
+            String username = invokerButton.getText();
+            clientModel.addContact(username);
+        }
+    }
 
 }// END OF CLIENT CONTROLLER

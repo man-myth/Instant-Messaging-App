@@ -96,6 +96,7 @@ public class UserModel implements Serializable {
     }
 
     //returns the user if he/she is in the contact list
+
     public UserModel searchUserInContact(String username) {
         for(UserModel u: contacts){
             if (u.getUsername().equals(username))
@@ -104,6 +105,13 @@ public class UserModel implements Serializable {
         return null;
     }
 
+    public void updateChatroom(String roomName, ChatRoomModel newChatRoom) {
+        for (int i = 0; i < chatRooms.size(); i++) {
+            if (chatRooms.get(i).getName().equals(roomName)) {
+                chatRooms.set(i, newChatRoom);
+            }
+        }
+    }
 
     public boolean hasContact(String username) {
         for (UserModel user : contacts) {

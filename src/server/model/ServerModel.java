@@ -49,7 +49,6 @@ public class ServerModel {
                 System.out.println("[SERVER]: Client connected: " + clientSocket);
                 ClientHandlerModel clientHandler = new ClientHandlerModel(clientSocket);
                 clients.add(clientHandler);
-
                 pool.execute(clientHandler);
 
             } catch (IOException e) {
@@ -78,8 +77,17 @@ public class ServerModel {
         return registeredUsers;
     }
 
-    public void setRegisteredUsers(List<UserModel> registeredUsers) {
-        this.registeredUsers = registeredUsers;
+
+    public static void setRegisteredUsers(List<UserModel> newRegisteredUsers) {
+        registeredUsers = newRegisteredUsers;
+    }
+
+    public static void updateUser(String username, UserModel updatedUser) {
+        for (int i = 0; i < registeredUsers.size(); i++) {
+            if (registeredUsers.get(i).getUsername().equals(username)) {
+                registeredUsers.set(i, updatedUser);
+            }
+        }
     }
 
     public static void addRegisteredUser(UserModel user) {
