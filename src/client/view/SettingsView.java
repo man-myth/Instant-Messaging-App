@@ -65,11 +65,11 @@ public class SettingsView extends JFrame {
 
     /*----- Inner Static Classes -----*/
 
-    // ---JFrame class that takes the new username
+    //--- NEW USERNAME VIEW
     public static class AskNewName extends JFrame {
         // -Fields
         JButton change = new JButton("change");
-        JTextField textField = new HintTextField("New username");
+        JTextField textField = new HintJTextField("New username");
         JLabel label = new JLabel("Enter new username");
 
         // -Constructor
@@ -116,7 +116,7 @@ public class SettingsView extends JFrame {
         }
     }// end of AskNewName
 
-    // ---JFrame class that takes the new password
+    //--- NEW PASSWORD VIEW
     public static class AskNewPass extends JFrame {
         // -Fields
         JButton change = new JButton("change");
@@ -178,7 +178,93 @@ public class SettingsView extends JFrame {
         }
     }// end of AskNewPass
 
-    // ---JFrame class that takes the new password
+    //---STATUS VIEW
+    public static class StatusView extends JFrame {
+        public JButton online = new JButton("Online");
+        public JButton offline = new JButton("Offline");
+        public JButton afk = new JButton("AFK");
+        public JButton busy = new JButton("Busy");
+        public JButton disturb = new JButton("Do not disturb");
+        public JButton idle = new JButton("Idle");
+        public JButton invi = new JButton("Invisible");
+        public JLabel status = new JLabel();
+
+        public StatusView(){
+            //buttons
+            online.setFocusable(false);
+            online.setPreferredSize(new Dimension(150, 50));
+
+            offline.setFocusable(false);
+            offline.setPreferredSize(new Dimension(150, 50));
+
+            afk.setFocusable(false);
+            afk.setPreferredSize(new Dimension(150, 50));
+
+            busy.setFocusable(false);
+            busy.setPreferredSize(new Dimension(150, 50));
+
+            disturb.setFocusable(false);
+            disturb.setPreferredSize(new Dimension(150, 50));
+
+            idle.setFocusable(false);
+            idle.setPreferredSize(new Dimension(150, 50));
+
+            invi.setFocusable(false);
+            invi.setPreferredSize(new Dimension(150, 50));
+
+            // frame details 1
+            this.setPreferredSize(new Dimension(280, 460));
+            this.setLayout(new FlowLayout());
+            this.setTitle("Set Status");
+            this.setResizable(false);
+
+            //add components
+            this.add(status);
+            this.add(online);
+            this.add(offline);
+            this.add(afk);
+            this.add(busy);
+            this.add(disturb);
+            this.add(idle);
+            this.add(invi);
+
+            // frame details 2
+            this.pack();
+            this.setVisible(true);
+            this.setLocationRelativeTo(null);
+            this.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+        }
+
+        public void setCurrentStatus(String s){
+            status.setText("Current status:   "+s);
+        }
+
+        public void setLabelOnline(){
+            status.setText("Current status:   Online");
+        }
+
+        public void setLabelOffline(){
+            status.setText("Current status:   Offline");
+        }
+
+        public void setLabelAFK(){
+            status.setText("Current status:   Away from keyboard");
+        }
+        public void setLabelBusy(){
+            status.setText("Current status:   Busy");
+        }
+        public void setLabelDisturb(){
+            status.setText("Current status:   Do not disturb");
+        }
+        public void setLabelIdle(){
+            status.setText("Current status:   Idle");
+        }
+        public void setLabelInvi(){
+            status.setText("Current status:   Invisible");
+        }
+    }
+
+    //--- HELP MODULE VIEW
     public static class HelpModule extends JFrame{
         // -Fields
        String guide ="<html><body width = '%1s'><h1>Questions:</h1>"
@@ -197,15 +283,14 @@ public class SettingsView extends JFrame {
             // frame details
             this.setLayout(new FlowLayout());
             this.add(helpLabel);
-            helpLabel.setPreferredSize(new Dimension(250,230));
+            helpLabel.setPreferredSize(new Dimension(250,270));
 
             // frame details 2
-            this.setPreferredSize(new Dimension(300, 250));
+            this.setPreferredSize(new Dimension(300, 350));
             this.pack();
             this.setVisible(true);
             this.setLocationRelativeTo(null);
             this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-
         }
     }
 
