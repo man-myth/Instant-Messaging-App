@@ -36,7 +36,7 @@ public class ClientView extends JFrame {
         menuBar.add(menu);
 
         mainPanel = new JPanel(new BorderLayout());
-        contactsPanel = new ContactsPanel(user.getChatRooms());
+        contactsPanel = new ContactsPanel(user);
         chatPanel = new ChatPanel(publicChat);
         membersPanel = new MembersPanel(user, publicChat);
         mainPanel.add(contactsPanel, BorderLayout.WEST);
@@ -84,9 +84,9 @@ public class ClientView extends JFrame {
         }
     }
 
-    public void updateContacts(List<ChatRoomModel> rooms) {
+    public void updateContacts(UserModel user) {
         mainPanel.remove(contactsPanel);
-        contactsPanel = new ContactsPanel(rooms);
+        contactsPanel = new ContactsPanel(user);
         mainPanel.add(contactsPanel, BorderLayout.WEST);
         mainPanel.revalidate();
     }
@@ -218,21 +218,32 @@ public class ClientView extends JFrame {
         JScrollPane scrollPane;
 
 
-        public ContactsPanel(List<ChatRoomModel> rooms) {
+        public ContactsPanel(UserModel user) {
             JLabel contactsLabel = new JLabel("Contacts", SwingConstants.CENTER);
             contactsLabel.setFont(ClientView.headingFont);
+            List<ChatRoomModel> rooms = user.getChatRooms();
+            List<ChatRoomModel> bookmarkedRooms = user.getBookmarks();
 
             panel = new JPanel();
             panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-            ContactButton publicChatButton = new ContactButton("Public Chat", false);
+            ContactButton publicChatButton = new ContactButton("Public Chat", false, true);
             buttons = new ArrayList<>();
             buttons.add(publicChatButton);
             panel.add(publicChatButton);
 
-            for (ChatRoomModel room : rooms) {
-                ContactButton button = new ContactButton(room.getName(), false);
+            for (ChatRoomModel bookmarkedRoom : bookmarkedRooms) {
+                System.out.println("Adding " + bookmarkedRoom.getName());
+                ContactButton button = new ContactButton(bookmarkedRoom.getName(), false, true);
                 buttons.add(button);
                 panel.add(button);
+
+            }for (ChatRoomModel room : rooms) {
+                if (!bookmarkedRooms.contains(room)) {
+                    System.out.println("Adding to room " + room.getName());
+                    ContactButton button = new ContactButton(room.getName(), false, false);
+                    buttons.add(button);
+                    panel.add(button);
+                }
             }
             scrollPane = new JScrollPane(panel);
             scrollPane.setPreferredSize(new Dimension(100, 430));
@@ -263,9 +274,10 @@ public class ClientView extends JFrame {
         public class ContactButton extends JButton {
             ImageIcon imageIcon;
             ContactsPopupMenu popupMenu;
-            Boolean isBookmarked = false;
+            Boolean isBookmarked ;
 
-            public ContactButton(String contactName, boolean hasUnread) {
+            public ContactButton(String contactName, boolean hasUnread, boolean isBookmarked) {
+                this.isBookmarked = isBookmarked;
                 this.setMaximumSize(new Dimension(Integer.MAX_VALUE, 35));
                 this.setText(contactName);
                 if (hasUnread) {
@@ -284,7 +296,7 @@ public class ClientView extends JFrame {
                 if (!isBookmarked) {
                     this.setBackground(Color.WHITE);
                 } else {
-                    this.setBackground(Color.GRAY);
+                    this.setBackground(Color.LIGHT_GRAY);
                 }
 
             }

@@ -168,15 +168,15 @@ public class ClientController implements Runnable {
                         }
 
                     } else if (event.equals("contact added")) { // do this if event = "contact added"
-                        clientModel.updateChatRooms();
-                        clientView.updateContacts(clientModel.getUser().getChatRooms());
+                        clientModel.updateUser();
+                        clientView.updateContacts(clientModel.getUser());
 
                         // Re-set action listeners
                         clientView.setContactButtonsActionListener(new ContactButtonActionListener());
                         clientView.setContactPopUpButtonsActionListener(new AddBookmarkListener());
                     }else if (event.equals("bookmark added")) { // do this if event = "bookmark added"
                         clientModel.updateUser();
-                        clientView.updateContacts(clientModel.getUser().getRoomsList());
+                        clientView.updateContacts(clientModel.getUser());
                         // Re-set action listeners
                         clientView.setContactButtonsActionListener(new ContactButtonActionListener());
                         clientView.setContactPopUpButtonsActionListener(new AddBookmarkListener());

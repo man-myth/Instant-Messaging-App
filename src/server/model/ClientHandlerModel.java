@@ -113,7 +113,7 @@ public class ClientHandlerModel implements Runnable {
                         currentUser = getUserFromList(currentUser.getUsername());
 
                         outputStream.writeObject("contact added");
-                        outputStream.writeObject(currentUser.getChatRooms());
+                        outputStream.writeObject(currentUser);
 
                         // Update client view of new contact if new contact is logged in
                         for (ClientHandlerModel client : ServerModel.clients) {
