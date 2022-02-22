@@ -102,4 +102,8 @@ public class ChatRoomModel implements Serializable {
         this.admin = admin;
     }
 
+    @Override
+    public String toString() {
+        return  name;
+    }
 }

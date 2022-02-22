@@ -1,7 +1,7 @@
 package server.view;
 
 import client.view.ClientView;
-import client.view.HintTextField;
+import client.view.HintJTextField;
 import server.model.ChatRoomModel;
 import server.model.MessageModel;
 import server.model.UserModel;
@@ -135,7 +135,7 @@ public class AdminView extends JFrame {
                 addText(content, message.getSender().getUsername() + ": " + message.getContent());
             }
             scrollPane = new JScrollPane(content);
-            messageTextArea = new HintTextField("Message");
+            messageTextArea = new HintJTextField("Message");
             messageTextArea.setPreferredSize(new Dimension(550, 35));
             messageTextArea.setBorder(UIManager.getLookAndFeel().getDefaults().getBorder("TextField.border"));
 
@@ -204,7 +204,7 @@ public class AdminView extends JFrame {
             }
             panel.setPreferredSize(new Dimension(100, 430));
 
-            searchBar = new HintTextField("Search Contacts");
+            searchBar = new HintJTextField("Search Contacts");
             searchBar.setPreferredSize(new Dimension(200, 35));
 
             this.setLayout(new BorderLayout());
@@ -248,7 +248,7 @@ public class AdminView extends JFrame {
 
         public MembersPanel(UserModel user, ChatRoomModel publicChat) {
             List<UserModel> users =  publicChat.getUsers();
-            searchBar = new HintTextField("Search Members");
+            searchBar = new HintJTextField("Search Members");
             searchBar.setPreferredSize(new Dimension(200, 25));
 
             panel = new JPanel();

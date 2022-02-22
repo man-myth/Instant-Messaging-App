@@ -11,7 +11,7 @@ import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
 import java.awt.*;
 import java.awt.event.ActionListener;
-import java.lang.reflect.Member;
+import java.awt.event.TextListener;
 import java.util.ArrayList;
 import java.util.List;
 import java.awt.event.WindowAdapter;
@@ -19,7 +19,7 @@ import java.awt.event.WindowAdapter;
 public class ClientView extends JFrame {
 
     JPanel mainPanel;
-    ContactsPanel contactsPanel;
+    public ContactsPanel contactsPanel;
     // Changes: Jpanel -> MembersPanel
     MembersPanel membersPanel;
     ChatPanel chatPanel;
@@ -41,7 +41,7 @@ public class ClientView extends JFrame {
         membersPanel = new MembersPanel(user, publicChat);
         mainPanel.add(contactsPanel, BorderLayout.WEST);
         mainPanel.add(chatPanel, BorderLayout.CENTER);
-        mainPanel.add(membersPanel, BorderLayout.EAST);
+        mainPanel.add(membersPanel,BorderLayout.EAST);
         mainPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         this.add(mainPanel);
         this.setJMenuBar(menuBar);
@@ -82,8 +82,10 @@ public class ClientView extends JFrame {
         contactsPanel.setContactButtonsActionListener(listener);
     }
 
-    public void setRoom(String roomName) {
-
+    public void setContactPopUpButtonsActionListener(ActionListener listener) {
+        for (ContactsPanel.ContactButton button : contactsPanel.getContactButtons()) {
+            button.getPopupMenu().setBookmarkButtonActionListener(listener);
+        }
     }
 
     public void updateContacts(List<ChatRoomModel> rooms) {
@@ -144,6 +146,40 @@ public class ClientView extends JFrame {
         membersPanel.changeUsername(oldName, newName);
     }
 
+    public void membersSearchActionListener(TextListener listener){
+        membersPanel.searchBar.addTextListener(listener);
+    }
+
+    public void contactsSearchListener(TextListener listener){
+        contactsPanel.searchBar.addTextListener(listener);
+    }
+
+    public void changeMemberButtonPanel(String username, ChatRoomModel room){
+        membersPanel.clear();
+        membersPanel.changeButtons(username, room);
+        membersPanel.revalidate();
+    }
+
+    public void originalMemberButtonPanel(ChatRoomModel room){
+        membersPanel.clear();
+        membersPanel.fillButtons(room.getUsers());
+        membersPanel.revalidate();
+    }
+
+    public void changeContactButtons(String username, UserModel u){
+        contactsPanel.clear();
+        contactsPanel.changeContactButtons(username,u);
+        contactsPanel.revalidate();
+    }
+
+    public void originalContactButtons(){
+        contactsPanel.clear();
+        contactsPanel.fillContactButtonsSearch(contactsPanel.getButtons());
+        contactsPanel.revalidate();
+    }
+
+
+
 
     /*---------- INNER CLASSES ----------*/
 
@@ -162,7 +198,7 @@ public class ClientView extends JFrame {
                 addText(content, message.getSender().getUsername() + ": " + message.getContent());
             }
             scrollPane = new JScrollPane(content);
-            messageTextArea = new HintTextField("Message");
+            messageTextArea = new HintJTextField("Message");
             messageTextArea.setPreferredSize(new Dimension(550, 35));
             messageTextArea.setBorder(UIManager.getLookAndFeel().getDefaults().getBorder("TextField.border"));
 
@@ -216,8 +252,10 @@ public class ClientView extends JFrame {
     class ContactsPanel extends JPanel {
         JPanel panel;
         List<ContactButton> buttons;
-        JTextField searchBar;
+        TextField searchBar;
         JScrollPane scrollPane;
+        ContactButton publicChatButton;
+
 
         public ContactsPanel(List<ChatRoomModel> rooms) {
             JLabel contactsLabel = new JLabel("Contacts", SwingConstants.CENTER);
@@ -225,7 +263,7 @@ public class ClientView extends JFrame {
 
             panel = new JPanel();
             panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-            ContactButton publicChatButton = new ContactButton("Public Chat", false);
+            publicChatButton = new ContactButton("Public Chat", false);
             buttons = new ArrayList<>();
             buttons.add(publicChatButton);
             panel.add(publicChatButton);
@@ -252,12 +290,59 @@ public class ClientView extends JFrame {
 
         public void setContactButtonsActionListener(ActionListener listener) {
             for (ContactButton button : buttons) {
-                button.addActionListener(listener);
+                button.addActionListener(listener);;
             }
+        }
+
+
+        public List<ContactButton> getContactButtons() {
+            return buttons;
+        }
+
+        public void fillContactButtonsSearch(List<ContactButton> contactButtons){
+            panel = new JPanel();
+            panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+            panel.add(publicChatButton);
+
+            for (ContactButton b : contactButtons) {
+                panel.add(b);
+            }
+            scrollPane = new JScrollPane(panel);
+            scrollPane.setPreferredSize(new Dimension(100, 430));
+            this.add(scrollPane, BorderLayout.CENTER);
+        }
+
+        public void changeContactButtons(String username, UserModel user){
+            panel = new JPanel();
+            panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+
+            for(UserModel u: user.getContacts()){
+                if(u.getUsername().contains(username)) {
+                    for(ContactButton c: buttons){
+                        if(c.getText().contains(username))
+                            panel.add(c);
+                    }
+                }
+            }
+            scrollPane = new JScrollPane(panel);
+            scrollPane.setPreferredSize(new Dimension(100, 430));
+            this.add(scrollPane, BorderLayout.CENTER);
+            this.repaint();
+            this.revalidate();
+        }
+
+        public void clear() {
+            contactsPanel.remove(scrollPane);
+        }
+
+        public List<ContactButton> getButtons(){
+            return buttons;
         }
 
         class ContactButton extends JButton {
             ImageIcon imageIcon;
+            ContactsPopupMenu popupMenu;
+            Boolean isBookmarked = false;
 
             public ContactButton(String contactName, boolean hasUnread) {
                 this.setMaximumSize(new Dimension(Integer.MAX_VALUE, 35));
@@ -267,29 +352,43 @@ public class ClientView extends JFrame {
                 } else {
                     imageIcon = new ImageIcon("res/graphics/user.png");
                 }
+                popupMenu = new ContactsPopupMenu();
+                this.setComponentPopupMenu(popupMenu);
 
                 Image image = imageIcon.getImage();
                 Image scaledImage = image.getScaledInstance(30, 30, java.awt.Image.SCALE_SMOOTH);
                 imageIcon = new ImageIcon(scaledImage);
                 this.setIcon(imageIcon);
                 this.setHorizontalAlignment(SwingConstants.LEFT);
-                this.setBackground(Color.WHITE);
+                if (!isBookmarked) {
+                    this.setBackground(Color.WHITE);
+                } else {
+                    this.setBackground(Color.GRAY);
+                }
+
+            }
+
+            public ContactsPopupMenu getPopupMenu() {
+                return popupMenu;
+            }
+
+            public void setBookmarked(Boolean bookmarked) {
+                isBookmarked = bookmarked;
             }
         }
     }
 
     /*MembersPanel Class*/
-    class MembersPanel extends JPanel {
+    class MembersPanel extends JPanel{
         JPanel panel, settingsPanel;
         JButton addButton, kickButton, settingsButton;
         JScrollPane scrollPane;
-        JTextField searchBar;
-        List<MemberButton> memberButtons;
+        public List<MemberButton> memberButtons;
+        TextField searchBar;
 
         public MembersPanel(UserModel user, ChatRoomModel publicChat) {
             searchBar = new HintTextField("Search Members");
             searchBar.setPreferredSize(new Dimension(200, 25));
-
             fillButtons(publicChat.getUsers());
 
             settingsPanel = new JPanel(new GridLayout());
@@ -306,9 +405,9 @@ public class ClientView extends JFrame {
             if (!user.getUsername().equals(publicChat.getAdmin())) {
                 kickButton.setVisible(false);
             }
+
             this.setLayout(new BorderLayout());
             this.setBackground(Color.GREEN);
-
             this.add(searchBar, BorderLayout.NORTH);
             this.add(scrollPane, BorderLayout.CENTER);
             this.add(settingsPanel, BorderLayout.SOUTH);
@@ -334,6 +433,24 @@ public class ClientView extends JFrame {
             scrollPane = new JScrollPane(panel);
             scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
             this.add(scrollPane, BorderLayout.CENTER);
+        }
+
+        public void changeButtons(String username, ChatRoomModel chatRoom){
+            panel = new JPanel();
+            panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+            memberButtons = new ArrayList<>();
+            for(UserModel u: chatRoom.getUsers()){
+                if(u.getUsername().contains(username)) {
+                    MemberButton button = new MemberButton(u.getUsername());
+                    memberButtons.add(button);
+                    panel.add(button);
+                }
+            }
+            scrollPane = new JScrollPane(panel);
+            scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+            this.add(scrollPane, BorderLayout.CENTER);
+            this.repaint();
+            this.revalidate();
         }
 
         class MemberButton extends JButton {
@@ -407,7 +524,7 @@ public class ClientView extends JFrame {
             }
         }
 
-    }
+    }//end of MembersPanel class
 
     /*MemberPopupMenu Class*/
     class MemberPopupMenu extends JPopupMenu {
@@ -417,8 +534,19 @@ public class ClientView extends JFrame {
             add = new JMenuItem("Add contact");
             this.add(add);
         }
-
         public void setAddItemActionListener(ActionListener listener) {
+            add.addActionListener(listener);
+        }
+    }
+
+    class ContactsPopupMenu extends JPopupMenu {
+        JMenuItem add;
+
+        public ContactsPopupMenu() {
+            add = new JMenuItem("Add to bookmark");
+            this.add(add);
+        }
+        public void setBookmarkButtonActionListener(ActionListener listener) {
             add.addActionListener(listener);
         }
     }

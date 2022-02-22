@@ -9,16 +9,17 @@ public class UserModel implements Serializable {
     private String status;
     private Boolean isActive;
     private List<UserModel> contacts;
-    private List<UserModel> bookmarks;
+    private List<ChatRoomModel> bookmarks;
     private List<ChatRoomModel> chatRooms;
     private List<MessageModel> unreadMessages;
 
     public UserModel(String username, String password) {
         this.username = username;
         this.password = password;
-        this.status = "";
+        this.status = "Online";
         this.contacts = new ArrayList<>();
         this.chatRooms = new ArrayList<>();
+        this.bookmarks = new ArrayList<>();
         this.isActive = false;
     }
 
@@ -60,18 +61,34 @@ public class UserModel implements Serializable {
         this.contacts = contacts;
     }
 
-    public List<UserModel> getBookmarks() {
+    public List<ChatRoomModel> getBookmarks() {
         return bookmarks;
     }
 
-    public void setBookmarks(List<UserModel> bookmarks) {
+    public void setBookmarks(List<ChatRoomModel> bookmarks) {
         this.bookmarks = bookmarks;
     }
-
     public List<ChatRoomModel> getChatRooms() {
         return chatRooms;
     }
 
+    public List<ChatRoomModel> getRoomsList(){
+        List<ChatRoomModel> rooms = new ArrayList<>();
+        //put bookmarked rooms at the top list
+        try {
+            for (ChatRoomModel m : getBookmarks()) {
+                rooms.add(m);
+            }
+            for (ChatRoomModel r : this.getChatRooms()) {
+                if (!rooms.contains(r)) {
+                    rooms.add(r);
+                }
+            }
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+        return rooms;
+    }
     public void setChatRooms(List<ChatRoomModel> chatRooms) {
         this.chatRooms = chatRooms;
     }
@@ -139,8 +156,4 @@ public class UserModel implements Serializable {
                 '}';
     }
 
-    public void bookmarkingUser(String username) {
-        UserModel user = searchUserInContact(username);
-        bookmarks.add(user);
-    }
 }
