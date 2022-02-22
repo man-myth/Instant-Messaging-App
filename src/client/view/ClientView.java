@@ -78,13 +78,22 @@ public class ClientView extends JFrame {
         contactsPanel.setContactButtonsActionListener(listener);
     }
 
-    public void setContactPopUpButtonsActionListener(ActionListener listener) {
+    public void setBookmarkButtonActionListener(ActionListener listener) {
         for (ContactsPanel.ContactButton button : contactsPanel.getContactButtons()) {
             button.getPopupMenu().setBookmarkButtonActionListener(listener);
         }
     }
 
-
+    public void setRemoveBookmarkButtonActionListener(ActionListener listener){
+        for (ContactsPanel.ContactButton button : contactsPanel.getContactButtons()) {
+            button.getPopupMenu().setRemoveBookmarkButtonActionListener(listener);
+        }
+    }
+    public void setRemoveContactButtonActionListener(ActionListener listener){
+        for (ContactsPanel.ContactButton button : contactsPanel.getContactButtons()) {
+            button.getPopupMenu().setRemoveContactButtonActionListener(listener);
+        }
+    }
     public void updateContacts(UserModel user) {
         mainPanel.remove(contactsPanel);
         contactsPanel = new ContactsPanel(user);

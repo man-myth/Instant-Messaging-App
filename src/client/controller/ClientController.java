@@ -190,9 +190,6 @@ public class ClientController implements Runnable {
                         clientView.setRemoveContactButtonActionListener(new RemoveContactListener());
 
                     }else if (event.equals("bookmark updated")) { // do this if event = "bookmark added/removed"
-                        clientView.setContactPopUpButtonsActionListener(new AddBookmarkListener());
-                        clientView.contactsSearchListener(new ContactsSearchListener());
-                    }else if (event.equals("bookmark added")) { // do this if event = "bookmark added"
                         clientModel.updateUser();
                         System.out.println("updating contacts....");
                         clientView.updateContacts(clientModel.getUser());
@@ -201,6 +198,7 @@ public class ClientController implements Runnable {
                         clientView.setBookmarkButtonActionListener(new AddBookmarkListener());
                         clientView.setRemoveBookmarkButtonActionListener(new RemoveBookmarkListener());
                         clientView.setRemoveContactButtonActionListener(new RemoveContactListener());
+                        clientView.contactsSearchListener(new ContactsSearchListener());
                     } else if (event.equals("return room")) {
                         clientModel.receiveRoom();
                         clientView.updateRoom(clientModel.getCurrentRoom());
