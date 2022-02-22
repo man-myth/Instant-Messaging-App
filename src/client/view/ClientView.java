@@ -281,7 +281,7 @@ public class ClientView extends JFrame {
 
             panel = new JPanel();
             panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-            ContactButton publicChatButton = new ContactButton("Public Chat", false, true);
+            publicChatButton = new ContactButton("Public Chat", false, true);
             buttons = new ArrayList<>();
             buttons.add(publicChatButton);
             panel.add(publicChatButton);
