@@ -149,10 +149,5 @@ public class UserModel implements Serializable {
                 ", unreadMessages=" + unreadMessages +
                 '}';
     }
-    public ChatRoomModel bookmarkingUser(ChatRoomModel roomToAdd) {
-        ChatRoomModel room = roomToAdd;
-        bookmarks.add(room);
-        return room;
 
-    }
 }
