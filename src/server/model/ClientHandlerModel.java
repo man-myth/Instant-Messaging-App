@@ -89,8 +89,13 @@ public class ClientHandlerModel implements Runnable {
                 } else if (input.equals("add contact")) {
                     String username = (String) inputStream.readObject();
                     UserModel user = getUserFromList(username);
+                    boolean addingSelf = username.equals(currentUser.getUsername());
+                    if (addingSelf) {
+                        outputStream.writeObject("adding self");
+                    }
+
                     // Run if user is not null and user is not yet a contact of current user
-                    if (user != null && !currentUser.hasContact(username)) {
+                    if (user != null && !currentUser.hasContact(username) && !addingSelf) {
                         // Contains initial list of chat room members
                         List<UserModel> users = new ArrayList<>();
                         users.add(currentUser);
