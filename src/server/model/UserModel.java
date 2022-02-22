@@ -149,8 +149,8 @@ public class UserModel implements Serializable {
                 ", unreadMessages=" + unreadMessages +
                 '}';
     }
-    public ChatRoomModel bookmarkingUser(String username) {
-        ChatRoomModel room = new ChatRoomModel(username, this.getUsername());
+    public ChatRoomModel bookmarkingUser(String username, String admin) {
+        ChatRoomModel room = new ChatRoomModel(username, admin);
         bookmarks.add(room);
         return room;
 

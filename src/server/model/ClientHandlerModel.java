@@ -131,7 +131,7 @@ public class ClientHandlerModel implements Runnable {
                 } else if(input.equals("add bookmark")){
                     String username = (String) inputStream.readObject();
                     //UserModel userToAdd = getUserFromList(username);
-                    ChatRoomModel room = currentUser.bookmarkingUser(username);
+                    ChatRoomModel room = null; //currentUser.bookmarkingUser(username);
                     if (username != null && !currentUser.getBookmarks().contains(room)) {
                         // add user to bookmarks list
                         currentUser.getBookmarks().add(room);

@@ -19,7 +19,7 @@ import java.awt.event.WindowAdapter;
 public class ClientView extends JFrame {
 
     JPanel mainPanel;
-    ContactsPanel contactsPanel;
+    public ContactsPanel contactsPanel;
     // Changes: Jpanel -> MembersPanel
     MembersPanel membersPanel;
     ChatPanel chatPanel;
@@ -78,8 +78,10 @@ public class ClientView extends JFrame {
         contactsPanel.setContactButtonsActionListener(listener);
     }
 
-    public void setRoom(String roomName) {
-
+    public void setContactPopUpButtonsActionListener(ActionListener listener) {
+        for (ContactsPanel.ContactButton button : contactsPanel.getContactButtons()) {
+            button.getPopupMenu().setBookmarkButtonActionListener(listener);
+        }
     }
 
     public void updateContacts(List<ChatRoomModel> rooms) {
@@ -249,11 +251,16 @@ public class ClientView extends JFrame {
 
         public void setContactButtonsActionListener(ActionListener listener) {
             for (ContactButton button : buttons) {
-                button.addActionListener(listener);
+                button.addActionListener(listener);;
             }
         }
 
-        class ContactButton extends JButton {
+
+        public List<ContactButton> getContactButtons() {
+            return buttons;
+        }
+
+        public class ContactButton extends JButton {
             ImageIcon imageIcon;
             ContactsPopupMenu popupMenu;
 
@@ -274,7 +281,13 @@ public class ClientView extends JFrame {
                 this.setIcon(imageIcon);
                 this.setHorizontalAlignment(SwingConstants.LEFT);
                 this.setBackground(Color.WHITE);
+
             }
+
+            public ContactsPopupMenu getPopupMenu() {
+                return popupMenu;
+            }
+
         }
     }
 
@@ -429,7 +442,7 @@ public class ClientView extends JFrame {
             add = new JMenuItem("Add to bookmark");
             this.add(add);
         }
-        public void setAddItemActionListener(ActionListener listener) {
+        public void setBookmarkButtonActionListener(ActionListener listener) {
             add.addActionListener(listener);
         }
     }

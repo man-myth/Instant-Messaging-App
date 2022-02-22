@@ -145,8 +145,8 @@ public class ClientController implements Runnable {
         // Set ActionListener for member button popup menu
         clientView.setAddItemActionListener(new AddContactListener());
 
-        // Set ActionListener for contact button popup menu
-        clientView.setContactButtonsActionListener(new AddBookmarkListener());
+//        // Set ActionListener for contact button popup menu
+        clientView.setContactPopUpButtonsActionListener(new AddBookmarkListener());
 
         // Set ActionListener for contact buttons
         clientView.setContactButtonsActionListener(new ContactButtonActionListener());
@@ -203,7 +203,6 @@ public class ClientController implements Runnable {
     }// end of run method
 
     class ContactButtonActionListener implements ActionListener {
-
         public void actionPerformed(ActionEvent e) {
             String room = ((JButton) e.getSource()).getText();
             if (room.equals(clientModel.getCurrentRoom().getName())) {
@@ -249,10 +248,13 @@ public class ClientController implements Runnable {
 
     class AddBookmarkListener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
+            System.out.println("Inside bookmark listener");
             JMenuItem menuItem = (JMenuItem) e.getSource();
             JPopupMenu popupMenu = (JPopupMenu) menuItem.getParent();
             JButton invokerButton = (JButton) popupMenu.getInvoker();
             String username = invokerButton.getText();
+            //ChatRoomModel bookmarkChat = clientModel.getCurrentRoom();
+            System.out.println(" chat room to bookmark: " + username);
             clientModel.addBookmark(username);
         }
     }
