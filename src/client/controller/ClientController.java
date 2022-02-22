@@ -192,6 +192,8 @@ public class ClientController implements Runnable {
                         clientView.setRemoveContactButtonActionListener(new RemoveContactListener());
                         clientView.contactsSearchListener(new ContactsSearchListener());
 
+                    } else if (event.equals("adding self")) {
+                        clientView.showErrorMessage("You are adding yourself!");
                     } else if (event.equals("contact updated")) { // do this if event = "contact added"
                         clientModel.updateUser();
                         clientView.updateContacts(clientModel.getUser());
@@ -202,7 +204,7 @@ public class ClientController implements Runnable {
                         clientView.setRemoveBookmarkButtonActionListener(new RemoveBookmarkListener());
                         clientView.setRemoveContactButtonActionListener(new RemoveContactListener());
                         clientView.contactsSearchListener(new ContactsSearchListener());
-                    }else if (event.equals("bookmark updated")) { // do this if event = "bookmark added/removed"
+                    } else if (event.equals("bookmark updated")) { // do this if event = "bookmark added/removed"
                         clientModel.updateUser();
                         System.out.println("updating contacts....");
                         clientView.updateContacts(clientModel.getUser());
@@ -375,6 +377,7 @@ public class ClientController implements Runnable {
             clientModel.addBookmark(username);
         }
     }
+
     class RemoveBookmarkListener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
             JMenuItem menuItem = (JMenuItem) e.getSource();
@@ -384,6 +387,7 @@ public class ClientController implements Runnable {
             clientModel.removeBookmark(username);
         }
     }
+
     class RemoveContactListener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
             //System.out.println("Inside bookmark listener");

@@ -41,7 +41,7 @@ public class ClientView extends JFrame {
         membersPanel = new MembersPanel(user, publicChat);
         mainPanel.add(contactsPanel, BorderLayout.WEST);
         mainPanel.add(chatPanel, BorderLayout.CENTER);
-        mainPanel.add(membersPanel,BorderLayout.EAST);
+        mainPanel.add(membersPanel, BorderLayout.EAST);
         mainPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         this.add(mainPanel);
         this.setJMenuBar(menuBar);
@@ -50,6 +50,10 @@ public class ClientView extends JFrame {
         this.setLocationRelativeTo(null);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setResizable(false);
+    }
+
+    public void showErrorMessage(String message) {
+        JOptionPane.showMessageDialog(this, message, "Error", JOptionPane.ERROR_MESSAGE);
     }
 
     public String getInput(String prompt) {
@@ -88,16 +92,18 @@ public class ClientView extends JFrame {
         }
     }
 
-    public void setRemoveBookmarkButtonActionListener(ActionListener listener){
+    public void setRemoveBookmarkButtonActionListener(ActionListener listener) {
         for (ContactsPanel.ContactButton button : contactsPanel.getContactButtons()) {
             button.getPopupMenu().setRemoveBookmarkButtonActionListener(listener);
         }
     }
-    public void setRemoveContactButtonActionListener(ActionListener listener){
+
+    public void setRemoveContactButtonActionListener(ActionListener listener) {
         for (ContactsPanel.ContactButton button : contactsPanel.getContactButtons()) {
             button.getPopupMenu().setRemoveContactButtonActionListener(listener);
         }
     }
+
     public void updateContacts(UserModel user) {
         mainPanel.remove(contactsPanel);
         contactsPanel = new ContactsPanel(user);
@@ -156,33 +162,33 @@ public class ClientView extends JFrame {
         membersPanel.changeUsername(oldName, newName);
     }
 
-    public void membersSearchActionListener(TextListener listener){
+    public void membersSearchActionListener(TextListener listener) {
         membersPanel.searchBar.addTextListener(listener);
     }
 
-    public void contactsSearchListener(TextListener listener){
+    public void contactsSearchListener(TextListener listener) {
         contactsPanel.searchBar.addTextListener(listener);
     }
 
-    public void changeMemberButtonPanel(String username, ChatRoomModel room){
+    public void changeMemberButtonPanel(String username, ChatRoomModel room) {
         membersPanel.clear();
         membersPanel.changeButtons(username, room);
         membersPanel.revalidate();
     }
 
-    public void originalMemberButtonPanel(ChatRoomModel room){
+    public void originalMemberButtonPanel(ChatRoomModel room) {
         membersPanel.clear();
         membersPanel.fillButtons(room.getUsers());
         membersPanel.revalidate();
     }
 
-    public void changeContactButtons(String username, UserModel u){
+    public void changeContactButtons(String username, UserModel u) {
         contactsPanel.clear();
-        contactsPanel.changeContactButtons(username,u);
+        contactsPanel.changeContactButtons(username, u);
         contactsPanel.revalidate();
     }
 
-    public void originalContactButtons(){
+    public void originalContactButtons() {
         contactsPanel.clear();
         contactsPanel.fillContactButtonsSearch(contactsPanel.getButtons());
         contactsPanel.revalidate();
@@ -285,7 +291,8 @@ public class ClientView extends JFrame {
                 buttons.add(button);
                 panel.add(button);
 
-            }for (ChatRoomModel room : rooms) {
+            }
+            for (ChatRoomModel room : rooms) {
                 if (!bookmarkedRooms.contains(room)) {
                     ContactButton button = new ContactButton(room.getName(), false, false);
                     buttons.add(button);
@@ -309,7 +316,8 @@ public class ClientView extends JFrame {
 
         public void setContactButtonsActionListener(ActionListener listener) {
             for (ContactButton button : buttons) {
-                button.addActionListener(listener);;
+                button.addActionListener(listener);
+                ;
             }
         }
 
@@ -318,7 +326,7 @@ public class ClientView extends JFrame {
             return buttons;
         }
 
-        public void fillContactButtonsSearch(List<ContactButton> contactButtons){
+        public void fillContactButtonsSearch(List<ContactButton> contactButtons) {
             panel = new JPanel();
             panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
             panel.add(publicChatButton);
@@ -331,14 +339,14 @@ public class ClientView extends JFrame {
             this.add(scrollPane, BorderLayout.CENTER);
         }
 
-        public void changeContactButtons(String username, UserModel user){
+        public void changeContactButtons(String username, UserModel user) {
             panel = new JPanel();
             panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
-            for(UserModel u: user.getContacts()){
-                if(u.getUsername().contains(username)) {
-                    for(ContactButton c: buttons){
-                        if(c.getText().contains(username))
+            for (UserModel u : user.getContacts()) {
+                if (u.getUsername().contains(username)) {
+                    for (ContactButton c : buttons) {
+                        if (c.getText().contains(username))
                             panel.add(c);
                     }
                 }
@@ -354,14 +362,14 @@ public class ClientView extends JFrame {
             contactsPanel.remove(scrollPane);
         }
 
-        public List<ContactButton> getButtons(){
+        public List<ContactButton> getButtons() {
             return buttons;
         }
 
         class ContactButton extends JButton {
             ImageIcon imageIcon;
             ContactsPopupMenu popupMenu;
-            Boolean isBookmarked ;
+            Boolean isBookmarked;
 
             public ContactButton(String contactName, boolean hasUnread, boolean isBookmarked) {
                 this.isBookmarked = isBookmarked;
@@ -399,7 +407,7 @@ public class ClientView extends JFrame {
     }
 
     /*MembersPanel Class*/
-    class MembersPanel extends JPanel{
+    class MembersPanel extends JPanel {
         JPanel panel, settingsPanel;
         JButton addButton, kickButton, settingsButton;
         JScrollPane scrollPane;
@@ -455,12 +463,12 @@ public class ClientView extends JFrame {
             this.add(scrollPane, BorderLayout.CENTER);
         }
 
-        public void changeButtons(String username, ChatRoomModel chatRoom){
+        public void changeButtons(String username, ChatRoomModel chatRoom) {
             panel = new JPanel();
             panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
             memberButtons = new ArrayList<>();
-            for(UserModel u: chatRoom.getUsers()){
-                if(u.getUsername().contains(username)) {
+            for (UserModel u : chatRoom.getUsers()) {
+                if (u.getUsername().contains(username)) {
                     MemberButton button = new MemberButton(u.getUsername());
                     memberButtons.add(button);
                     panel.add(button);
@@ -554,6 +562,7 @@ public class ClientView extends JFrame {
             add = new JMenuItem("Add contact");
             this.add(add);
         }
+
         public void setAddItemActionListener(ActionListener listener) {
             add.addActionListener(listener);
         }
@@ -572,12 +581,15 @@ public class ClientView extends JFrame {
             this.add(removeBookmark);
             this.add(removeContact);
         }
+
         public void setBookmarkButtonActionListener(ActionListener listener) {
             addtoBookmark.addActionListener(listener);
         }
+
         public void setRemoveBookmarkButtonActionListener(ActionListener listener) {
             removeBookmark.addActionListener(listener);
         }
+
         public void setRemoveContactButtonActionListener(ActionListener listener) {
             removeContact.addActionListener(listener);
         }
