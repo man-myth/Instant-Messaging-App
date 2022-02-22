@@ -8,13 +8,14 @@ import client.view.KickContactFromRoomView;
 import client.view.SettingsView;
 import server.model.ChatRoomModel;
 import server.model.MessageModel;
-import server.model.ServerModel;
 import server.model.UserModel;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.TextEvent;
+import java.awt.event.TextListener;
 import java.io.*;
 import java.net.Socket;
 import java.time.LocalDate;
@@ -62,7 +63,6 @@ public class ClientController implements Runnable {
                     boolean isChanged = clientModel.changeUsername(enteredName, oldName);
                     if (isChanged) {
                         clientView.changeUsername(oldName, enteredName); //change button text of username
-                        clientModel.getCurrentRoom().searchUser(oldName).setUsername(enteredName); //change the username from chatroom list
                         newName.changeSuccess(oldName, enteredName);
                     } else {
                         newName.promptError();
@@ -87,8 +87,39 @@ public class ClientController implements Runnable {
             //set status listener
             settingsView.changeStatusActionListener(e3 ->{
                 statusView = new SettingsView.StatusView();
-                statusView.button.addActionListener(b -> {
-                    //todo set status @2213277
+                statusView.online.addActionListener(b -> {
+                    clientModel.getUser().setStatus("Online");
+                    statusView.setLabelOnline();
+                });
+
+                statusView.offline.addActionListener(b2->{
+                    clientModel.getUser().setStatus("Offline");
+                    statusView.setLabelOffline();
+                });
+
+                statusView.afk.addActionListener(b2->{
+                    clientModel.getUser().setStatus("Away from keyboard");
+                    statusView.setLabelAFK();
+                });
+
+                statusView.busy.addActionListener(b2->{
+                    clientModel.getUser().setStatus("Busy");
+                    statusView.setLabelBusy();
+                });
+
+                statusView.disturb.addActionListener(b2->{
+                    clientModel.getUser().setStatus("Do not disturb");
+                    statusView.setLabelDisturb();
+                });
+
+                statusView.idle.addActionListener(b2->{
+                    clientModel.getUser().setStatus("Idle");
+                    statusView.setLabelIdle();
+                });
+
+                statusView.invi.addActionListener(b2->{
+                    clientModel.getUser().setStatus("Invisible");
+                    statusView.setLabelInvi();
                 });
             });
 
@@ -156,45 +187,12 @@ public class ClientController implements Runnable {
 
         // Set ActionListener for contact buttons
         clientView.setContactButtonsActionListener(new ContactButtonActionListener());
-        // Add contact popup menu listener
-        clientView.setAddItemActionListener(e -> {
-            JMenuItem menuItem = (JMenuItem) e.getSource();
-            JPopupMenu popupMenu = (JPopupMenu) menuItem.getParent();
-            JButton invokerButton = (JButton) popupMenu.getInvoker();
-            String username = invokerButton.getText();
-            clientModel.addContact(username);
-        });
 
-        // Bookmarking popup menu listener
-        clientView.setBookmarkListener(e -> {
-            JMenuItem menuItem = (JMenuItem) e.getSource();
-            JPopupMenu popupMenu = (JPopupMenu) menuItem.getParent();
-            JButton invokerButton = (JButton) popupMenu.getInvoker();
-            String username = invokerButton.getText();
-            clientModel.getUser().bookmarkingUser(username);
-            System.out.println(clientModel.getUser().getBookmarks().get(0));
-        });
+        //members search bar text listener
+        clientView.membersSearchActionListener(new MembersSearchTextListener());
 
-
-        //- main search bar action listener
-        clientView.searchBarActionListener(e -> {
-            JTextField tf = (JTextField) e.getSource();
-            String username = tf.getText();
-            if(!username.equals("")) {
-                clientView.runChangeButtonName("");
-                clientView.showMemberPane2();
-            }
-        });
-
-        //- secondary search bar text listener
-        clientView.setSearchTextListener2(e -> {
-            TextField tf = (TextField) e.getSource();
-            String username = tf.getText();
-            System.out.println(username);
-            clientView.runChangeButtonName(username);
-            if(username.equals(""))
-                clientView.showMemberPane1();
-        });
+        //members search bar text listener
+        clientView.contactsSearchListener(new ContactsSearchListener());
 
         // Separate thread for GUI
         EventQueue.invokeLater(() -> clientView.setVisible(true));
@@ -239,6 +237,31 @@ public class ClientController implements Runnable {
         }).start();
     }// end of run method
 
+    class MembersSearchTextListener implements TextListener{
+        @Override
+        public void textValueChanged(TextEvent e) {
+            TextField tf = (TextField) e.getSource();
+            String username = tf.getText();
+            if(!username.equals("")) {
+                clientView.changeMemberButtonPanel(username,clientModel.getCurrentRoom());
+            }else
+                clientView.originalMemberButtonPanel(clientModel.getCurrentRoom());
+            clientView.setAddItemActionListener(new AddContactListener());
+        }
+    }
+
+    class ContactsSearchListener implements TextListener{
+        @Override
+        public void textValueChanged(TextEvent e) {
+            TextField tf = (TextField) e.getSource();
+            String username = tf.getText();
+            if(!username.equals("")) {
+                clientView.changeContactButtons(username, clientModel.getUser());
+            }else
+                clientView.originalContactButtons();
+        }
+    }
+
     class ContactButtonActionListener implements ActionListener {
 
         public void actionPerformed(ActionEvent e) {
@@ -280,7 +303,10 @@ public class ClientController implements Runnable {
             JPopupMenu popupMenu = (JPopupMenu) menuItem.getParent();
             JButton invokerButton = (JButton) popupMenu.getInvoker();
             String username = invokerButton.getText();
+            UserModel newContact = clientModel.getCurrentRoom().searchUser(username);
             clientModel.addContact(username);
+            clientModel.getUser().getContacts().add(newContact);
+
         }
     }
 

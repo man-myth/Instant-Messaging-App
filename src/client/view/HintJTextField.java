@@ -5,12 +5,12 @@ import java.awt.*;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 
-public class HintTextField extends TextField implements FocusListener {
+public class HintJTextField extends JTextField implements FocusListener {
 
     private final String hint;
     private boolean showingHint;
 
-    public HintTextField(final String hint) {
+    public HintJTextField(final String hint) {
         super(hint);
         this.setForeground(Color.GRAY);
         this.hint = hint;

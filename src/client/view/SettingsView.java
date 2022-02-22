@@ -69,7 +69,7 @@ public class SettingsView extends JFrame {
     public static class AskNewName extends JFrame {
         // -Fields
         JButton change = new JButton("change");
-        JTextField textField = new HintTextField("New username");
+        JTextField textField = new HintJTextField("New username");
         JLabel label = new JLabel("Enter new username");
 
         // -Constructor
@@ -180,16 +180,53 @@ public class SettingsView extends JFrame {
 
     //---STATUS VIEW
     public static class StatusView extends JFrame {
-        public JButton button = new JButton("Set status as offline");
+        public JButton online = new JButton("Online");
+        public JButton offline = new JButton("Offline");
+        public JButton afk = new JButton("AFK");
+        public JButton busy = new JButton("Busy");
+        public JButton disturb = new JButton("Do not disturb");
+        public JButton idle = new JButton("Idle");
+        public JButton invi = new JButton("Invisible");
+        public JLabel status = new JLabel("Current status:   Online");
 
         public StatusView(){
             //buttons
-            button.setFocusable(false);
+            online.setFocusable(false);
+            online.setPreferredSize(new Dimension(150, 50));
+
+            offline.setFocusable(false);
+            offline.setPreferredSize(new Dimension(150, 50));
+
+            afk.setFocusable(false);
+            afk.setPreferredSize(new Dimension(150, 50));
+
+            busy.setFocusable(false);
+            busy.setPreferredSize(new Dimension(150, 50));
+
+            disturb.setFocusable(false);
+            disturb.setPreferredSize(new Dimension(150, 50));
+
+            idle.setFocusable(false);
+            idle.setPreferredSize(new Dimension(150, 50));
+
+            invi.setFocusable(false);
+            invi.setPreferredSize(new Dimension(150, 50));
 
             // frame details 1
-            this.setPreferredSize(new Dimension(200, 200));
+            this.setPreferredSize(new Dimension(280, 460));
             this.setLayout(new FlowLayout());
             this.setTitle("Set Status");
+            this.setResizable(false);
+
+            //add components
+            this.add(status);
+            this.add(online);
+            this.add(offline);
+            this.add(afk);
+            this.add(busy);
+            this.add(disturb);
+            this.add(idle);
+            this.add(invi);
 
             // frame details 2
             this.pack();
@@ -198,18 +235,32 @@ public class SettingsView extends JFrame {
             this.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         }
 
-        public void toOnline(){
-            button.setText("Set status as online");
+        public void setLabelOnline(){
+            status.setText("Current status:   Online");
         }
 
-        public void toOffline(){
-            button.setText("Set status as offline");
+        public void setLabelOffline(){
+            status.setText("Current status:   Offline");
         }
 
-
+        public void setLabelAFK(){
+            status.setText("Current status:   Away from keyboard");
+        }
+        public void setLabelBusy(){
+            status.setText("Current status:   Busy");
+        }
+        public void setLabelDisturb(){
+            status.setText("Current status:   Do not disturb");
+        }
+        public void setLabelIdle(){
+            status.setText("Current status:   Idle");
+        }
+        public void setLabelInvi(){
+            status.setText("Current status:   Invisible");
+        }
     }
 
-    // ---JFrame class that takes the new password
+    //--- HELP MODULE VIEW
     public static class HelpModule extends JFrame{
         // -Fields
        String guide ="<html><body width = '%1s'><h1>Questions:</h1>"
@@ -228,7 +279,7 @@ public class SettingsView extends JFrame {
             // frame details
             this.setLayout(new FlowLayout());
             this.add(helpLabel);
-            helpLabel.setPreferredSize(new Dimension(250,230));
+            helpLabel.setPreferredSize(new Dimension(250,250));
 
             // frame details 2
             this.setPreferredSize(new Dimension(300, 250));

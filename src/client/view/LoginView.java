@@ -18,7 +18,7 @@ public class LoginView extends JFrame {
 
         dimension = new Dimension(200, 25);
 
-        usernameTextField = new HintTextField("Username");
+        usernameTextField = new HintJTextField("Username");
         usernameTextField.setPreferredSize(dimension);
         passwordTextField = new HintPasswordField("Password");
         passwordTextField.setPreferredSize(dimension);
