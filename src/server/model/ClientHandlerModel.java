@@ -27,14 +27,6 @@ public class ClientHandlerModel implements Runnable {
     }
 
     public void run() {
-        for (UserModel user : ServerModel.getRegisteredUsers()) {
-            System.out.println(user);
-            System.out.print("Chat rooms: ");
-            for (ChatRoomModel chatRoom : user.getChatRooms()) {
-                System.out.print(chatRoom.getName() + " ");
-            }
-            System.out.println();
-        }
         // Handle requests of the client
         currentUser = new UserModel();
         try {
@@ -97,13 +89,13 @@ public class ClientHandlerModel implements Runnable {
                         users.add(user);
 
                         // Create new chat room for current user
-                        ChatRoomModel newChatRoom = new ChatRoomModel(username, users, new ArrayList<>());
+                        ChatRoomModel newChatRoom = new ChatRoomModel(username, users, new ArrayList<>(), "");
                         currentUser.getContacts().add(user);
                         currentUser.getChatRooms().add(newChatRoom);
                         ServerModel.updateUser(currentUser.getUsername(), currentUser);
                         // Add chat room for other user
                         user.getContacts().add(currentUser);
-                        newChatRoom = new ChatRoomModel(currentUser.getUsername(), users, new ArrayList<>());
+                        newChatRoom = new ChatRoomModel(currentUser.getUsername(), users, new ArrayList<>(), "");
                         user.getChatRooms().add(newChatRoom);
                         ServerModel.updateUser(user.getUsername(), user);
 
@@ -114,6 +106,7 @@ public class ClientHandlerModel implements Runnable {
 
                         outputStream.writeObject("contact added");
                         outputStream.writeObject(currentUser.getChatRooms());
+                        outputStream.writeObject(user);
 
                         // Update client view of new contact if new contact is logged in
                         for (ClientHandlerModel client : ServerModel.clients) {
@@ -124,6 +117,7 @@ public class ClientHandlerModel implements Runnable {
                                 client.currentUser = getUserFromList(user.getUsername());
                                 client.writeObject("contact added");
                                 client.writeObject(client.currentUser.getChatRooms());
+                                client.writeObject(user);
                                 break;
                             }
                         }
@@ -198,6 +192,37 @@ public class ClientHandlerModel implements Runnable {
                     }
                     Utility.exportUsersData(ServerModel.getRegisteredUsers());
                     System.out.println("password changed for " + name);
+                } else if (input.equals("add contact to room")) {
+                    UserModel newMember = (UserModel) inputStream.readObject();
+                    ChatRoomModel room = getChatRoomFromList(currentUser, (String) inputStream.readObject());
+                    // If added member to private chat room
+                    if (room.getAdmin().equals("")) {
+                        System.out.println("no admin");
+                        // Create new chat room
+                        outputStream.writeObject("get room name");
+                        ChatRoomModel newRoom = new ChatRoomModel((String) inputStream.readObject(), room.getUsers(), new ArrayList<>(), currentUser.getUsername());
+                        newRoom.addUser(newMember);
+                        currentUser.getChatRooms().add(newRoom);
+                    } else {
+                        room.addUser(newMember);
+                        currentUser.updateChatroom(room.getName(), room);
+                    }
+
+                    // Save .dat file
+                    ServerModel.updateUser(currentUser.getUsername(), currentUser);
+                    Utility.exportUsersData(ServerModel.getRegisteredUsers());
+                    ServerModel.setRegisteredUsers(Utility.readUsersData("res/data.dat"));
+                    currentUser = getUserFromList(currentUser.getUsername());
+
+                    outputStream.writeObject("update chat rooms");
+                    outputStream.writeObject(currentUser.getChatRooms());
+                    for (UserModel user : room.getUsers()) {
+                        if (user.equals(currentUser)) {
+                            continue;
+                        }
+                        user.getChatRooms().add(room);
+                        ServerModel.updateUser(user.getUsername(), user);
+                    }
                 }
 
 

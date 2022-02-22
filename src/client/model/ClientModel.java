@@ -102,24 +102,36 @@ public class ClientModel {
         }
     }
 
+    public void writeString(String string) {
+        try {
+            outputStream.writeObject(string);
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+    }
+
     /*--- ADDING CONTACT MODEL ---*/
 
     // adds the new user to contact list
     public void updateChatRooms() {
         List<ChatRoomModel> newChatRoomList = new ArrayList<>();
         try {
-            System.out.println("Hello!");
             newChatRoomList = (List<ChatRoomModel>) inputStream.readObject();
-
-            for (ChatRoomModel chatRooms : newChatRoomList) {
-                System.out.println(chatRooms.getName());
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
+        } catch (ClassNotFoundException| IOException e) {
             e.printStackTrace();
         }
         user.setChatRooms(newChatRoomList);
+    }
+
+    public void updateContacts() {
+        try {
+            UserModel contact = (UserModel) inputStream.readObject();
+            if (!user.hasContact(contact.getUsername())) {
+                user.getContacts().add(contact);
+            }
+        } catch (ClassNotFoundException| IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public void addContact(String username) {
@@ -145,6 +157,16 @@ public class ClientModel {
         try {
             currentRoom = (ChatRoomModel) inputStream.readObject();
         } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void addContactToRoom(UserModel newMember, String roomName) {
+        try {
+            outputStream.writeObject("add contact to room");
+            outputStream.writeObject(newMember);
+            outputStream.writeObject(roomName);
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }

@@ -83,7 +83,6 @@ public class ClientController implements Runnable {
                 });
             });
 
-
             settingsView.helpActionListener(e3 -> {
                 helpModule = new SettingsView.HelpModule(); // access the HelpModule class from SettingsView
 
@@ -109,9 +108,8 @@ public class ClientController implements Runnable {
                     if (isUserHere)
                         addToRoomView.errorUserIsHere();
                     else {
-                        clientModel.getCurrentRoom().addUser(newMember);
-                        clientView.addNewMember(newMember);
-                        addToRoomView.successMessage();
+                        clientModel.addContactToRoom(newMember, clientModel.getCurrentRoom().getName());
+                        //clientView.addNewMember(newMember);
                     }
                 } catch (NullPointerException error) {
                     addToRoomView.errorInvalidAction();
@@ -165,6 +163,7 @@ public class ClientController implements Runnable {
 
                     } else if (event.equals("contact added")) { // do this if event = "contact added"
                         clientModel.updateChatRooms();
+                        clientModel.updateContacts();
                         clientView.updateContacts(clientModel.getUser().getChatRooms());
 
                         // Re-set action listeners
@@ -177,11 +176,20 @@ public class ClientController implements Runnable {
                         clientView.setAddItemActionListener(new AddContactListener());
                         clientView.setMessageListener(new MessageListener());
                     } else if (event.equals("new message")) {
-                        // Update GUI
+                        // Update GUI if current room has new message
                         MessageModel message = clientModel.getMessageFromStream();
                         if (message.getReceiver().getName().equalsIgnoreCase(clientModel.getCurrentRoom().getName())) {
                             clientView.addMessage(message);
                         }
+                    } else if (event.equals("update chat rooms")) {
+                        clientModel.updateChatRooms();
+                        clientView.updateContacts(clientModel.getUser().getChatRooms());
+
+                        // Re-set action listeners
+                        clientView.setContactButtonsActionListener(new ContactButtonActionListener());
+                    } else if (event.equals("get room name")) {
+                        clientModel.writeString(clientView.getInput("Enter new room name."));
+                        addToRoomView.successMessage();
                     }
                 }
             } catch (Exception e) {
@@ -192,7 +200,6 @@ public class ClientController implements Runnable {
     }// end of run method
 
     class ContactButtonActionListener implements ActionListener {
-
         public void actionPerformed(ActionEvent e) {
             String room = ((JButton) e.getSource()).getText();
             if (room.equals(clientModel.getCurrentRoom().getName())) {
