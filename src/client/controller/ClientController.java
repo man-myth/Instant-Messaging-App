@@ -245,7 +245,6 @@ public class ClientController implements Runnable {
 
     class AddContactListener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
-            System.out.println("inside add contact listener");
             JMenuItem menuItem = (JMenuItem) e.getSource();
             JPopupMenu popupMenu = (JPopupMenu) menuItem.getParent();
             JButton invokerButton = (JButton) popupMenu.getInvoker();
