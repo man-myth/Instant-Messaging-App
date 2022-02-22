@@ -50,8 +50,10 @@ public class ClientHandlerModel implements Runnable {
                         writeObject(ServerModel.getPublicChat());
                         loginAttempts=0;
                     } else {
-                        loginAttempts++;
-                        authenticate.toggleChangePass(loginAttempts, username);
+                        if(ServerModel.doesUsernameExist(username)) {
+                            loginAttempts++;
+                            authenticate.toggleChangePass(loginAttempts, username);
+                        }
                         outputStream.writeObject("FAILED");
                     }
                 } else if (input.equals("register")) {
