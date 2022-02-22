@@ -91,6 +91,7 @@ public class ClientHandlerModel implements Runnable {
                     UserModel user = getUserFromList(username);
                     // Run if user is not null and user is not yet a contact of current user
                     if (user != null && !currentUser.hasContact(username)) {
+                        System.out.println("this is the problem");
                         // Contains initial list of chat room members
                         List<UserModel> users = new ArrayList<>();
                         users.add(currentUser);
@@ -101,6 +102,7 @@ public class ClientHandlerModel implements Runnable {
                         currentUser.getContacts().add(user);
                         currentUser.getChatRooms().add(newChatRoom);
                         ServerModel.updateUser(currentUser.getUsername(), currentUser);
+
                         // Add chat room for other user
                         user.getContacts().add(currentUser);
                         newChatRoom = new ChatRoomModel(currentUser.getUsername(), users, new ArrayList<>());
@@ -137,7 +139,12 @@ public class ClientHandlerModel implements Runnable {
                             break;
                         }
                     }
-                    
+                    for (UserModel contact: currentUser.getContacts()){
+                        if(contact.getUsername().equals(username)) {
+                            currentUser.getContacts().remove(contact);
+                            break;
+                        }
+                    }
                     ServerModel.updateUser(currentUser.getUsername(), currentUser);
                         // Save data
                     Utility.exportUsersData(ServerModel.getRegisteredUsers());

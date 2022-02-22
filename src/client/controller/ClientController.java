@@ -170,10 +170,8 @@ public class ClientController implements Runnable {
                         }
 
                     } else if (event.equals("contact updated")) { // do this if event = "contact added"
-                        System.out.println("before update " + clientModel.getUser().getContacts());
                         clientModel.updateUser();
                         clientView.updateContacts(clientModel.getUser());
-                        System.out.println("after  update " + clientModel.getUser().getContacts());
 
                         // Re-set action listeners
                         clientView.setContactButtonsActionListener(new ContactButtonActionListener());
@@ -247,6 +245,7 @@ public class ClientController implements Runnable {
 
     class AddContactListener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
+            System.out.println("inside add contact listener");
             JMenuItem menuItem = (JMenuItem) e.getSource();
             JPopupMenu popupMenu = (JPopupMenu) menuItem.getParent();
             JButton invokerButton = (JButton) popupMenu.getInvoker();
@@ -257,23 +256,19 @@ public class ClientController implements Runnable {
 
     class AddBookmarkListener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
-            System.out.println("Inside bookmark listener");
             JMenuItem menuItem = (JMenuItem) e.getSource();
             JPopupMenu popupMenu = (JPopupMenu) menuItem.getParent();
             JButton invokerButton = (JButton) popupMenu.getInvoker();
             String username = invokerButton.getText();
-            System.out.println("Bookmark " + username);
             clientModel.addBookmark(username);
         }
     }
     class RemoveBookmarkListener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
-            System.out.println("Inside remove bookmark listener");
             JMenuItem menuItem = (JMenuItem) e.getSource();
             JPopupMenu popupMenu = (JPopupMenu) menuItem.getParent();
             JButton invokerButton = (JButton) popupMenu.getInvoker();
             String username = invokerButton.getText();
-            System.out.println("Bookmark to remove" + username);
             clientModel.removeBookmark(username);
         }
     }
