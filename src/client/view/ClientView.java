@@ -215,6 +215,7 @@ public class ClientView extends JFrame {
         JTextField searchBar;
         JScrollPane scrollPane;
 
+
         public ContactsPanel(List<ChatRoomModel> rooms) {
             JLabel contactsLabel = new JLabel("Contacts", SwingConstants.CENTER);
             contactsLabel.setFont(ClientView.headingFont);
@@ -254,6 +255,7 @@ public class ClientView extends JFrame {
 
         class ContactButton extends JButton {
             ImageIcon imageIcon;
+            ContactsPopupMenu popupMenu;
 
             public ContactButton(String contactName, boolean hasUnread) {
                 this.setMaximumSize(new Dimension(Integer.MAX_VALUE, 35));
@@ -263,6 +265,8 @@ public class ClientView extends JFrame {
                 } else {
                     imageIcon = new ImageIcon("res/graphics/user.png");
                 }
+                popupMenu = new ContactsPopupMenu();
+                this.setComponentPopupMenu(popupMenu);
 
                 Image image = imageIcon.getImage();
                 Image scaledImage = image.getScaledInstance(30, 30, java.awt.Image.SCALE_SMOOTH);
@@ -413,7 +417,18 @@ public class ClientView extends JFrame {
             add = new JMenuItem("Add contact");
             this.add(add);
         }
+        public void setAddItemActionListener(ActionListener listener) {
+            add.addActionListener(listener);
+        }
+    }
 
+    class ContactsPopupMenu extends JPopupMenu {
+        JMenuItem add;
+
+        public ContactsPopupMenu() {
+            add = new JMenuItem("Add to bookmark");
+            this.add(add);
+        }
         public void setAddItemActionListener(ActionListener listener) {
             add.addActionListener(listener);
         }

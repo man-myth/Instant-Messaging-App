@@ -128,7 +128,25 @@ public class ClientHandlerModel implements Runnable {
                             }
                         }
                     }
-                } else if (input.equals("get room")) {
+                } else if(input.equals("add bookmark")){
+                    String username = (String) inputStream.readObject();
+                    //UserModel userToAdd = getUserFromList(username);
+                    ChatRoomModel room = currentUser.bookmarkingUser(username);
+                    if (username != null && !currentUser.getBookmarks().contains(room)) {
+                        // add user to bookmarks list
+                        currentUser.getBookmarks().add(room);
+                        ServerModel.updateUser(currentUser.getUsername(), currentUser);
+
+                        // Save data
+                        Utility.exportUsersData(ServerModel.getRegisteredUsers());
+                        ServerModel.setRegisteredUsers(Utility.readUsersData("res/data.dat"));
+                        currentUser = getUserFromList(currentUser.getUsername());
+
+                        outputStream.writeObject("bookmark added");
+                        outputStream.writeObject(currentUser.getChatRooms());
+
+                    }
+                }else if (input.equals("get room")) {
                     currentUser = getUserFromList(currentUser.getUsername());
                     String roomName = (String) inputStream.readObject();
                     outputStream.writeObject("return room");
