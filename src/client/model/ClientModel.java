@@ -110,7 +110,6 @@ public class ClientModel {
         try {
             System.out.println("Hello!");
             newChatRoomList = (List<ChatRoomModel>) inputStream.readObject();
-
             for (ChatRoomModel chatRooms : newChatRoomList) {
                 System.out.println(chatRooms.getName());
             }
@@ -122,9 +121,27 @@ public class ClientModel {
         user.setChatRooms(newChatRoomList);
     }
 
+    public void updateUser(){
+        try {
+            this.user = (UserModel) inputStream.readObject();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
     public void addContact(String username) {
         try {
             outputStream.writeObject("add contact");
+            outputStream.writeObject(username);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void addBookmark(String username) {
+        try {
+            outputStream.writeObject("add bookmark");
             outputStream.writeObject(username);
         } catch (IOException e) {
             e.printStackTrace();

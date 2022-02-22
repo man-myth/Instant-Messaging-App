@@ -19,14 +19,13 @@ import java.awt.event.WindowAdapter;
 public class ClientView extends JFrame {
 
     JPanel mainPanel;
-    ContactsPanel contactsPanel;
+    public ContactsPanel contactsPanel;
+    // Changes: Jpanel -> MembersPanel
     MembersPanel membersPanel;
     ChatPanel chatPanel;
     JMenuBar menuBar;
     JMenu menu;
     JMenuItem logOut;
-    public JPanel membersCardPanel;
-    public CardLayout cl = new CardLayout();
     static Font headingFont = new Font("Calibri", Font.PLAIN, 20);
 
     public ClientView(UserModel user, ChatRoomModel publicChat) {
@@ -35,9 +34,6 @@ public class ClientView extends JFrame {
         logOut = new JMenuItem("Log Out");
         menu.add(logOut);
         menuBar.add(menu);
-
-        membersCardPanel = new JPanel();
-        membersCardPanel.setLayout(cl);
 
         mainPanel = new JPanel(new BorderLayout());
         contactsPanel = new ContactsPanel(user.getChatRooms());
@@ -82,8 +78,10 @@ public class ClientView extends JFrame {
         contactsPanel.setContactButtonsActionListener(listener);
     }
 
-    public void setRoom(String roomName) {
-
+    public void setContactPopUpButtonsActionListener(ActionListener listener) {
+        for (ContactsPanel.ContactButton button : contactsPanel.getContactButtons()) {
+            button.getPopupMenu().setBookmarkButtonActionListener(listener);
+        }
     }
 
     public void updateContacts(List<ChatRoomModel> rooms) {
@@ -259,6 +257,7 @@ public class ClientView extends JFrame {
         JScrollPane scrollPane;
         ContactButton publicChatButton;
 
+
         public ContactsPanel(List<ChatRoomModel> rooms) {
             JLabel contactsLabel = new JLabel("Contacts", SwingConstants.CENTER);
             contactsLabel.setFont(ClientView.headingFont);
@@ -292,10 +291,16 @@ public class ClientView extends JFrame {
 
         public void setContactButtonsActionListener(ActionListener listener) {
             for (ContactButton button : buttons) {
-                button.addActionListener(listener);
+                button.addActionListener(listener);;
             }
         }
 
+
+        public List<ContactButton> getContactButtons() {
+            return buttons;
+        }
+
+        public class ContactButton extends JButton {
         public void fillContactButtonsSearch(List<ContactButton> contactButtons){
             panel = new JPanel();
             panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
@@ -338,6 +343,8 @@ public class ClientView extends JFrame {
 
         class ContactButton extends JButton {
             ImageIcon imageIcon;
+            ContactsPopupMenu popupMenu;
+            Boolean isBookmarked = false;
 
             public ContactButton(String contactName, boolean hasUnread) {
                 this.setMaximumSize(new Dimension(Integer.MAX_VALUE, 35));
@@ -347,13 +354,28 @@ public class ClientView extends JFrame {
                 } else {
                     imageIcon = new ImageIcon("res/graphics/user.png");
                 }
+                popupMenu = new ContactsPopupMenu();
+                this.setComponentPopupMenu(popupMenu);
 
                 Image image = imageIcon.getImage();
                 Image scaledImage = image.getScaledInstance(30, 30, java.awt.Image.SCALE_SMOOTH);
                 imageIcon = new ImageIcon(scaledImage);
                 this.setIcon(imageIcon);
                 this.setHorizontalAlignment(SwingConstants.LEFT);
-                this.setBackground(Color.WHITE);
+                if (!isBookmarked) {
+                    this.setBackground(Color.WHITE);
+                } else {
+                    this.setBackground(Color.GRAY);
+                }
+
+            }
+
+            public ContactsPopupMenu getPopupMenu() {
+                return popupMenu;
+            }
+
+            public void setBookmarked(Boolean bookmarked) {
+                isBookmarked = bookmarked;
             }
         }
     }
@@ -514,8 +536,19 @@ public class ClientView extends JFrame {
             add = new JMenuItem("Add contact");
             this.add(add);
         }
-
         public void setAddItemActionListener(ActionListener listener) {
+            add.addActionListener(listener);
+        }
+    }
+
+    class ContactsPopupMenu extends JPopupMenu {
+        JMenuItem add;
+
+        public ContactsPopupMenu() {
+            add = new JMenuItem("Add to bookmark");
+            this.add(add);
+        }
+        public void setBookmarkButtonActionListener(ActionListener listener) {
             add.addActionListener(listener);
         }
     }

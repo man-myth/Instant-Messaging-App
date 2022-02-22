@@ -194,6 +194,10 @@ public class ClientController implements Runnable {
         //members search bar text listener
         clientView.contactsSearchListener(new ContactsSearchListener());
 
+        // Set ActionListener for contact button popup menu
+        clientView.setContactPopUpButtonsActionListener(new AddBookmarkListener());
+
+
         // Separate thread for GUI
         EventQueue.invokeLater(() -> clientView.setVisible(true));
 
@@ -215,6 +219,13 @@ public class ClientController implements Runnable {
 
                         // Re-set action listeners
                         clientView.setContactButtonsActionListener(new ContactButtonActionListener());
+                        clientView.setContactPopUpButtonsActionListener(new AddBookmarkListener());
+                    }else if (event.equals("bookmark added")) { // do this if event = "bookmark added"
+                        clientModel.updateUser();
+                        clientView.updateContacts(clientModel.getUser().getRoomsList());
+                        // Re-set action listeners
+                        clientView.setContactButtonsActionListener(new ContactButtonActionListener());
+                        clientView.setContactPopUpButtonsActionListener(new AddBookmarkListener());
                     } else if (event.equals("return room")) {
                         clientModel.receiveRoom();
                         clientView.updateRoom(clientModel.getCurrentRoom());
@@ -263,7 +274,6 @@ public class ClientController implements Runnable {
     }
 
     class ContactButtonActionListener implements ActionListener {
-
         public void actionPerformed(ActionEvent e) {
             String room = ((JButton) e.getSource()).getText();
             if (room.equals(clientModel.getCurrentRoom().getName())) {
@@ -293,7 +303,6 @@ public class ClientController implements Runnable {
                 clientView.addMessage(msg);
                 clientView.clearTextArea();
             }
-
         }
     }
 
@@ -310,4 +319,15 @@ public class ClientController implements Runnable {
         }
     }
 
+    class AddBookmarkListener implements ActionListener {
+        public void actionPerformed(ActionEvent e) {
+            System.out.println("Inside bookmark listener");
+            JMenuItem menuItem = (JMenuItem) e.getSource();
+            JPopupMenu popupMenu = (JPopupMenu) menuItem.getParent();
+            JButton invokerButton = (JButton) popupMenu.getInvoker();
+            String username = invokerButton.getText();
+            System.out.println("Bookmark " + username);
+            clientModel.addBookmark(username);
+        }
+    }
 }// END OF CLIENT CONTROLLER
