@@ -27,7 +27,7 @@ public class UpdateDatFiles {
         messages.add(new MessageModel(new UserModel("test", "test"), new ChatRoomModel("test", ""), "Hello!", LocalTime.now(), LocalDate.now()));
         messages.add(new MessageModel(new UserModel("test", "test"), new ChatRoomModel("test", ""), "Hi!", LocalTime.now(), LocalDate.now()));
         messages.add(new MessageModel(new UserModel("test", "test"), new ChatRoomModel("test", ""), "shhh", LocalTime.now(), LocalDate.now()));
-        ChatRoomModel publicChat = new ChatRoomModel("Public Chat", Utility.readUsersData("res/data.dat"), messages);
-        Utility.exportPublicChat(publicChat);
+        //ChatRoomModel publicChat = new ChatRoomModel("Public Chat", Utility.readUsersData("res/data.dat"), messages);
+        //Utility.exportPublicChat(publicChat);
     }
 }

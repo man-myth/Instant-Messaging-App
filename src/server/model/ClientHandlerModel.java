@@ -108,8 +108,6 @@ public class ClientHandlerModel implements Runnable {
                         outputStream.writeObject("contact added");
                         outputStream.writeObject(currentUser.getChatRooms());
                         outputStream.writeObject(user);
-                        outputStream.writeObject("contact updated");
-                        outputStream.writeObject(currentUser);
 
                         // Update client view of new contact if new contact is logged in
                         for (ClientHandlerModel client : ServerModel.clients) {
@@ -289,7 +287,7 @@ public class ClientHandlerModel implements Runnable {
                     currentUser = getUserFromList(currentUser.getUsername());
 
                     outputStream.writeObject("update chat rooms");
-                    outputStream.writeObject(currentUser.getChatRooms());
+                    outputStream.writeObject(currentUser);
                     for (UserModel user : room.getUsers()) {
                         if (user.equals(currentUser)) {
                             continue;

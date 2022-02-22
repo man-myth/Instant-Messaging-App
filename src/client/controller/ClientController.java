@@ -181,7 +181,14 @@ public class ClientController implements Runnable {
                     } else if (event.equals("contact added")) { // do this if event = "contact added"
                         clientModel.updateChatRooms();
                         clientModel.updateContacts();
-                        clientView.updateContacts(clientModel.getUser().getChatRooms());
+                        clientView.updateContacts(clientModel.getUser());
+
+                        clientView.setContactButtonsActionListener(new ContactButtonActionListener());
+                        clientView.setBookmarkButtonActionListener(new AddBookmarkListener());
+                        clientView.setRemoveBookmarkButtonActionListener(new RemoveBookmarkListener());
+                        clientView.setRemoveContactButtonActionListener(new RemoveContactListener());
+                        clientView.contactsSearchListener(new ContactsSearchListener());
+
                     } else if (event.equals("contact updated")) { // do this if event = "contact added"
                         clientModel.updateUser();
                         clientView.updateContacts(clientModel.getUser());
@@ -191,11 +198,8 @@ public class ClientController implements Runnable {
                         clientView.setBookmarkButtonActionListener(new AddBookmarkListener());
                         clientView.setRemoveBookmarkButtonActionListener(new RemoveBookmarkListener());
                         clientView.setRemoveContactButtonActionListener(new RemoveContactListener());
-
-                    }else if (event.equals("bookmark updated")) { // do this if event = "bookmark added/removed"
-                        clientView.setContactPopUpButtonsActionListener(new AddBookmarkListener());
                         clientView.contactsSearchListener(new ContactsSearchListener());
-                    } else if (event.equals("bookmark added")) { // do this if event = "bookmark added"
+                    }else if (event.equals("bookmark updated")) { // do this if event = "bookmark added/removed"
                         clientModel.updateUser();
                         System.out.println("updating contacts....");
                         clientView.updateContacts(clientModel.getUser());
@@ -220,7 +224,7 @@ public class ClientController implements Runnable {
                         }
                     } else if (event.equals("update chat rooms")) {
                         clientModel.updateChatRooms();
-                        clientView.updateContacts(clientModel.getUser().getChatRooms());
+                        clientView.updateContacts(clientModel.getUser());
 
                         // Re-set action listeners
                         clientView.setContactButtonsActionListener(new ContactButtonActionListener());
