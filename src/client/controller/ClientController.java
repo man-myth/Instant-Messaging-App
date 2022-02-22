@@ -79,51 +79,12 @@ public class ClientController implements Runnable {
                     boolean isPassValid = clientModel.isPassValid(enteredPass, reEnteredPass); // checks if passwords match
                     newPass.promptError(isPassValid); // prompt an error if passwords do not match
                     clientModel.changePassword(enteredPass, isPassValid); // else, change password
-                    clientModel.getCurrentRoom().searchUser(clientModel.getUser().getUsername()).setPassword(enteredPass);
                     newPass.changeSuccess(isPassValid);
                 });
             });
 
             //set status listener
-            settingsView.changeStatusActionListener(e3 ->{
-                String status = clientModel.getUser().getStatus();
-                statusView = new SettingsView.StatusView();
-                statusView.setCurrentStatus(status);
-                statusView.online.addActionListener(b -> {
-                    clientModel.getUser().setStatus("Online");
-                    statusView.setLabelOnline();
-                });
-
-                statusView.offline.addActionListener(b2->{
-                    clientModel.getUser().setStatus("Offline");
-                    statusView.setLabelOffline();
-                });
-
-                statusView.afk.addActionListener(b2->{
-                    clientModel.getUser().setStatus("Away from keyboard");
-                    statusView.setLabelAFK();
-                });
-
-                statusView.busy.addActionListener(b2->{
-                    clientModel.getUser().setStatus("Busy");
-                    statusView.setLabelBusy();
-                });
-
-                statusView.disturb.addActionListener(b2->{
-                    clientModel.getUser().setStatus("Do not disturb");
-                    statusView.setLabelDisturb();
-                });
-
-                statusView.idle.addActionListener(b2->{
-                    clientModel.getUser().setStatus("Idle");
-                    statusView.setLabelIdle();
-                });
-
-                statusView.invi.addActionListener(b2->{
-                    clientModel.getUser().setStatus("Invisible");
-                    statusView.setLabelInvi();
-                });
-            });
+            settingsView.changeStatusActionListener(new SetStatusListener());
 
 
             settingsView.helpActionListener(e3 -> {
@@ -222,6 +183,7 @@ public class ClientController implements Runnable {
                         // Re-set action listeners
                         clientView.setContactButtonsActionListener(new ContactButtonActionListener());
                         clientView.setContactPopUpButtonsActionListener(new AddBookmarkListener());
+                        clientView.contactsSearchListener(new ContactsSearchListener());
                     }else if (event.equals("bookmark added")) { // do this if event = "bookmark added"
                         clientModel.updateUser();
                         clientView.updateContacts(clientModel.getUser().getRoomsList());
@@ -249,6 +211,49 @@ public class ClientController implements Runnable {
             }
         }).start();
     }// end of run method
+
+    class SetStatusListener implements ActionListener{
+        @Override
+        public void actionPerformed(ActionEvent e){
+            String status = clientModel.getUser().getStatus();
+            statusView = new SettingsView.StatusView();
+            statusView.setCurrentStatus(status);
+            statusView.online.addActionListener(b -> {
+                clientModel.getUser().setStatus("Online");
+                statusView.setLabelOnline();
+            });
+
+            statusView.offline.addActionListener(b2->{
+                clientModel.getUser().setStatus("Offline");
+                statusView.setLabelOffline();
+            });
+
+            statusView.afk.addActionListener(b2->{
+                clientModel.getUser().setStatus("Away from keyboard");
+                statusView.setLabelAFK();
+            });
+
+            statusView.busy.addActionListener(b2->{
+                clientModel.getUser().setStatus("Busy");
+                statusView.setLabelBusy();
+            });
+
+            statusView.disturb.addActionListener(b2->{
+                clientModel.getUser().setStatus("Do not disturb");
+                statusView.setLabelDisturb();
+            });
+
+            statusView.idle.addActionListener(b2->{
+                clientModel.getUser().setStatus("Idle");
+                statusView.setLabelIdle();
+            });
+
+            statusView.invi.addActionListener(b2->{
+                clientModel.getUser().setStatus("Invisible");
+                statusView.setLabelInvi();
+            });
+        }
+    }
 
     class MembersSearchTextListener implements TextListener{
         @Override
