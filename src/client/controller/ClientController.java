@@ -86,7 +86,9 @@ public class ClientController implements Runnable {
 
             //set status listener
             settingsView.changeStatusActionListener(e3 ->{
+                String status = clientModel.getUser().getStatus();
                 statusView = new SettingsView.StatusView();
+                statusView.setCurrentStatus(status);
                 statusView.online.addActionListener(b -> {
                     clientModel.getUser().setStatus("Online");
                     statusView.setLabelOnline();

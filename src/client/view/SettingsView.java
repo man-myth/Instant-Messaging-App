@@ -187,7 +187,7 @@ public class SettingsView extends JFrame {
         public JButton disturb = new JButton("Do not disturb");
         public JButton idle = new JButton("Idle");
         public JButton invi = new JButton("Invisible");
-        public JLabel status = new JLabel("Current status:   Online");
+        public JLabel status = new JLabel();
 
         public StatusView(){
             //buttons
@@ -235,6 +235,10 @@ public class SettingsView extends JFrame {
             this.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         }
 
+        public void setCurrentStatus(String s){
+            status.setText("Current status:   "+s);
+        }
+
         public void setLabelOnline(){
             status.setText("Current status:   Online");
         }
@@ -279,15 +283,14 @@ public class SettingsView extends JFrame {
             // frame details
             this.setLayout(new FlowLayout());
             this.add(helpLabel);
-            helpLabel.setPreferredSize(new Dimension(250,250));
+            helpLabel.setPreferredSize(new Dimension(250,270));
 
             // frame details 2
-            this.setPreferredSize(new Dimension(300, 250));
+            this.setPreferredSize(new Dimension(300, 350));
             this.pack();
             this.setVisible(true);
             this.setLocationRelativeTo(null);
             this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-
         }
     }
 

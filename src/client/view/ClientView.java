@@ -174,11 +174,6 @@ public class ClientView extends JFrame {
         contactsPanel.revalidate();
     }
 
-    public void showMemberPane1(){
-        membersPanel.searchBar.setText("");
-        cl.show(membersCardPanel, "1");
-    }
-
 
 
 
@@ -300,7 +295,6 @@ public class ClientView extends JFrame {
             return buttons;
         }
 
-        public class ContactButton extends JButton {
         public void fillContactButtonsSearch(List<ContactButton> contactButtons){
             panel = new JPanel();
             panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
