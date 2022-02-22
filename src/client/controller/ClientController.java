@@ -113,7 +113,9 @@ public class ClientController implements Runnable {
                         addToRoomView.errorUserIsHere();
                     else {
                         clientModel.addContactToRoom(newMember, clientModel.getCurrentRoom().getName());
-                        //clientView.addNewMember(newMember);
+                        if (!clientModel.getCurrentRoom().getAdmin().equals("")) {
+                            addToRoomView.successMessage();
+                        }
                     }
                 } catch (NullPointerException error) {
                     addToRoomView.errorInvalidAction();
@@ -158,7 +160,6 @@ public class ClientController implements Runnable {
 
         // Set ActionListener for contact button popup menu
         clientView.setContactPopUpButtonsActionListener(new AddBookmarkListener());
-
 
         // Separate thread for GUI
         EventQueue.invokeLater(() -> clientView.setVisible(true));

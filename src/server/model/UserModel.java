@@ -72,6 +72,10 @@ public class UserModel implements Serializable {
         return chatRooms;
     }
 
+    public void addChatRoom(ChatRoomModel newRoom) {
+        chatRooms.add(newRoom);
+    }
+
     public List<ChatRoomModel> getRoomsList(){
         List<ChatRoomModel> rooms = new ArrayList<>();
         //put bookmarked rooms at the top list
