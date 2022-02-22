@@ -78,11 +78,22 @@ public class ClientView extends JFrame {
         contactsPanel.setContactButtonsActionListener(listener);
     }
 
-    public void setContactPopUpButtonsActionListener(ActionListener listener) {
+    public void setBookmarkButtonActionListener(ActionListener listener) {
         for (ContactsPanel.ContactButton button : contactsPanel.getContactButtons()) {
             button.getPopupMenu().setBookmarkButtonActionListener(listener);
         }
     }
+    public void setRemoveBookmarkButtonActionListener(ActionListener listener) {
+        for (ContactsPanel.ContactButton button : contactsPanel.getContactButtons()) {
+            button.getPopupMenu().setRemoveBookmarkButtonActionListener(listener);
+        }
+    }
+    public void setRemoveContactButtonActionListener(ActionListener listener) {
+        for (ContactsPanel.ContactButton button : contactsPanel.getContactButtons()) {
+            button.getPopupMenu().setRemoveContactButtonActionListener(listener);
+        }
+    }
+
 
     public void updateContacts(UserModel user) {
         mainPanel.remove(contactsPanel);
@@ -456,14 +467,26 @@ public class ClientView extends JFrame {
     }
 
     class ContactsPopupMenu extends JPopupMenu {
-        JMenuItem add;
+        JMenuItem addtoBookmark;
+        JMenuItem removeBookmark;
+        JMenuItem removeContact;
 
         public ContactsPopupMenu() {
-            add = new JMenuItem("Add to bookmark");
-            this.add(add);
+            addtoBookmark = new JMenuItem("Bookmark contact");
+            removeBookmark = new JMenuItem("Remove bookmark");
+            removeContact = new JMenuItem("Remove Contact");
+            this.add(addtoBookmark);
+            this.add(removeBookmark);
+            this.add(removeContact);
         }
         public void setBookmarkButtonActionListener(ActionListener listener) {
-            add.addActionListener(listener);
+            addtoBookmark.addActionListener(listener);
+        }
+        public void setRemoveBookmarkButtonActionListener(ActionListener listener) {
+            removeBookmark.addActionListener(listener);
+        }
+        public void setRemoveContactButtonActionListener(ActionListener listener) {
+            removeContact.addActionListener(listener);
         }
     }
 }
