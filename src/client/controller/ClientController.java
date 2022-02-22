@@ -176,9 +176,7 @@ public class ClientController implements Runnable {
                         clientView.setContactPopUpButtonsActionListener(new AddBookmarkListener());
                     }else if (event.equals("bookmark added")) { // do this if event = "bookmark added"
                         clientModel.updateUser();
-                        System.out.println("before : " + clientModel.getCurrentRoom());
                         clientView.updateContacts(clientModel.getUser().getRoomsList());
-                        System.out.println("after : " +clientModel.getCurrentRoom());
                         // Re-set action listeners
                         clientView.setContactButtonsActionListener(new ContactButtonActionListener());
                         clientView.setContactPopUpButtonsActionListener(new AddBookmarkListener());
@@ -234,7 +232,6 @@ public class ClientController implements Runnable {
                 clientView.addMessage(msg);
                 clientView.clearTextArea();
             }
-
         }
     }
 
@@ -255,12 +252,8 @@ public class ClientController implements Runnable {
             JPopupMenu popupMenu = (JPopupMenu) menuItem.getParent();
             JButton invokerButton = (JButton) popupMenu.getInvoker();
             String username = invokerButton.getText();
-            //ChatRoomModel bookmarkChat = clientModel.getCurrentRoom();
-            System.out.println(" chat room to bookmark: " + username);
+            System.out.println("Bookmark " + username);
             clientModel.addBookmark(username);
         }
     }
-
-
-
 }// END OF CLIENT CONTROLLER

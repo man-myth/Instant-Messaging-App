@@ -263,6 +263,7 @@ public class ClientView extends JFrame {
         public class ContactButton extends JButton {
             ImageIcon imageIcon;
             ContactsPopupMenu popupMenu;
+            Boolean isBookmarked = false;
 
             public ContactButton(String contactName, boolean hasUnread) {
                 this.setMaximumSize(new Dimension(Integer.MAX_VALUE, 35));
@@ -280,7 +281,11 @@ public class ClientView extends JFrame {
                 imageIcon = new ImageIcon(scaledImage);
                 this.setIcon(imageIcon);
                 this.setHorizontalAlignment(SwingConstants.LEFT);
-                this.setBackground(Color.WHITE);
+                if (!isBookmarked) {
+                    this.setBackground(Color.WHITE);
+                } else {
+                    this.setBackground(Color.GRAY);
+                }
 
             }
 
@@ -288,6 +293,9 @@ public class ClientView extends JFrame {
                 return popupMenu;
             }
 
+            public void setBookmarked(Boolean bookmarked) {
+                isBookmarked = bookmarked;
+            }
         }
     }
 
