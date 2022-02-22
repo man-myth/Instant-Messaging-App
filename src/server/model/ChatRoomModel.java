@@ -28,6 +28,7 @@ public class ChatRoomModel implements Serializable {
         this.name = name;
         this.users = users;
         this.chatHistory = chatHistory;
+        this.admin = this.name;
     }
 
     // returns the user if userList contains the specified user

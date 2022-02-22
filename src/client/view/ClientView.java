@@ -243,14 +243,12 @@ public class ClientView extends JFrame {
             panel.add(publicChatButton);
 
             for (ChatRoomModel bookmarkedRoom : bookmarkedRooms) {
-                System.out.println("Adding " + bookmarkedRoom.getName());
                 ContactButton button = new ContactButton(bookmarkedRoom.getName(), false, true);
                 buttons.add(button);
                 panel.add(button);
 
             }for (ChatRoomModel room : rooms) {
                 if (!bookmarkedRooms.contains(room)) {
-                    System.out.println("Adding to room " + room.getName());
                     ContactButton button = new ContactButton(room.getName(), false, false);
                     buttons.add(button);
                     panel.add(button);

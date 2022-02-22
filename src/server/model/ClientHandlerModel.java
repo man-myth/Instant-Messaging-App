@@ -112,7 +112,7 @@ public class ClientHandlerModel implements Runnable {
                         ServerModel.setRegisteredUsers(Utility.readUsersData("res/data.dat"));
                         currentUser = getUserFromList(currentUser.getUsername());
 
-                        outputStream.writeObject("contact added");
+                        outputStream.writeObject("contact updated");
                         outputStream.writeObject(currentUser);
 
                         // Update client view of new contact if new contact is logged in
@@ -128,7 +128,25 @@ public class ClientHandlerModel implements Runnable {
                             }
                         }
                     }
-                } else if(input.equals("add bookmark")){
+                } else if (input.equals("remove contact")) {
+                    String username = (String) inputStream.readObject();
+
+                    for (ChatRoomModel chatRoom: currentUser.getChatRooms()){
+                        if(chatRoom.getName().equals(username)) {
+                            currentUser.getChatRooms().remove(chatRoom);
+                            break;
+                        }
+                    }
+                    
+                    ServerModel.updateUser(currentUser.getUsername(), currentUser);
+                        // Save data
+                    Utility.exportUsersData(ServerModel.getRegisteredUsers());
+                    ServerModel.setRegisteredUsers(Utility.readUsersData("res/data.dat"));
+                    currentUser = getUserFromList(currentUser.getUsername());
+                    outputStream.writeObject("contact updated");
+                    outputStream.writeObject(currentUser);
+
+                }else if(input.equals("add bookmark")){
                     String username = (String) inputStream.readObject();
                     System.out.println("adding " + username + " to bookmark");
 

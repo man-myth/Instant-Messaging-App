@@ -120,7 +120,7 @@ public class ClientModel {
         }
         user.setChatRooms(newChatRoomList);
     }
-
+    // updated the UserModel
     public void updateUser(){
         try {
             this.user = (UserModel) inputStream.readObject();
@@ -133,6 +133,14 @@ public class ClientModel {
     public void addContact(String username) {
         try {
             outputStream.writeObject("add contact");
+            outputStream.writeObject(username);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    public void removeContact(String username) {
+        try {
+            outputStream.writeObject("remove contact");
             outputStream.writeObject(username);
         } catch (IOException e) {
             e.printStackTrace();

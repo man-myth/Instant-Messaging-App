@@ -169,15 +169,18 @@ public class ClientController implements Runnable {
                             clientView.addMessage(message);
                         }
 
-                    } else if (event.equals("contact added")) { // do this if event = "contact added"
+                    } else if (event.equals("contact updated")) { // do this if event = "contact added"
+                        System.out.println("before update " + clientModel.getUser().getContacts());
                         clientModel.updateUser();
                         clientView.updateContacts(clientModel.getUser());
+                        System.out.println("after  update " + clientModel.getUser().getContacts());
 
                         // Re-set action listeners
                         clientView.setContactButtonsActionListener(new ContactButtonActionListener());
                         clientView.setBookmarkButtonActionListener(new AddBookmarkListener());
                         clientView.setRemoveBookmarkButtonActionListener(new RemoveBookmarkListener());
                         clientView.setRemoveContactButtonActionListener(new RemoveContactListener());
+
                     }else if (event.equals("bookmark updated")) { // do this if event = "bookmark added/removed"
                         clientModel.updateUser();
                         System.out.println("updating contacts....");
@@ -276,13 +279,13 @@ public class ClientController implements Runnable {
     }
     class RemoveContactListener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
-//            System.out.println("Inside bookmark listener");
-//            JMenuItem menuItem = (JMenuItem) e.getSource();
-//            JPopupMenu popupMenu = (JPopupMenu) menuItem.getParent();
-//            JButton invokerButton = (JButton) popupMenu.getInvoker();
-//            String username = invokerButton.getText();
-//            System.out.println("Bookmark " + username);
-//            clientModel.addBookmark(username);
+            //System.out.println("Inside bookmark listener");
+            JMenuItem menuItem = (JMenuItem) e.getSource();
+            JPopupMenu popupMenu = (JPopupMenu) menuItem.getParent();
+            JButton invokerButton = (JButton) popupMenu.getInvoker();
+            String username = invokerButton.getText();
+            System.out.println("remove " + username);
+            clientModel.removeContact(username);
         }
     }
 }// END OF CLIENT CONTROLLER
