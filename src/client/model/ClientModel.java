@@ -147,6 +147,14 @@ public class ClientModel {
             e.printStackTrace();
         }
     }
+    public void removeBookmark(String username) {
+            try {
+                outputStream.writeObject("remove bookmark");
+                outputStream.writeObject(username);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
 
     // Send a request to the server for the specified chat room
     public void requestRoom(String roomName) {

@@ -131,7 +131,7 @@ public class ClientHandlerModel implements Runnable {
                 } else if(input.equals("add bookmark")){
                     String username = (String) inputStream.readObject();
                     System.out.println("adding " + username + " to bookmark");
-                    //UserModel userToAdd = getUserFromList(username);
+
                     ChatRoomModel room = null;
                     // find the room to bookmark from list of chatrooms
                     for(ChatRoomModel chat : currentUser.getChatRooms()){
@@ -149,9 +149,32 @@ public class ClientHandlerModel implements Runnable {
                         ServerModel.setRegisteredUsers(Utility.readUsersData("res/data.dat"));
                         currentUser = getUserFromList(currentUser.getUsername());
 
-                        outputStream.writeObject("bookmark added");
+                        outputStream.writeObject("bookmark updated");
                         outputStream.writeObject(currentUser);
                     }
+
+                }  else if(input.equals("remove bookmark")){
+                    String username = (String) inputStream.readObject();
+                    System.out.println("removing " + username + " to bookmark");
+
+                    ChatRoomModel room = null;
+                    // find the room to bookmark from list of chatrooms
+                    for(ChatRoomModel chat : currentUser.getBookmarks()){
+                        if(chat.getName().equals(username)){
+                            System.out.println("before removing bookmark: " + currentUser.getBookmarks());
+                            currentUser.getBookmarks().remove(chat);
+                            System.out.println("after removing bookmark: " + currentUser.getBookmarks());
+                            break;
+                        }
+                    }
+                    ServerModel.updateUser(currentUser.getUsername(), currentUser);
+
+                    // Save data
+                    Utility.exportUsersData(ServerModel.getRegisteredUsers());
+                    ServerModel.setRegisteredUsers(Utility.readUsersData("res/data.dat"));
+                    currentUser = getUserFromList(currentUser.getUsername());
+                    outputStream.writeObject("bookmark updated");
+                    outputStream.writeObject(currentUser);
 
                 } else if (input.equals("get room")) {
                     currentUser = getUserFromList(currentUser.getUsername());
