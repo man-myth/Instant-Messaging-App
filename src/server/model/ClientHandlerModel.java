@@ -1,5 +1,7 @@
 package server.model;
 
+import server.controller.AuthenticatorController;
+
 import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -13,6 +15,7 @@ public class ClientHandlerModel implements Runnable {
     ObjectOutputStream outputStream;
     ObjectInputStream inputStream;
     UserModel currentUser;
+    int loginAttempts=0;
 
     // constructor
     public ClientHandlerModel(Socket socket) {
@@ -35,17 +38,20 @@ public class ClientHandlerModel implements Runnable {
                 input = inputStream.readObject();
 
                 if (input.equals("login")) {
-                    AuthenticatorModel authenticate = new AuthenticatorModel(inputStream, outputStream,
+                    AuthenticatorController authenticate = new AuthenticatorController(inputStream, outputStream,
                             ServerModel.getRegisteredUsers());
                     String username = (String) inputStream.readObject();
                     String password = (String) inputStream.readObject();
                     System.out.printf("Attempting to login with username:%s and password:%s\n", username, password);
-                    if (authenticate.verifyUser(username, password)) {
+                    if (authenticate.isVerified(username, password)) {
                         outputStream.writeObject("VERIFIED");
                         currentUser = getUserFromList(username, password);
                         writeObject(currentUser);
                         writeObject(ServerModel.getPublicChat());
+                        loginAttempts=0;
                     } else {
+                        loginAttempts++;
+                        authenticate.toggleChangePass(loginAttempts, username);
                         outputStream.writeObject("FAILED");
                     }
                 } else if (input.equals("register")) {

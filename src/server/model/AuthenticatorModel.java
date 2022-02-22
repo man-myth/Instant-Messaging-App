@@ -22,19 +22,40 @@ public class AuthenticatorModel {
      * This method checks if login credentials are valid
      * @return
      */
-    public boolean verifyUser(String username, String password) throws IOException {
+    public String verifyUser(String username, String password) {
+        if(username.length()==0)
+            return "enter username";
         for (UserModel user : users) {
             if (user.getUsername().compareTo(username) == 0 && user.getPassword().compareTo(password) == 0){
-                if (user.isActive()) {
-                    JOptionPane.showMessageDialog(null, username + " is already logged in!","Error", JOptionPane.ERROR_MESSAGE);
-                    return false;
-                }
+                if (user.isActive()) { return "is active"; }
                 user.setActive(true);
-                return true;
+                return "verified";
             }
+            else if (user.getUsername().equals(username) && !user.getPassword().equals(password))
+                return "wrong pass";
         }
-        JOptionPane.showMessageDialog(null, username + " does not exist!","Error", JOptionPane.ERROR_MESSAGE);
-        return false;
+        return "does not exist";
     }
+
+    public boolean toggleChangePass(int attempts){
+        return attempts % 3 == 0;
+    }
+
+    public boolean isPassValid(String pass, String rePass) {
+        return pass.equals(rePass);
+    }
+
+    public void changePassword(String pass, boolean isValid, String username) {
+        if (isValid) {
+            UserModel u = new UserModel();
+            for(UserModel user : users) {
+                if (user.getUsername().equals(username))
+                    u = user;
+            }
+            u.setPassword(pass);
+            Utility.exportUsersData(users);
+        }
+    }
+
 
 }
