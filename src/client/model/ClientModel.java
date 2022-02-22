@@ -134,6 +134,7 @@ public class ClientModel {
         }
     }
 
+    // updated the UserModel
     public void updateUser(){
         try {
             this.user = (UserModel) inputStream.readObject();
@@ -151,6 +152,14 @@ public class ClientModel {
             e.printStackTrace();
         }
     }
+    public void removeContact(String username) {
+        try {
+            outputStream.writeObject("remove contact");
+            outputStream.writeObject(username);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     public void addBookmark(String username) {
         try {
@@ -160,6 +169,14 @@ public class ClientModel {
             e.printStackTrace();
         }
     }
+    public void removeBookmark(String username) {
+            try {
+                outputStream.writeObject("remove bookmark");
+                outputStream.writeObject(username);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
 
     // Send a request to the server for the specified chat room
     public void requestRoom(String roomName) {

@@ -36,7 +36,7 @@ public class ClientView extends JFrame {
         menuBar.add(menu);
 
         mainPanel = new JPanel(new BorderLayout());
-        contactsPanel = new ContactsPanel(user.getChatRooms());
+        contactsPanel = new ContactsPanel(user);
         chatPanel = new ChatPanel(publicChat);
         membersPanel = new MembersPanel(user, publicChat);
         mainPanel.add(contactsPanel, BorderLayout.WEST);
@@ -82,15 +82,25 @@ public class ClientView extends JFrame {
         contactsPanel.setContactButtonsActionListener(listener);
     }
 
-    public void setContactPopUpButtonsActionListener(ActionListener listener) {
+    public void setBookmarkButtonActionListener(ActionListener listener) {
         for (ContactsPanel.ContactButton button : contactsPanel.getContactButtons()) {
             button.getPopupMenu().setBookmarkButtonActionListener(listener);
         }
     }
 
-    public void updateContacts(List<ChatRoomModel> rooms) {
+    public void setRemoveBookmarkButtonActionListener(ActionListener listener){
+        for (ContactsPanel.ContactButton button : contactsPanel.getContactButtons()) {
+            button.getPopupMenu().setRemoveBookmarkButtonActionListener(listener);
+        }
+    }
+    public void setRemoveContactButtonActionListener(ActionListener listener){
+        for (ContactsPanel.ContactButton button : contactsPanel.getContactButtons()) {
+            button.getPopupMenu().setRemoveContactButtonActionListener(listener);
+        }
+    }
+    public void updateContacts(UserModel user) {
         mainPanel.remove(contactsPanel);
-        contactsPanel = new ContactsPanel(rooms);
+        contactsPanel = new ContactsPanel(user);
         mainPanel.add(contactsPanel, BorderLayout.WEST);
         mainPanel.revalidate();
     }
@@ -257,21 +267,30 @@ public class ClientView extends JFrame {
         ContactButton publicChatButton;
 
 
-        public ContactsPanel(List<ChatRoomModel> rooms) {
+        public ContactsPanel(UserModel user) {
             JLabel contactsLabel = new JLabel("Contacts", SwingConstants.CENTER);
             contactsLabel.setFont(ClientView.headingFont);
+            List<ChatRoomModel> rooms = user.getChatRooms();
+            List<ChatRoomModel> bookmarkedRooms = user.getBookmarks();
 
             panel = new JPanel();
             panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-            publicChatButton = new ContactButton("Public Chat", false);
+            ContactButton publicChatButton = new ContactButton("Public Chat", false, true);
             buttons = new ArrayList<>();
             buttons.add(publicChatButton);
             panel.add(publicChatButton);
 
-            for (ChatRoomModel room : rooms) {
-                ContactButton button = new ContactButton(room.getName(), false);
+            for (ChatRoomModel bookmarkedRoom : bookmarkedRooms) {
+                ContactButton button = new ContactButton(bookmarkedRoom.getName(), false, true);
                 buttons.add(button);
                 panel.add(button);
+
+            }for (ChatRoomModel room : rooms) {
+                if (!bookmarkedRooms.contains(room)) {
+                    ContactButton button = new ContactButton(room.getName(), false, false);
+                    buttons.add(button);
+                    panel.add(button);
+                }
             }
             scrollPane = new JScrollPane(panel);
             scrollPane.setPreferredSize(new Dimension(100, 430));
@@ -342,9 +361,10 @@ public class ClientView extends JFrame {
         class ContactButton extends JButton {
             ImageIcon imageIcon;
             ContactsPopupMenu popupMenu;
-            Boolean isBookmarked = false;
+            Boolean isBookmarked ;
 
-            public ContactButton(String contactName, boolean hasUnread) {
+            public ContactButton(String contactName, boolean hasUnread, boolean isBookmarked) {
+                this.isBookmarked = isBookmarked;
                 this.setMaximumSize(new Dimension(Integer.MAX_VALUE, 35));
                 this.setText(contactName);
                 if (hasUnread) {
@@ -363,7 +383,7 @@ public class ClientView extends JFrame {
                 if (!isBookmarked) {
                     this.setBackground(Color.WHITE);
                 } else {
-                    this.setBackground(Color.GRAY);
+                    this.setBackground(Color.LIGHT_GRAY);
                 }
 
             }
@@ -540,14 +560,26 @@ public class ClientView extends JFrame {
     }
 
     class ContactsPopupMenu extends JPopupMenu {
-        JMenuItem add;
+        JMenuItem addtoBookmark;
+        JMenuItem removeBookmark;
+        JMenuItem removeContact;
 
         public ContactsPopupMenu() {
-            add = new JMenuItem("Add to bookmark");
-            this.add(add);
+            addtoBookmark = new JMenuItem("Bookmark contact");
+            removeBookmark = new JMenuItem("Remove bookmark");
+            removeContact = new JMenuItem("Remove Contact");
+            this.add(addtoBookmark);
+            this.add(removeBookmark);
+            this.add(removeContact);
         }
         public void setBookmarkButtonActionListener(ActionListener listener) {
-            add.addActionListener(listener);
+            addtoBookmark.addActionListener(listener);
+        }
+        public void setRemoveBookmarkButtonActionListener(ActionListener listener) {
+            removeBookmark.addActionListener(listener);
+        }
+        public void setRemoveContactButtonActionListener(ActionListener listener) {
+            removeContact.addActionListener(listener);
         }
     }
 }

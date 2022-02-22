@@ -159,7 +159,11 @@ public class ClientController implements Runnable {
         clientView.contactsSearchListener(new ContactsSearchListener());
 
         // Set ActionListener for contact button popup menu
-        clientView.setContactPopUpButtonsActionListener(new AddBookmarkListener());
+        clientView.setBookmarkButtonActionListener(new AddBookmarkListener());
+
+        clientView.setRemoveBookmarkButtonActionListener(new RemoveBookmarkListener());
+
+        clientView.setRemoveContactButtonActionListener(new RemoveContactListener());
 
         // Separate thread for GUI
         EventQueue.invokeLater(() -> clientView.setVisible(true));
@@ -179,18 +183,34 @@ public class ClientController implements Runnable {
                     } else if (event.equals("contact added")) { // do this if event = "contact added"
                         clientModel.updateChatRooms();
                         clientModel.updateContacts();
-                        clientView.updateContacts(clientModel.getUser().getChatRooms());
+                        clientView.updateContacts(clientModel.getUser());
+
+                        clientView.setContactButtonsActionListener(new ContactButtonActionListener());
+                        clientView.setBookmarkButtonActionListener(new AddBookmarkListener());
+                        clientView.setRemoveBookmarkButtonActionListener(new RemoveBookmarkListener());
+                        clientView.setRemoveContactButtonActionListener(new RemoveContactListener());
+                        clientView.contactsSearchListener(new ContactsSearchListener());
+
+                    } else if (event.equals("contact updated")) { // do this if event = "contact added"
+                        clientModel.updateUser();
+                        clientView.updateContacts(clientModel.getUser());
 
                         // Re-set action listeners
                         clientView.setContactButtonsActionListener(new ContactButtonActionListener());
-                        clientView.setContactPopUpButtonsActionListener(new AddBookmarkListener());
+                        clientView.setBookmarkButtonActionListener(new AddBookmarkListener());
+                        clientView.setRemoveBookmarkButtonActionListener(new RemoveBookmarkListener());
+                        clientView.setRemoveContactButtonActionListener(new RemoveContactListener());
                         clientView.contactsSearchListener(new ContactsSearchListener());
-                    } else if (event.equals("bookmark added")) { // do this if event = "bookmark added"
+                    }else if (event.equals("bookmark updated")) { // do this if event = "bookmark added/removed"
                         clientModel.updateUser();
-                        clientView.updateContacts(clientModel.getUser().getRoomsList());
+                        System.out.println("updating contacts....");
+                        clientView.updateContacts(clientModel.getUser());
                         // Re-set action listeners
                         clientView.setContactButtonsActionListener(new ContactButtonActionListener());
-                        clientView.setContactPopUpButtonsActionListener(new AddBookmarkListener());
+                        clientView.setBookmarkButtonActionListener(new AddBookmarkListener());
+                        clientView.setRemoveBookmarkButtonActionListener(new RemoveBookmarkListener());
+                        clientView.setRemoveContactButtonActionListener(new RemoveContactListener());
+                        clientView.contactsSearchListener(new ContactsSearchListener());
                     } else if (event.equals("return room")) {
                         clientModel.receiveRoom();
                         clientView.updateRoom(clientModel.getCurrentRoom());
@@ -206,7 +226,7 @@ public class ClientController implements Runnable {
                         }
                     } else if (event.equals("update chat rooms")) {
                         clientModel.updateChatRooms();
-                        clientView.updateContacts(clientModel.getUser().getChatRooms());
+                        clientView.updateContacts(clientModel.getUser());
 
                         // Re-set action listeners
                         clientView.setContactButtonsActionListener(new ContactButtonActionListener());
@@ -345,6 +365,26 @@ public class ClientController implements Runnable {
             String username = invokerButton.getText();
             System.out.println("Bookmark " + username);
             clientModel.addBookmark(username);
+        }
+    }
+    class RemoveBookmarkListener implements ActionListener {
+        public void actionPerformed(ActionEvent e) {
+            JMenuItem menuItem = (JMenuItem) e.getSource();
+            JPopupMenu popupMenu = (JPopupMenu) menuItem.getParent();
+            JButton invokerButton = (JButton) popupMenu.getInvoker();
+            String username = invokerButton.getText();
+            clientModel.removeBookmark(username);
+        }
+    }
+    class RemoveContactListener implements ActionListener {
+        public void actionPerformed(ActionEvent e) {
+            //System.out.println("Inside bookmark listener");
+            JMenuItem menuItem = (JMenuItem) e.getSource();
+            JPopupMenu popupMenu = (JPopupMenu) menuItem.getParent();
+            JButton invokerButton = (JButton) popupMenu.getInvoker();
+            String username = invokerButton.getText();
+            System.out.println("remove " + username);
+            clientModel.removeContact(username);
         }
     }
 }// END OF CLIENT CONTROLLER
