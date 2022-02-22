@@ -11,7 +11,7 @@ import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
 import java.awt.*;
 import java.awt.event.ActionListener;
-import java.lang.reflect.Member;
+import java.awt.event.TextListener;
 import java.util.ArrayList;
 import java.util.List;
 import java.awt.event.WindowAdapter;
@@ -21,12 +21,16 @@ public class ClientView extends JFrame {
     JPanel mainPanel, contactsPanel;
     // Changes: Jpanel -> MembersPanel
     MembersPanel membersPanel;
+    MembersPanelSearch membersPanelSearch;
     ChatPanel chatPanel;
     JMenuBar menuBar;
     JMenu menu;
     JMenuItem logOut;
+    public JPanel membersCardPanel;
+    public CardLayout cl = new CardLayout();
     static Font headingFont = new Font("Calibri", Font.PLAIN, 20);
 
+    //todo textfield focus
     public ClientView(UserModel user, ChatRoomModel publicChat) {
         menuBar = new JMenuBar();
         menu = new JMenu("Menu");
@@ -34,13 +38,19 @@ public class ClientView extends JFrame {
         menu.add(logOut);
         menuBar.add(menu);
 
+        membersCardPanel = new JPanel();
+        membersCardPanel.setLayout(cl);
+
         mainPanel = new JPanel(new BorderLayout());
         contactsPanel = new ContactsPanel(user.getContacts());
         chatPanel = new ChatPanel(publicChat);
         membersPanel = new MembersPanel(user, publicChat);
+        membersPanelSearch = new MembersPanelSearch(user,publicChat);
+        membersCardPanel.add(membersPanel, "1");
+        membersCardPanel.add(membersPanelSearch, "2");
         mainPanel.add(contactsPanel, BorderLayout.WEST);
         mainPanel.add(chatPanel, BorderLayout.CENTER);
-        mainPanel.add(membersPanel, BorderLayout.EAST);
+        mainPanel.add(membersCardPanel, BorderLayout.EAST);
         mainPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         this.add(mainPanel);
         this.setJMenuBar(menuBar);
@@ -71,6 +81,14 @@ public class ClientView extends JFrame {
         for (MembersPanel.MemberButton button : membersPanel.getMemberButtons()) {
             button.getPopupMenu().setAddItemActionListener(listener);
         }
+        membersPanelSearch.memberButton.getPopupMenu().setAddItemActionListener(listener);
+    }
+
+    public void setBookmarkListener(ActionListener listener){
+        for (MembersPanel.MemberButton button : membersPanel.getMemberButtons()) {
+            button.getPopupMenu().setBookmarkActionListener(listener);
+        }
+        membersPanelSearch.memberButton.getPopupMenu().setBookmarkActionListener(listener);
     }
 
     public void setRoom(String roomName) {
@@ -124,6 +142,31 @@ public class ClientView extends JFrame {
     public void changeUsername(String oldName, String newName){
         membersPanel.changeUsername(oldName,newName);
     }
+
+    public void searchBarActionListener(ActionListener listener){
+        membersPanel.searchBar.addActionListener(listener);
+    }
+
+    public void setSearchTextListener2(TextListener listener){
+        membersPanelSearch.searchBar2.addTextListener(listener);
+    }
+
+    public void showMemberPane1(){
+        membersPanel.searchBar.setText("");
+        cl.show(membersCardPanel, "1");
+    }
+
+    public void showMemberPane2(){
+        membersPanelSearch.searchBar2.setText(membersPanel.searchBar.getText());
+        cl.show(membersCardPanel, "2");
+    }
+
+
+    public void runChangeButtonName(String username){
+        membersPanelSearch.changeButtonName(username);
+    }
+
+
 
 
     /*---------- INNER CLASSES ----------*/
@@ -247,12 +290,12 @@ public class ClientView extends JFrame {
     }
 
     /*MembersPanel Class*/
-    class MembersPanel extends JPanel {
+    class MembersPanel extends JPanel{
         JPanel panel, settingsPanel;
         JButton addButton, kickButton, settingsButton;
         JScrollPane scrollPane;
+        public List<MemberButton> memberButtons;
         JTextField searchBar;
-        List<MemberButton> memberButtons;
 
         public MembersPanel(UserModel user, ChatRoomModel publicChat) {
             List<UserModel> users =  publicChat.getUsers();
@@ -286,7 +329,6 @@ public class ClientView extends JFrame {
             }
             this.setLayout(new BorderLayout());
             this.setBackground(Color.GREEN);
-
             this.add(searchBar, BorderLayout.NORTH);
             this.add(scrollPane, BorderLayout.CENTER);
             this.add(settingsPanel, BorderLayout.SOUTH);
@@ -366,19 +408,114 @@ public class ClientView extends JFrame {
             }
         }
 
-    }
+    }//end of MembersPanel class
+
+    /*MembersPanelSearch Class*/
+    class MembersPanelSearch extends JPanel{
+        JPanel panel, settingsPanel;
+        JButton addButton, kickButton, settingsButton;
+        MemberButton memberButton;
+        JScrollPane scrollPane;
+        List<UserModel> users;
+        TextField searchBar2;
+
+        public MembersPanelSearch(UserModel user, ChatRoomModel publicChat) {
+            users = publicChat.getUsers();
+            searchBar2 = new TextField();
+            searchBar2.setPreferredSize(new Dimension(200, 25));
+
+            panel = new JPanel();
+            panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+            memberButton = new MemberButton("");
+            panel.add(memberButton);
+
+            scrollPane = new JScrollPane(panel);
+            scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+            settingsPanel = new JPanel(new GridLayout());
+            addButton = new JButton(ClientView.scaleIcon("res/graphics/add-user.png"));
+            addButton.setBackground(Color.WHITE);
+            kickButton = new JButton(ClientView.scaleIcon("res/graphics/remove-user.png"));
+            kickButton.setBackground(Color.WHITE);
+            settingsButton = new JButton(ClientView.scaleIcon("res/graphics/gear.png"));
+            settingsButton.setBackground(Color.WHITE);
+            settingsPanel.add(addButton);
+            settingsPanel.add(kickButton);
+            settingsPanel.add(settingsButton);
+            settingsPanel.setPreferredSize(new Dimension(200, 35));
+            if(!user.getUsername().equals(publicChat.getAdmin())){
+                kickButton.setVisible(false);
+            }
+            this.setLayout(new BorderLayout());
+            this.setBackground(Color.GREEN);
+            this.add(searchBar2, BorderLayout.NORTH);
+            this.add(scrollPane, BorderLayout.CENTER);
+            this.add(settingsPanel, BorderLayout.SOUTH);
+            this.setMinimumSize(new Dimension(200, 500));
+            this.setPreferredSize(new Dimension(200, 500));
+            this.setMaximumSize(new Dimension(200, 500));
+        }
+
+        class MemberButton extends JButton {
+            ImageIcon imageIcon;
+            MemberPopupMenu popupMenu;
+
+            public MemberButton(String memberName) {
+                this.setMinimumSize(new Dimension(175, 35));
+                this.setPreferredSize(new Dimension(200, 35));
+                this.setMaximumSize(new Dimension(200, 35));
+                this.setText(memberName);
+
+                popupMenu = new MemberPopupMenu();
+                this.setComponentPopupMenu(popupMenu);
+
+                imageIcon = new ImageIcon("res/graphics/user.png");
+
+                Image image = imageIcon.getImage();
+                Image scaledImage = image.getScaledInstance(30, 30, java.awt.Image.SCALE_SMOOTH);
+                imageIcon = new ImageIcon(scaledImage);
+                this.setIcon(imageIcon);
+                this.setHorizontalAlignment(SwingConstants.LEFT);
+                this.setBackground(Color.WHITE);
+            }
+
+            public MemberPopupMenu getPopupMenu() {
+                return popupMenu;
+            }
+        }//member button
+
+        public void changeButtonName(String username){
+            for(UserModel u: users){
+                if(u.getUsername().equals(username)) {
+                    memberButton.setText(username);
+                    break;
+                }else{
+                    memberButton.setText("");
+                }
+            }
+            this.repaint();
+            this.revalidate();
+
+        }
+    }//end of MembersPanelSearch class
 
     /*MemberPopupMenu Class*/
     class MemberPopupMenu extends JPopupMenu {
         JMenuItem add;
+        JMenuItem bookmark;
 
         public MemberPopupMenu() {
             add = new JMenuItem("Add contact");
+            bookmark = new JMenuItem("Bookmark");
             this.add(add);
+            this.add(bookmark);
         }
 
         public void setAddItemActionListener(ActionListener listener) {
             add.addActionListener(listener);
+        }
+
+        public void setBookmarkActionListener(ActionListener listener){
+            bookmark.addActionListener(listener);
         }
     }
 }

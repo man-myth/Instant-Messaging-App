@@ -9,7 +9,7 @@ public class UserModel implements Serializable {
     private String status;
     private Boolean isActive;
     private List<UserModel> contacts;
-    private List<UserModel> bookmarks;
+    private List<UserModel> bookmarks=new ArrayList<>();
     private List<ChatRoomModel> chatRooms;
     private List<MessageModel> unreadMessages;
 

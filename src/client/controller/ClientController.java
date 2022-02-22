@@ -153,13 +153,44 @@ public class ClientController implements Runnable {
             }
         });
 
-        // Set ActionListener for member button popup menu
+        // Add contact popup menu listener
         clientView.setAddItemActionListener(e -> {
             JMenuItem menuItem = (JMenuItem) e.getSource();
             JPopupMenu popupMenu = (JPopupMenu) menuItem.getParent();
             JButton invokerButton = (JButton) popupMenu.getInvoker();
             String username = invokerButton.getText();
             clientModel.addContact(username);
+        });
+
+        // Bookmarking popup menu listener
+        clientView.setBookmarkListener(e -> {
+            JMenuItem menuItem = (JMenuItem) e.getSource();
+            JPopupMenu popupMenu = (JPopupMenu) menuItem.getParent();
+            JButton invokerButton = (JButton) popupMenu.getInvoker();
+            String username = invokerButton.getText();
+            clientModel.getUser().bookmarkingUser(username);
+            System.out.println(clientModel.getUser().getBookmarks().get(0));
+        });
+
+
+        //- main search bar action listener
+        clientView.searchBarActionListener(e -> {
+            JTextField tf = (JTextField) e.getSource();
+            String username = tf.getText();
+            if(!username.equals("")) {
+                clientView.runChangeButtonName("");
+                clientView.showMemberPane2();
+            }
+        });
+
+        //- secondary search bar text listener
+        clientView.setSearchTextListener2(e -> {
+            TextField tf = (TextField) e.getSource();
+            String username = tf.getText();
+            System.out.println(username);
+            clientView.runChangeButtonName(username);
+            if(username.equals(""))
+                clientView.showMemberPane1();
         });
 
         // Separate thread for GUI

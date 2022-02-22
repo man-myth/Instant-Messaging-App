@@ -28,7 +28,7 @@ public class Client {
 //        messages.add(new MessageModel(new UserModel("test", "test"), new ChatRoomModel("test", "admin"), "shhh", LocalTime.now(), LocalDate.now()));
 //        ChatRoomModel publicChat = new ChatRoomModel("", Utility.readUsersData("res/data.dat"), messages);
 //        Utility.exportPublicChat(publicChat);
-
+//
 
        // Start client;
         LoginController logInController = new LoginController();
