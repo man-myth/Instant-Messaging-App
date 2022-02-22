@@ -154,8 +154,7 @@ public class ClientHandlerModel implements Runnable {
                     outputStream.writeObject("contact updated");
                     outputStream.writeObject(currentUser);
 
-                }else if(input.equals("add bookmark")){
-                } else if (input.equals("add bookmark")) {
+                }else if (input.equals("add bookmark")) {
                     String username = (String) inputStream.readObject();
                     System.out.println("adding " + username + " to bookmark");
 
@@ -333,6 +332,17 @@ public class ClientHandlerModel implements Runnable {
                             }
                         }
                     }
+                }else if(input.equals("update status")){
+                    String status = (String) inputStream.readObject();
+                    String username = (String) inputStream.readObject();
+                    currentUser.setStatus(status);
+                    for(UserModel u: ServerModel.getRegisteredUsers()){
+                        if(u.getUsername().equals(username)) {
+                            u.setStatus(status);
+                            break;
+                        }
+                    }
+                    Utility.exportUsersData(ServerModel.getRegisteredUsers());
                 }
 
 

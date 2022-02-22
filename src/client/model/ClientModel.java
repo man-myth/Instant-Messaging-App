@@ -110,7 +110,7 @@ public class ClientModel {
         }
     }
 
-    /*--- ADDING CONTACT MODEL ---*/
+/*--- ADDING CONTACT MODEL ---*/
 
     // adds the new user to contact list
     public void updateChatRooms() {
@@ -206,16 +206,6 @@ public class ClientModel {
         }
     }
 
-    /*--- ADDING/KICKING OF CONTACT TO CHAT ROOM MODEL ---*/
-
-    public UserModel getContact(String username) {
-        for (UserModel u : user.getContacts()) {
-            if (u.getUsername().equals(username))
-                return u;
-        }
-        return new UserModel("null", "null");
-    }
-
 /*--- ADDING/KICKING OF CONTACT TO CHAT ROOM MODEL ---*/
 
     // takes the list of contacts and put their usernames in a String array
@@ -230,6 +220,15 @@ public class ClientModel {
         }
         return contacts.toArray(String[]::new);
     }
+
+    public UserModel getContact(String username) {
+        for (UserModel u : user.getContacts()) {
+            if (u.getUsername().equals(username))
+                return u;
+        }
+        return new UserModel("null", "null");
+    }
+
 
 
 /*--- SETTINGS MODEL ---*/
@@ -264,6 +263,17 @@ public class ClientModel {
                 e.printStackTrace();
             }
         }
+    }
+
+    public void changeStatus(String status){
+        try {
+            outputStream.writeObject("update status");
+            outputStream.writeObject(status);
+            outputStream.writeObject(user.getUsername());
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
     }
 
 

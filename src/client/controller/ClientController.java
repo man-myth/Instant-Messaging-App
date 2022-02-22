@@ -87,6 +87,7 @@ public class ClientController implements Runnable {
             //set status listener
             settingsView.changeStatusActionListener(new SetStatusListener());
 
+            //help module display
             settingsView.helpActionListener(e3 -> {
                 helpModule = new SettingsView.HelpModule(); // access the HelpModule class from SettingsView
 
@@ -250,36 +251,43 @@ public class ClientController implements Runnable {
             statusView.setCurrentStatus(status);
             statusView.online.addActionListener(b -> {
                 clientModel.getUser().setStatus("Online");
+                clientModel.changeStatus("Online"); //change status in server side
                 statusView.setLabelOnline();
             });
 
             statusView.offline.addActionListener(b2 -> {
                 clientModel.getUser().setStatus("Offline");
+                clientModel.changeStatus("Offline"); //change status in server side
                 statusView.setLabelOffline();
             });
 
             statusView.afk.addActionListener(b2 -> {
                 clientModel.getUser().setStatus("Away from keyboard");
+                clientModel.changeStatus("Away from keyboard"); //change status in server side
                 statusView.setLabelAFK();
             });
 
             statusView.busy.addActionListener(b2 -> {
                 clientModel.getUser().setStatus("Busy");
+                clientModel.changeStatus("Busy"); //change status in server side
                 statusView.setLabelBusy();
             });
 
             statusView.disturb.addActionListener(b2 -> {
                 clientModel.getUser().setStatus("Do not disturb");
+                clientModel.changeStatus("Do not disturb"); //change status in server side
                 statusView.setLabelDisturb();
             });
 
             statusView.idle.addActionListener(b2 -> {
                 clientModel.getUser().setStatus("Idle");
+                clientModel.changeStatus("Idle"); //change status in server side
                 statusView.setLabelIdle();
             });
 
             statusView.invi.addActionListener(b2 -> {
                 clientModel.getUser().setStatus("Invisible");
+                clientModel.changeStatus("Invisible"); //change status in server side
                 statusView.setLabelInvi();
             });
         }
