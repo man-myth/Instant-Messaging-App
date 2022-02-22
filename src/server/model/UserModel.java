@@ -23,6 +23,8 @@ public class UserModel implements Serializable {
         this.isActive = false;
     }
 
+    public UserModel(UserModel model) {}
+
     public UserModel() {
 
     }
@@ -115,11 +117,15 @@ public class UserModel implements Serializable {
     //returns the user if he/she is in the contact list
 
     public UserModel searchUserInContact(String username) {
-        for(UserModel u: contacts){
+        for (UserModel u : contacts) {
             if (u.getUsername().equals(username))
                 return u;
         }
         return null;
+    }
+
+    public ChatRoomModel getChatRoom(String roomName) {
+        return getChatRooms().stream().filter(room -> room.getName().equals(roomName)).findAny().orElse(null);
     }
 
     public void updateChatroom(String roomName, ChatRoomModel newChatRoom) {

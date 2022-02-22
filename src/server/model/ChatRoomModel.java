@@ -24,11 +24,11 @@ public class ChatRoomModel implements Serializable {
         this.chatHistory = new ArrayList<>();
     }
 
-    public ChatRoomModel(String name, List<UserModel> users, List<MessageModel> chatHistory) {
+    public ChatRoomModel(String name, List<UserModel> users, List<MessageModel> chatHistory, String admin) {
         this.name = name;
         this.users = users;
         this.chatHistory = chatHistory;
-        this.admin = this.name;
+        this.admin = admin;
     }
 
     // returns the user if userList contains the specified user

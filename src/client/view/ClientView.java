@@ -52,6 +52,10 @@ public class ClientView extends JFrame {
         this.setResizable(false);
     }
 
+    public String getInput(String prompt) {
+        return JOptionPane.showInputDialog(this, prompt);
+    }
+
     public String getMessage() {
         return chatPanel.getMessageTextArea().getText();
     }

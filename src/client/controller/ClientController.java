@@ -83,9 +83,9 @@ public class ClientController implements Runnable {
                 });
             });
 
+
             //set status listener
             settingsView.changeStatusActionListener(new SetStatusListener());
-
 
             settingsView.helpActionListener(e3 -> {
                 helpModule = new SettingsView.HelpModule(); // access the HelpModule class from SettingsView
@@ -112,9 +112,8 @@ public class ClientController implements Runnable {
                     if (isUserHere)
                         addToRoomView.errorUserIsHere();
                     else {
-                        clientModel.getCurrentRoom().addUser(newMember);
-                        clientView.addNewMember(newMember);
-                        addToRoomView.successMessage();
+                        clientModel.addContactToRoom(newMember, clientModel.getCurrentRoom().getName());
+                        //clientView.addNewMember(newMember);
                     }
                 } catch (NullPointerException error) {
                     addToRoomView.errorInvalidAction();
@@ -179,6 +178,10 @@ public class ClientController implements Runnable {
                             clientView.addMessage(message);
                         }
 
+                    } else if (event.equals("contact added")) { // do this if event = "contact added"
+                        clientModel.updateChatRooms();
+                        clientModel.updateContacts();
+                        clientView.updateContacts(clientModel.getUser().getChatRooms());
                     } else if (event.equals("contact updated")) { // do this if event = "contact added"
                         clientModel.updateUser();
                         clientView.updateContacts(clientModel.getUser());
@@ -190,6 +193,9 @@ public class ClientController implements Runnable {
                         clientView.setRemoveContactButtonActionListener(new RemoveContactListener());
 
                     }else if (event.equals("bookmark updated")) { // do this if event = "bookmark added/removed"
+                        clientView.setContactPopUpButtonsActionListener(new AddBookmarkListener());
+                        clientView.contactsSearchListener(new ContactsSearchListener());
+                    } else if (event.equals("bookmark added")) { // do this if event = "bookmark added"
                         clientModel.updateUser();
                         System.out.println("updating contacts....");
                         clientView.updateContacts(clientModel.getUser());
@@ -207,11 +213,20 @@ public class ClientController implements Runnable {
                         clientView.setAddItemActionListener(new AddContactListener());
                         clientView.setMessageListener(new MessageListener());
                     } else if (event.equals("new message")) {
-                        // Update GUI
+                        // Update GUI if current room has new message
                         MessageModel message = clientModel.getMessageFromStream();
                         if (message.getReceiver().getName().equalsIgnoreCase(clientModel.getCurrentRoom().getName())) {
                             clientView.addMessage(message);
                         }
+                    } else if (event.equals("update chat rooms")) {
+                        clientModel.updateChatRooms();
+                        clientView.updateContacts(clientModel.getUser().getChatRooms());
+
+                        // Re-set action listeners
+                        clientView.setContactButtonsActionListener(new ContactButtonActionListener());
+                    } else if (event.equals("get room name")) {
+                        clientModel.writeString(clientView.getInput("Enter new room name."));
+                        addToRoomView.successMessage();
                     }
                 }
             } catch (Exception e) {
@@ -221,9 +236,9 @@ public class ClientController implements Runnable {
         }).start();
     }// end of run method
 
-    class SetStatusListener implements ActionListener{
+    class SetStatusListener implements ActionListener {
         @Override
-        public void actionPerformed(ActionEvent e){
+        public void actionPerformed(ActionEvent e) {
             String status = clientModel.getUser().getStatus();
             statusView = new SettingsView.StatusView();
             statusView.setCurrentStatus(status);
@@ -232,59 +247,59 @@ public class ClientController implements Runnable {
                 statusView.setLabelOnline();
             });
 
-            statusView.offline.addActionListener(b2->{
+            statusView.offline.addActionListener(b2 -> {
                 clientModel.getUser().setStatus("Offline");
                 statusView.setLabelOffline();
             });
 
-            statusView.afk.addActionListener(b2->{
+            statusView.afk.addActionListener(b2 -> {
                 clientModel.getUser().setStatus("Away from keyboard");
                 statusView.setLabelAFK();
             });
 
-            statusView.busy.addActionListener(b2->{
+            statusView.busy.addActionListener(b2 -> {
                 clientModel.getUser().setStatus("Busy");
                 statusView.setLabelBusy();
             });
 
-            statusView.disturb.addActionListener(b2->{
+            statusView.disturb.addActionListener(b2 -> {
                 clientModel.getUser().setStatus("Do not disturb");
                 statusView.setLabelDisturb();
             });
 
-            statusView.idle.addActionListener(b2->{
+            statusView.idle.addActionListener(b2 -> {
                 clientModel.getUser().setStatus("Idle");
                 statusView.setLabelIdle();
             });
 
-            statusView.invi.addActionListener(b2->{
+            statusView.invi.addActionListener(b2 -> {
                 clientModel.getUser().setStatus("Invisible");
                 statusView.setLabelInvi();
             });
         }
     }
 
-    class MembersSearchTextListener implements TextListener{
+    class MembersSearchTextListener implements TextListener {
         @Override
         public void textValueChanged(TextEvent e) {
             TextField tf = (TextField) e.getSource();
             String username = tf.getText();
-            if(!username.equals("")) {
-                clientView.changeMemberButtonPanel(username,clientModel.getCurrentRoom());
-            }else
+            if (!username.equals("")) {
+                clientView.changeMemberButtonPanel(username, clientModel.getCurrentRoom());
+            } else
                 clientView.originalMemberButtonPanel(clientModel.getCurrentRoom());
             clientView.setAddItemActionListener(new AddContactListener());
         }
     }
 
-    class ContactsSearchListener implements TextListener{
+    class ContactsSearchListener implements TextListener {
         @Override
         public void textValueChanged(TextEvent e) {
             TextField tf = (TextField) e.getSource();
             String username = tf.getText();
-            if(!username.equals("")) {
+            if (!username.equals("")) {
                 clientView.changeContactButtons(username, clientModel.getUser());
-            }else
+            } else
                 clientView.originalContactButtons();
         }
     }
