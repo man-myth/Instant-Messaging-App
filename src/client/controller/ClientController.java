@@ -145,11 +145,12 @@ public class ClientController implements Runnable {
         // Set ActionListener for member button popup menu
         clientView.setAddItemActionListener(new AddContactListener());
 
-//        // Set ActionListener for contact button popup menu
-        clientView.setContactPopUpButtonsActionListener(new AddBookmarkListener());
-
         // Set ActionListener for contact buttons
         clientView.setContactButtonsActionListener(new ContactButtonActionListener());
+
+        // Set ActionListener for contact button popup menu
+        clientView.setContactPopUpButtonsActionListener(new AddBookmarkListener());
+
 
         // Separate thread for GUI
         EventQueue.invokeLater(() -> clientView.setVisible(true));
@@ -172,14 +173,15 @@ public class ClientController implements Runnable {
 
                         // Re-set action listeners
                         clientView.setContactButtonsActionListener(new ContactButtonActionListener());
-
+                        clientView.setContactPopUpButtonsActionListener(new AddBookmarkListener());
                     }else if (event.equals("bookmark added")) { // do this if event = "bookmark added"
-
+                        clientModel.updateUser();
+                        System.out.println("before : " + clientModel.getCurrentRoom());
                         clientView.updateContacts(clientModel.getUser().getRoomsList());
-
+                        System.out.println("after : " +clientModel.getCurrentRoom());
                         // Re-set action listeners
                         clientView.setContactButtonsActionListener(new ContactButtonActionListener());
-                        clientView.setContactButtonsActionListener(new AddBookmarkListener());
+                        clientView.setContactPopUpButtonsActionListener(new AddBookmarkListener());
                     } else if (event.equals("return room")) {
                         clientModel.receiveRoom();
                         clientView.updateRoom(clientModel.getCurrentRoom());

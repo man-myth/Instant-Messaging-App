@@ -121,6 +121,15 @@ public class ClientModel {
         user.setChatRooms(newChatRoomList);
     }
 
+    public void updateUser(){
+        try {
+            this.user = (UserModel) inputStream.readObject();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
     public void addContact(String username) {
         try {
             outputStream.writeObject("add contact");
