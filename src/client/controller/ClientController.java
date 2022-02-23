@@ -41,6 +41,7 @@ public class ClientController implements Runnable {
                             UserModel user, ChatRoomModel publicChat) {
         this.socket = socket;
         this.clientModel = new ClientModel(socket, inputStream, outputStream, user, publicChat);
+
     }
 
     // -Methods
@@ -50,6 +51,9 @@ public class ClientController implements Runnable {
         System.out.println("Logged in with user: " + clientModel.getUser());
         clientView = new ClientView(clientModel.getUser(), clientModel.getCurrentRoom());
         clientView.setWindowAdapter(new ExitOnCloseAdapter(socket));
+        clientView.setStatusImage(clientModel.getUser().getUsername(),clientModel.getUser().getStatus());
+        clientModel.changeStatus("Online");
+        clientModel.readAllStatus();
 
         //- settings actions
         clientView.settingsButtonListener(e -> {
@@ -236,6 +240,12 @@ public class ClientController implements Runnable {
                     } else if (event.equals("get room name")) {
                         clientModel.writeString(clientView.getInput("Enter new room name."));
                         addToRoomView.successMessage();
+                    } else if(event.equals("update status view")){
+                        String status = clientModel.getUsernameStatusStream();
+                        String username = clientModel.getUsernameStatusStream();
+                        clientModel.getCurrentRoom().searchUser(username).setStatus(status);
+                        clientModel.getUser().setStatus(status);
+                        clientView.setStatusImage(username,status);
                     }
                 }
             } catch (Exception e) {
@@ -248,9 +258,10 @@ public class ClientController implements Runnable {
     class SetStatusListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            String status = clientModel.getUser().getStatus();
+            String currStatus = clientModel.getUser().getStatus();
+            String username = clientModel.getUser().getUsername();
             statusView = new SettingsView.StatusView();
-            statusView.setCurrentStatus(status);
+            statusView.setCurrentStatus(currStatus);
             statusView.online.addActionListener(b -> {
                 clientModel.getUser().setStatus("Online");
                 clientModel.changeStatus("Online"); //change status in server side

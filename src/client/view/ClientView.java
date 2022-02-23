@@ -87,19 +87,19 @@ public class ClientView extends JFrame {
     }
 
     public void setBookmarkButtonActionListener(ActionListener listener) {
-        for (ContactsPanel.ContactButton button : contactsPanel.getContactButtons()) {
+        for (ContactsPanel.ContactButton button : contactsPanel.getButtons()) {
             button.getPopupMenu().setBookmarkButtonActionListener(listener);
         }
     }
 
     public void setRemoveBookmarkButtonActionListener(ActionListener listener) {
-        for (ContactsPanel.ContactButton button : contactsPanel.getContactButtons()) {
+        for (ContactsPanel.ContactButton button : contactsPanel.getButtons()) {
             button.getPopupMenu().setRemoveBookmarkButtonActionListener(listener);
         }
     }
 
     public void setRemoveContactButtonActionListener(ActionListener listener) {
-        for (ContactsPanel.ContactButton button : contactsPanel.getContactButtons()) {
+        for (ContactsPanel.ContactButton button : contactsPanel.getButtons()) {
             button.getPopupMenu().setRemoveContactButtonActionListener(listener);
         }
     }
@@ -128,6 +128,26 @@ public class ClientView extends JFrame {
         imageIcon = new ImageIcon(scaledImage);
 
         return imageIcon;
+    }
+
+    public void setStatusImage(String username, String status){
+        MembersPanel.MemberButton memberButton = null;
+        for(MembersPanel.MemberButton b: membersPanel.getMemberButtons()){
+            if(b.getText().equals(username)) {
+                memberButton = b;
+                break;
+            }
+        }
+
+        switch (status) {
+            case "Online" -> memberButton.setIcon(scaleIcon("res/graphics/active-user.png"));
+            case "Offline", "Invisible" -> memberButton.setIcon(scaleIcon("res/graphics/user.png"));
+            case "Away from keyboard" -> memberButton.setIcon(scaleIcon("res/graphics/afk-user.png"));
+            case "Busy" -> memberButton.setIcon(scaleIcon("res/graphics/busy-user.png"));
+            case "Do not disturb" -> memberButton.setIcon(scaleIcon("res/graphics/dont disturb-user.png"));
+            case "Idle" -> memberButton.setIcon(scaleIcon("res/graphics/idle-user.png"));
+        }
+
     }
 
     public void setMemberButtonsActionListener(ActionListener listener) {
@@ -317,13 +337,7 @@ public class ClientView extends JFrame {
         public void setContactButtonsActionListener(ActionListener listener) {
             for (ContactButton button : buttons) {
                 button.addActionListener(listener);
-                ;
             }
-        }
-
-
-        public List<ContactButton> getContactButtons() {
-            return buttons;
         }
 
         public void fillContactButtonsSearch(List<ContactButton> contactButtons) {
@@ -453,7 +467,7 @@ public class ClientView extends JFrame {
             panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
             memberButtons = new ArrayList<>();
             for (UserModel u : users) {
-                MemberButton button = new MemberButton(u.getUsername());
+                MemberButton button = new MemberButton(u.getUsername(),u.getStatus());
                 memberButtons.add(button);
                 panel.add(button);
             }
@@ -469,7 +483,7 @@ public class ClientView extends JFrame {
             memberButtons = new ArrayList<>();
             for (UserModel u : chatRoom.getUsers()) {
                 if (u.getUsername().contains(username)) {
-                    MemberButton button = new MemberButton(u.getUsername());
+                    MemberButton button = new MemberButton(u.getUsername(),u.getStatus());
                     memberButtons.add(button);
                     panel.add(button);
                 }
@@ -485,7 +499,7 @@ public class ClientView extends JFrame {
             ImageIcon imageIcon;
             MemberPopupMenu popupMenu;
 
-            public MemberButton(String memberName) {
+            public MemberButton(String memberName, String status) {
                 this.setMinimumSize(new Dimension(175, 35));
                 this.setPreferredSize(new Dimension(200, 35));
                 this.setMaximumSize(new Dimension(200, 35));
@@ -493,8 +507,15 @@ public class ClientView extends JFrame {
 
                 popupMenu = new MemberPopupMenu();
                 this.setComponentPopupMenu(popupMenu);
+                switch (status) {
+                    case "Online" -> imageIcon = new ImageIcon("res/graphics/active-user.png");
+                    case "Offline", "Invisible" -> imageIcon = new ImageIcon("res/graphics/user.png");
+                    case "Away from keyboard" -> imageIcon = new ImageIcon("res/graphics/afk-user.png");
+                    case "Busy" -> imageIcon = new ImageIcon("res/graphics/busy-user.png");
+                    case "Do not disturb" -> imageIcon = new ImageIcon("res/graphics/dont disturb-user.png");
+                    case "Idle" -> imageIcon = new ImageIcon("res/graphics/idle-user.png");
+                }
 
-                imageIcon = new ImageIcon("res/graphics/user.png");
 
                 Image image = imageIcon.getImage();
                 Image scaledImage = image.getScaledInstance(30, 30, java.awt.Image.SCALE_SMOOTH);
@@ -521,7 +542,7 @@ public class ClientView extends JFrame {
 
         //add a new member button
         public void addNewMember(UserModel user) {
-            MemberButton button = new MemberButton(user.getUsername());
+            MemberButton button = new MemberButton(user.getUsername(),user.getStatus());
             memberButtons.add(button);
             panel.add(button);
             this.revalidate();

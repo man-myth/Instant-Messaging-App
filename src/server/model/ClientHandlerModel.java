@@ -337,17 +337,21 @@ public class ClientHandlerModel implements Runnable {
                             }
                         }
                     }
-                }else if(input.equals("update status")){
+
+                }else if(input.equals("change status")){
                     String status = (String) inputStream.readObject();
-                    String username = (String) inputStream.readObject();
-                    currentUser.setStatus(status);
-                    for(UserModel u: ServerModel.getRegisteredUsers()){
-                        if(u.getUsername().equals(username)) {
-                            u.setStatus(status);
-                            break;
-                        }
+                    updateStatusToAll(status);
+
+                }else if(input.equals("read all status")){
+                    for (ClientHandlerModel client : ServerModel.clients) {
+                        if (client.equals(this)) {
+                            continue;
+                        }if(client.clientSocket.isClosed())
+                            continue;
+                        outputStream.writeObject("update status view");
+                        outputStream.writeObject(client.getCurrentUser().getStatus());
+                        outputStream.writeObject(client.getCurrentUser().getUsername());
                     }
-                    Utility.exportUsersData(ServerModel.getRegisteredUsers());
                 }
 
 
@@ -360,6 +364,7 @@ public class ClientHandlerModel implements Runnable {
             currentUser.setActive(false);
             // e.printStackTrace();
             try {
+                updateStatusToAll("Offline");
                 clientSocket.close();
             } catch (IOException ex) {
                 ex.printStackTrace();
@@ -397,5 +402,29 @@ public class ClientHandlerModel implements Runnable {
 
     public ChatRoomModel getChatRoomFromList(UserModel currentUser, String roomName) {
         return currentUser.getChatRooms().stream().filter(room -> room.getName().equals(roomName)).findAny().orElse(null);
+    }
+
+    public void updateStatusToAll(String status) throws IOException{
+        currentUser.setStatus(status);
+        outputStream.writeObject("update status view");
+        outputStream.writeObject(status);
+        outputStream.writeObject(currentUser.getUsername());
+
+        for (ClientHandlerModel client : ServerModel.clients) {
+            //if socket is closed in the client, continue
+            //if client is equal to this client, continue
+            if (client.equals(this) || client.clientSocket.isClosed()) {
+                continue;
+            }
+            client.writeObject("update status view");
+            client.writeObject(status);
+            client.writeObject(currentUser.getUsername());
+        }
+        Utility.exportUsersData(ServerModel.getRegisteredUsers());
+        ServerModel.setRegisteredUsers(Utility.readUsersData("res/data.dat"));
+    }
+
+    public UserModel getCurrentUser(){
+        return currentUser;
     }
 }

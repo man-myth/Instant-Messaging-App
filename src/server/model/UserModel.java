@@ -16,7 +16,7 @@ public class UserModel implements Serializable {
     public UserModel(String username, String password) {
         this.username = username;
         this.password = password;
-        this.status = "Online";
+        this.status = "Offline";
         this.contacts = new ArrayList<>();
         this.chatRooms = new ArrayList<>();
         this.bookmarks = new ArrayList<>();

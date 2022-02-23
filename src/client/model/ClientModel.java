@@ -267,13 +267,26 @@ public class ClientModel {
 
     public void changeStatus(String status){
         try {
-            outputStream.writeObject("update status");
+            user.setStatus(status);
+            currentRoom.searchUser(user.getUsername()).setStatus(status);
+            outputStream.writeObject("change status");
             outputStream.writeObject(status);
-            outputStream.writeObject(user.getUsername());
         }catch (Exception e){
             e.printStackTrace();
         }
 
+    }
+
+    public void readAllStatus(){
+        try{
+            outputStream.writeObject("read all status");
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    public String getUsernameStatusStream() throws Exception{
+        return (String) inputStream.readObject();
     }
 
 
