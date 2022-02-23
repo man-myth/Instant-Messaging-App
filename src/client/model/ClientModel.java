@@ -161,6 +161,16 @@ public class ClientModel {
         }
     }
 
+    /**
+     * Returns true if inputted user is an admin, otherwise returns false
+     * @param user
+     * @return boolean
+     */
+    public boolean isAdmin(UserModel user){
+        return user.getUsername().equals("admin") ||
+                user.getUsername().equals(currentRoom.getAdmin());
+    }
+
     public void addBookmark(String username) {
         try {
             outputStream.writeObject("add bookmark");

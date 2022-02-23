@@ -136,11 +136,16 @@ public class ClientController implements Runnable {
 
             kickUserView.setKickButtonActionListener(e1 -> {
                 try {
-                    String username = kickUserView.getSelected();
-                    UserModel roomMember = clientModel.getCurrentRoom().searchUser(username);
-                    clientModel.getCurrentRoom().kickUser(roomMember);
-                    clientView.kickMember(roomMember);
-                    kickUserView.successMessage();
+                    if (clientModel.isAdmin(clientModel.getUser())){
+                        String username = kickUserView.getSelected();
+                        UserModel roomMember = clientModel.getCurrentRoom().searchUser(username);
+                        clientModel.getCurrentRoom().kickUser(roomMember);
+                        clientView.kickMember(roomMember);
+                        kickUserView.successMessage();
+                    } else{
+                        clientView.noPermsMsg();
+                    }
+
                 } catch (NullPointerException error) {
                     kickUserView.errorInvalidAction();
                 }

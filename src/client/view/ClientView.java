@@ -214,6 +214,14 @@ public class ClientView extends JFrame {
         contactsPanel.revalidate();
     }
 
+    /**
+     * Outputs dialog box stating user does not have proper permissions.
+     */
+    public void noPermsMsg(){
+        JOptionPane.showMessageDialog(null,
+                "You do not have permission to use this feature.");
+    }
+
 
 
 
