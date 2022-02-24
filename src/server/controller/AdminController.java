@@ -1,28 +1,36 @@
 package server.controller;
 
-import client.view.*;
-import client.model.ClientModel;
-import server.model.*;
+import client.controller.ClientController;
+import client.view.AddContactToRoomView;
+import client.view.ExitOnCloseAdapter;
+import client.view.KickContactFromRoomView;
+import client.view.SettingsView;
 
+import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.TextEvent;
+import java.awt.event.TextListener;
+
 import java.io.*;
 import java.net.Socket;
-import java.net.UnknownHostException;
-import java.util.ArrayList;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import server.model.AdminModel;
+import server.model.ChatRoomModel;
+import server.model.MessageModel;
 import server.model.UserModel;
-import server.view.AdminView;
-import client.model.ClientModel;
 
-import javax.swing.*;
+
+import server.view.AdminView;
+import server.view.AuthenticatorView;
+
 
 
 public class AdminController {
+
     private Socket socket;
     private ObjectInputStream inputStream;
     private ObjectOutputStream outputStream;
@@ -35,18 +43,19 @@ public class AdminController {
     SettingsView.AskNewName newName;
     SettingsView.AskNewPass newPass;
 
-
+    // -Constructor
     public AdminController(Socket socket, ObjectInputStream inputStream, ObjectOutputStream outputStream,
                            UserModel user, ChatRoomModel publicChat) {
         this.socket = socket;
         this.inputStream = inputStream;
         this.outputStream = outputStream;
         this.currentRoom = publicChat;
-        this.adminModel = new AdminModel(socket, inputStream, outputStream, user);
+        this.adminModel = new AdminModel(socket, inputStream, outputStream, user, publicChat);
     }
 
+    // -Methods
 
-
+    // run method when calling admin controller
     public void run() {
         System.out.println("Logged in with user: " + adminModel.getUser());
         adminView = new AdminView(adminModel.getUser(), currentRoom);
@@ -128,18 +137,19 @@ public class AdminController {
                     currentRoom.kickUser(roomMember);
                     adminView.kickMember(roomMember);
                     kickUserView.successMessage();
+                    //missing else noPermsMsg
                 } catch (NullPointerException error) {
                     kickUserView.errorInvalidAction();
                 }
             });
         });
-
+        /*
         //- broadcasting messages actions
         adminView.setMessageListener(e -> {
             String message = adminView.getMessage();
             MessageModel msg = new MessageModel(adminModel.getUser(), currentRoom, message, LocalTime.now(),
                     LocalDate.now());
-            boolean doBroadcast = adminModel.broadcastMessage(message, msg);
+            boolean doBroadcast = adminModel.broadcastMessage(msg);
             if (doBroadcast) {
                 adminView.addMessage(msg);
                 adminView.clearTextArea();
@@ -154,8 +164,32 @@ public class AdminController {
             String username = invokerButton.getText();
             adminModel.addContact(username);
         });
+         */
+        //- broadcasting messages actions
+        adminView.setMessageListener(new MessageListener());
+
+        // Set ActionListener for member button popup menu
+        adminView.setAddItemActionListener(new AddContactListener());
+
+        // Set ActionListener for contact buttons
+        adminView.setContactButtonsActionListener(new ContactButtonActionListener());
+
+        //members search bar text listener
+        adminView.membersSearchActionListener(new MembersSearchTextListener());
+
+        //members search bar text listener
+        adminView.contactsSearchListener(new ContactsSearchListener());
+
+        // Set ActionListener for contact button popup menu
+        adminView.setBookmarkButtonActionListener(new AddBookmarkListener());
+
+        adminView.setRemoveBookmarkButtonActionListener(new RemoveBookmarkListener());
+
+        adminView.setRemoveContactButtonActionListener(new RemoveContactListener());
+
         // Separate thread for GUI
         EventQueue.invokeLater(() -> adminView.setVisible(true));
+
 
         // Thread for receiving responses from the server
         new Thread(() -> {
@@ -165,20 +199,44 @@ public class AdminController {
                     System.out.println(event);
                     if (event.equals("broadcast")) { // do this if event = "broadcast"
                         MessageModel message = adminModel.getMessageFromStream();
-                        adminView.addMessage(message);
+                        if (adminModel.getCurrentRoom().getName().equalsIgnoreCase("Public Chat")) {
+                            adminView.addMessage(message);
+                        }
+
                     } else if (event.equals("contact added")) { // do this if event = "contact added"
-                        adminModel.receiveContact();
-                        System.out.println(adminModel.getUser().getContacts());
-                        adminView.updateContacts(adminModel.getUser().getContacts());
+                        adminModel.updateChatRooms();
+                        adminModel.updateContacts();
+                        adminView.updateContacts(adminModel.getUser());
+
+                        adminView.setContactButtonsActionListener(new ContactButtonActionListener());
+                        adminView.setBookmarkButtonActionListener(new AddBookmarkListener());
+                        adminView.setRemoveBookmarkButtonActionListener(new RemoveBookmarkListener());
+                        adminView.setRemoveContactButtonActionListener(new RemoveContactListener());
+                        adminView.contactsSearchListener(new ContactsSearchListener());
+                        // System.out.println(adminModel.getUser().getContacts());
+
+                    } else if (event.equals("adding self")) {
+                        adminView.showErrorMessage("You are adding yourself!");
+                    } else if (event.equals("contact updated")) { // do this if event = "contact added"
+                        adminModel.updateUser();
+                        adminView.updateContacts(adminModel.getUser());
+
+                        // Re-set action listeners
+                        adminView.setContactButtonsActionListener(new ContactButtonActionListener());
+                        adminView.setBookmarkButtonActionListener(new AddBookmarkListener());
+                        adminView.setRemoveBookmarkButtonActionListener(new RemoveBookmarkListener());
+                        adminView.setRemoveContactButtonActionListener(new RemoveContactListener());
+                        adminView.contactsSearchListener(new ContactsSearchListener());
                     }
                 }
+
             } catch (Exception e) {
-                System.out.println(socket + "has disconnected.");
-                //e.printStackTrace();
+               //System.out.println(socket + "has disconnected.");
+                e.printStackTrace();
             }
         }).start();
 
-    }
+    }//end of run() thread
 
     //remove?
     public void receiveMessage(MessageModel message) {
@@ -200,5 +258,108 @@ public class AdminController {
         }
         adminView.clearTextArea();
     }
-}
+
+    class MembersSearchTextListener implements TextListener {
+        @Override
+        public void textValueChanged(TextEvent e) {
+            TextField tf = (TextField) e.getSource();
+            String username = tf.getText();
+            if (!username.equals("")) {
+              adminView.changeMemberButtonPanel(username, adminModel.getCurrentRoom());
+            } else
+               adminView.originalMemberButtonPanel(adminModel.getCurrentRoom());
+           adminView.setAddItemActionListener(new AddContactListener());
+        }
+    }
+
+    class ContactsSearchListener implements TextListener {
+        @Override
+        public void textValueChanged(TextEvent e) {
+            TextField tf = (TextField) e.getSource();
+            String username = tf.getText();
+            if (!username.equals("")) {
+                adminView.changeContactButtons(username, adminModel.getUser());
+            } else
+               adminView.originalContactButtons();
+        }
+    }
+
+    class ContactButtonActionListener implements ActionListener {
+        public void actionPerformed(ActionEvent e) {
+            String room = ((JButton) e.getSource()).getText();
+            if (room.equals(adminModel.getCurrentRoom().getName())) {
+                return;
+            }
+            adminModel.requestRoom(room);
+        }
+    }
+
+    class MessageListener implements ActionListener {
+        public void actionPerformed(ActionEvent e) {
+            String message = adminView.getMessage();
+            ChatRoomModel currentRoom = adminModel.getCurrentRoom();
+            MessageModel msg = new MessageModel(adminModel.getUser(), currentRoom, message, LocalTime.now(),
+                    LocalDate.now());
+
+            // Public chat
+            if (currentRoom.getName().equalsIgnoreCase("Public Chat")) {
+                boolean doBroadcast = adminModel.broadcastMessage(msg);
+                if (doBroadcast) {
+                    adminView.addMessage(msg);
+                    adminView.clearTextArea();
+                }
+                // Conference or Private Message
+            } else {
+                adminModel.sendMessage(msg);
+                adminView.addMessage(msg);
+                adminView.clearTextArea();
+            }
+        }
+    }
+    class AddContactListener implements ActionListener {
+        public void actionPerformed(ActionEvent e) {
+            JMenuItem menuItem = (JMenuItem) e.getSource();
+            JPopupMenu popupMenu = (JPopupMenu) menuItem.getParent();
+            JButton invokerButton = (JButton) popupMenu.getInvoker();
+            String username = invokerButton.getText();
+            UserModel newContact = adminModel.getCurrentRoom().searchUser(username);
+            adminModel.addContact(username);
+            adminModel.getUser().getContacts().add(newContact);
+
+        }
+    }
+    class AddBookmarkListener implements ActionListener {
+        public void actionPerformed(ActionEvent e) {
+            System.out.println("Inside bookmark listener");
+            JMenuItem menuItem = (JMenuItem) e.getSource();
+            JPopupMenu popupMenu = (JPopupMenu) menuItem.getParent();
+            JButton invokerButton = (JButton) popupMenu.getInvoker();
+            String username = invokerButton.getText();
+            System.out.println("Bookmark " + username);
+            adminModel.addBookmark(username);
+        }
+    }
+
+    class RemoveBookmarkListener implements ActionListener {
+        public void actionPerformed(ActionEvent e) {
+            JMenuItem menuItem = (JMenuItem) e.getSource();
+            JPopupMenu popupMenu = (JPopupMenu) menuItem.getParent();
+            JButton invokerButton = (JButton) popupMenu.getInvoker();
+            String username = invokerButton.getText();
+            adminModel.removeBookmark(username);
+        }
+    }
+
+    class RemoveContactListener implements ActionListener {
+        public void actionPerformed(ActionEvent e) {
+            //System.out.println("Inside bookmark listener");
+            JMenuItem menuItem = (JMenuItem) e.getSource();
+            JPopupMenu popupMenu = (JPopupMenu) menuItem.getParent();
+            JButton invokerButton = (JButton) popupMenu.getInvoker();
+            String username = invokerButton.getText();
+            System.out.println("remove " + username);
+            adminModel.removeContact(username);
+        }
+    }
+}// END OF ADMIN CONTROLLER
 
