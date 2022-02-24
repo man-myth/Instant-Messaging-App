@@ -21,7 +21,6 @@ import client.model.ClientModel;
 
 import javax.swing.*;
 
-
 public class AdminController {
     private Socket socket;
     private ObjectInputStream inputStream;
@@ -35,9 +34,8 @@ public class AdminController {
     SettingsView.AskNewName newName;
     SettingsView.AskNewPass newPass;
 
-
     public AdminController(Socket socket, ObjectInputStream inputStream, ObjectOutputStream outputStream,
-                           UserModel user, ChatRoomModel publicChat) {
+            UserModel user, ChatRoomModel publicChat) {
         this.socket = socket;
         this.inputStream = inputStream;
         this.outputStream = outputStream;
@@ -45,40 +43,27 @@ public class AdminController {
         this.adminModel = new AdminModel(socket, inputStream, outputStream, user);
     }
 
-
-
     public void run() {
         System.out.println("Logged in with user: " + adminModel.getUser());
         adminView = new AdminView(adminModel.getUser(), currentRoom);
         adminView.setWindowAdapter(new ExitOnCloseAdapter(socket));
 
-        //- settings actions
+        // - settings actions
         adminView.settingsButtonListener(e -> {
-            //asking new username listener
             SettingsView settingsView = new SettingsView();
             settingsView.changeNameActionListener(e1 -> {
-                newName = new SettingsView.AskNewName(); // access the AskNewName class from SettingsView
-                newName.changeListener(f -> { // action listener for the button in AskNewNAme
-                    String enteredName = newName.getText();
-                    String oldName = adminModel.getUser().getUsername();
-                    boolean isChanged = adminModel.changeUsername(enteredName, oldName);
-                    if(isChanged) {
-                        adminView.changeUsername(oldName, enteredName); //change button text of username
-                        currentRoom.searchUser(oldName).setUsername(enteredName); //change the username from chatroom list
-                        newName.changeSuccess(oldName, enteredName);
-                    }else{
-                        newName.promptError();
-                    }
-                });
+                adminView.promptErrorChangeUser();
+
             });
 
-            //asking new password listener
+            // asking new password listener
             settingsView.changePassActionListener(e2 -> {
                 newPass = new SettingsView.AskNewPass(); // access the AskNewPass class from SettingsView
                 newPass.changeListener(f -> { // action listener for the button in AskNewPass
                     String enteredPass = newPass.getPass();
                     String reEnteredPass = newPass.getRePass();
-                    boolean isPassValid = adminModel.isPassValid(enteredPass, reEnteredPass); // checks if passwords match
+                    boolean isPassValid = adminModel.isPassValid(enteredPass, reEnteredPass); // checks if passwords
+                                                                                              // match
                     newPass.promptError(isPassValid); // prompt an error if passwords do not match
                     adminModel.changePassword(enteredPass, isPassValid); // else, change password
                     currentRoom.searchUser(adminModel.getUser().getUsername()).setPassword(enteredPass);
@@ -88,7 +73,7 @@ public class AdminController {
 
         });
 
-        //- adding of contact to a room actions
+        // - adding of contact to a room actions
         adminView.setAddButtonActionListener(e -> {
             /*
              * once the add button to room is clicked,
@@ -110,13 +95,13 @@ public class AdminController {
                         adminView.addNewMember(newMember);
                         addToRoomView.successMessage();
                     }
-                }catch (NullPointerException error){
+                } catch (NullPointerException error) {
                     addToRoomView.errorInvalidAction();
                 }
             });
         });
 
-        //- kick user from the room actions
+        // - kick user from the room actions
         adminView.setKickButtonActionListener(e2 -> {
             String[] contactArray = adminModel.listToStringArrayAdd(currentRoom.getUsers());
             kickUserView = new KickContactFromRoomView(contactArray);
@@ -134,7 +119,7 @@ public class AdminController {
             });
         });
 
-        //- broadcasting messages actions
+        // - broadcasting messages actions
         adminView.setMessageListener(e -> {
             String message = adminView.getMessage();
             MessageModel msg = new MessageModel(adminModel.getUser(), currentRoom, message, LocalTime.now(),
@@ -174,13 +159,13 @@ public class AdminController {
                 }
             } catch (Exception e) {
                 System.out.println(socket + "has disconnected.");
-                //e.printStackTrace();
+                // e.printStackTrace();
             }
         }).start();
 
     }
 
-    //remove?
+    // remove?
     public void receiveMessage(MessageModel message) {
         adminView.addMessage(message);
     }
@@ -192,7 +177,8 @@ public class AdminController {
         }
         try {
             outputStream.writeObject("broadcast");
-            MessageModel msg = new MessageModel(adminModel.getUser(), currentRoom, message, LocalTime.now(), LocalDate.now());
+            MessageModel msg = new MessageModel(adminModel.getUser(), currentRoom, message, LocalTime.now(),
+                    LocalDate.now());
             outputStream.writeObject(msg);
             adminView.addMessage(msg);
         } catch (IOException ex) {
@@ -201,4 +187,3 @@ public class AdminController {
         adminView.clearTextArea();
     }
 }
-

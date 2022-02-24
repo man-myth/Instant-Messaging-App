@@ -45,6 +45,8 @@ public class AdminView extends JFrame {
         this.setResizable(false);
     }
 
+
+
     public String getMessage() {
         return chatPanel.getMessageTextArea().getText();
     }
@@ -117,6 +119,11 @@ public class AdminView extends JFrame {
 
     public void changeUsername(String oldName, String newName){
         membersPanel.changeUsername(oldName,newName);
+    }
+
+    public void promptErrorChangeUser(){
+        JOptionPane.showMessageDialog(this.getContentPane(), "Username is fixed for Admin", "Error",
+                JOptionPane.ERROR_MESSAGE);
     }
 
     /*---------- INNER CLASSES ----------*/
