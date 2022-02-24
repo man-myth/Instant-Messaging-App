@@ -20,7 +20,7 @@ import java.awt.event.WindowAdapter;
 public class AdminView extends JFrame {
 
     JPanel mainPanel, contactsPanel;
-    //Changes: Jpanel -> MembersPanel
+    // Changes: Jpanel -> MembersPanel
     MembersPanel membersPanel;
     ChatPanel chatPanel;
     JMenuBar menuBar;
@@ -44,8 +44,6 @@ public class AdminView extends JFrame {
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setResizable(false);
     }
-
-
 
     public String getMessage() {
         return chatPanel.getMessageTextArea().getText();
@@ -101,7 +99,7 @@ public class AdminView extends JFrame {
         membersPanel.addButton.addActionListener(listener);
     }
 
-    public void setKickButtonActionListener(ActionListener listener){
+    public void setKickButtonActionListener(ActionListener listener) {
         membersPanel.kickButton.addActionListener(listener);
     }
 
@@ -109,23 +107,38 @@ public class AdminView extends JFrame {
         membersPanel.settingsButton.addActionListener(listener);
     }
 
-    public void addNewMember(UserModel user){
+    public void addNewMember(UserModel user) {
         membersPanel.addNewMember(user);
     }
 
-    public void kickMember(UserModel user){
+    public void kickMember(UserModel user) {
         membersPanel.kickMember(user);
     }
 
-    public void changeUsername(String oldName, String newName){
-        membersPanel.changeUsername(oldName,newName);
-    }
-
-    public void promptErrorChangeUser(){
+    public void promptErrorChangeUser() {
         JOptionPane.showMessageDialog(this.getContentPane(), "Username is fixed for Admin", "Error",
                 JOptionPane.ERROR_MESSAGE);
     }
 
+    public void setStatusImage(String username, String status) {
+        MembersPanel.MemberButton memberButton = null;
+        for (MembersPanel.MemberButton b : membersPanel.getMemberButtons()) {
+            if (b.getText().equals(username)) {
+                memberButton = b;
+                break;
+            }
+        }
+
+        switch (status) {
+            case "Online" -> memberButton.setIcon(scaleIcon("res/graphics/active-user.png"));
+            case "Offline", "Invisible" -> memberButton.setIcon(scaleIcon("res/graphics/user.png"));
+            case "Away from keyboard" -> memberButton.setIcon(scaleIcon("res/graphics/afk-user.png"));
+            case "Busy" -> memberButton.setIcon(scaleIcon("res/graphics/busy-user.png"));
+            case "Do not disturb" -> memberButton.setIcon(scaleIcon("res/graphics/dont disturb-user.png"));
+            case "Idle" -> memberButton.setIcon(scaleIcon("res/graphics/idle-user.png"));
+        }
+
+    }
     /*---------- INNER CLASSES ----------*/
 
     class ChatPanel extends JPanel {
@@ -163,9 +176,10 @@ public class AdminView extends JFrame {
             this.revalidate();
         }
 
-        public void setKickButtonActionListener(ActionListener listener){
+        public void setKickButtonActionListener(ActionListener listener) {
             membersPanel.kickButton.addActionListener(listener);
         }
+
         public void addText(JTextPane pane, String text) {
             StyledDocument doc = pane.getStyledDocument();
 
@@ -245,7 +259,7 @@ public class AdminView extends JFrame {
         }
     }
 
-    /*MembersPanel Class*/
+    /* MembersPanel Class */
     class MembersPanel extends JPanel {
         JPanel panel, settingsPanel;
         JButton addButton, kickButton, settingsButton;
@@ -254,7 +268,7 @@ public class AdminView extends JFrame {
         List<MemberButton> memberButtons;
 
         public MembersPanel(UserModel user, ChatRoomModel publicChat) {
-            List<UserModel> users =  publicChat.getUsers();
+            List<UserModel> users = publicChat.getUsers();
             searchBar = new HintJTextField("Search Members");
             searchBar.setPreferredSize(new Dimension(200, 25));
 
@@ -280,9 +294,10 @@ public class AdminView extends JFrame {
             settingsPanel.add(kickButton);
             settingsPanel.add(settingsButton);
             settingsPanel.setPreferredSize(new Dimension(200, 35));
-//            if(!user.getUsername().equals(publicChat.getAdmin())){
-//                kickButton.setVisible(false);
-//            }
+            // if(!user.getUsername().equals(publicChat.getAdmin())){
+            // kickButton.setVisible(false);
+            // }
+
             this.setLayout(new BorderLayout());
             this.setBackground(Color.GREEN);
 
@@ -332,20 +347,20 @@ public class AdminView extends JFrame {
             return memberButtons;
         }
 
-        //add a new member button
-        public void addNewMember(UserModel user){
+        // add a new member button
+        public void addNewMember(UserModel user) {
             MemberButton button = new MemberButton(user.getUsername());
             memberButtons.add(button);
             panel.add(button);
             this.revalidate();
         }
 
-        //remove a member button
-        public void kickMember(UserModel user){
+        // remove a member button
+        public void kickMember(UserModel user) {
             String name = user.getUsername();
-            //loops to find the button with the same name
-            for(JButton b: memberButtons){
-                if(b.getText().equals(name)) {
+            // loops to find the button with the same name
+            for (JButton b : memberButtons) {
+                if (b.getText().equals(name)) {
                     panel.remove(b);
                     break;
                 }
@@ -355,19 +370,9 @@ public class AdminView extends JFrame {
             this.revalidate();
         }
 
-        //change username button
-        public void changeUsername(String oldName, String newName){
-            for(JButton b: memberButtons){
-                if(b.getText().equals(oldName)) {
-                    b.setText(newName);
-                    break;
-                }
-            }
-        }
-
     }
 
-    /*MemberPopupMenu Class*/
+    /* MemberPopupMenu Class */
     class MemberPopupMenu extends JPopupMenu {
         JMenuItem add;
 

@@ -16,13 +16,15 @@ public class AdminModel {
     private ObjectInputStream inputStream;
     final private ObjectOutputStream outputStream;
     UserModel user;
+    ChatRoomModel currentRoom;
 
     public AdminModel(Socket clientSocket, ObjectInputStream inputStream, ObjectOutputStream outputStream,
-            UserModel user) {
+            UserModel user, ChatRoomModel currentRoom) {
         this.clientSocket = clientSocket;
         this.inputStream = inputStream;
         this.outputStream = outputStream;
         this.user = user;
+        this.currentRoom = currentRoom;
     }
 
     /*
@@ -47,6 +49,10 @@ public class AdminModel {
 
     public void setUser(UserModel user) {
         this.user = user;
+    }
+
+    public ChatRoomModel getCurrentRoom() {
+        return currentRoom;
     }
 
     /*------------------------------- MODELS -------------------------------*/
@@ -132,5 +138,30 @@ public class AdminModel {
                 e.printStackTrace();
             }
         }
+
+    }
+
+    public void changeStatus(String status) {
+        try {
+            user.setStatus(status);
+            currentRoom.searchUser(user.getUsername()).setStatus(status);
+            outputStream.writeObject("change status");
+            outputStream.writeObject(status);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    public void readAllStatus(){
+        try{
+            outputStream.writeObject("read all status");
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    public String getUsernameStatusStream() throws Exception{
+        return (String) inputStream.readObject();
     }
 }// END OF ADMIN MODEL
