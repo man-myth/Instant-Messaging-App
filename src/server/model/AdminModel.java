@@ -95,6 +95,15 @@ public class AdminModel{
         return true;
     }
 
+    public void sendMessage(MessageModel msg) {
+        try {
+            outputStream.writeObject("send message");
+            outputStream.writeObject(msg);
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+    }
+
     /*--- ADDING CONTACT MODEL ---*/
 
     // adds the new user to contact list
@@ -166,8 +175,33 @@ public class AdminModel{
             e.printStackTrace();
         }
     }
-    // missing requestRoom method
-    // missing receiveRoom method
+    // Send a request to the server for the specified chat room
+    public void requestRoom(String roomName) {
+        try {
+            outputStream.writeObject("get room");
+            outputStream.writeObject(roomName);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void receiveRoom() {
+        try {
+            currentRoom = (ChatRoomModel) inputStream.readObject();
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void addContactToRoom(UserModel newMember, String roomName) {
+        try {
+            outputStream.writeObject("add contact to room");
+            outputStream.writeObject(newMember);
+            outputStream.writeObject(roomName);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
         /* old code remove?
     public void receiveContact() {
