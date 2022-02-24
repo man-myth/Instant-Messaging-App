@@ -156,6 +156,30 @@ public class AdminView extends JFrame {
         contactsPanel.searchBar.addTextListener(listener);
     }
 
+    public void changeMemberButtonPanel(String username, ChatRoomModel room) {
+        membersPanel.clear();
+        membersPanel.changeButtons(username, room);
+        membersPanel.revalidate();
+    }
+
+    public void originalMemberButtonPanel(ChatRoomModel room) {
+        membersPanel.clear();
+        membersPanel.fillButtons(room.getUsers());
+        membersPanel.revalidate();
+    }
+
+    public void changeContactButtons(String username, UserModel u) {
+        contactsPanel.clear();
+        contactsPanel.changeContactButtons(username, u);
+        contactsPanel.revalidate();
+    }
+
+    public void originalContactButtons() {
+        contactsPanel.clear();
+        contactsPanel.fillContactButtonsSearch(contactsPanel.getButtons());
+        contactsPanel.revalidate();
+    }
+
     /*---------- INNER CLASSES ----------*/
 
     class ChatPanel extends JPanel {
@@ -365,21 +389,17 @@ public class AdminView extends JFrame {
         List<MemberButton> memberButtons;
 
         public MembersPanel(UserModel user, ChatRoomModel publicChat) {
-            List<UserModel> users =  publicChat.getUsers();
             searchBar = new HintTextField("Search Members");
             searchBar.setPreferredSize(new Dimension(200, 25));
+            fillButtons(publicChat.getUsers());
 
-            panel = new JPanel();
+            /*panel = new JPanel();
             panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
             memberButtons = new ArrayList<>();
-            for (UserModel u : users) {
-                MemberButton button = new MemberButton(u.getUsername());
-                memberButtons.add(button);
-                panel.add(button);
-            }
-
-            scrollPane = new JScrollPane(panel);
+             */
+           // scrollPane = new JScrollPane(panel);
             scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+
             settingsPanel = new JPanel(new GridLayout());
             addButton = new JButton(AdminView.scaleIcon("res/graphics/add-user.png"));
             addButton.setBackground(Color.WHITE);
@@ -391,9 +411,9 @@ public class AdminView extends JFrame {
             settingsPanel.add(kickButton);
             settingsPanel.add(settingsButton);
             settingsPanel.setPreferredSize(new Dimension(200, 35));
-//            if(!user.getUsername().equals(publicChat.getAdmin())){
-//                kickButton.setVisible(false);
-//            }
+           if(!user.getUsername().equals(publicChat.getAdmin())){
+               kickButton.setVisible(false);
+           }
             this.setLayout(new BorderLayout());
             this.setBackground(Color.GREEN);
 
@@ -404,12 +424,48 @@ public class AdminView extends JFrame {
             this.setPreferredSize(new Dimension(200, 500));
             this.setMaximumSize(new Dimension(200, 500));
         }
+        public void clear() {
+            membersPanel.remove(scrollPane);
+        }
+        public void fillButtons(List<UserModel> users) {
+            panel = new JPanel();
+            panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+            memberButtons = new ArrayList<>();
+            for (UserModel u : users) {
+                MembersPanel.MemberButton button = new MembersPanel.MemberButton(u.getUsername(),u.getStatus());
+                memberButtons.add(button);
+                panel.add(button);
+            }
+
+            scrollPane = new JScrollPane(panel);
+            scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+            this.add(scrollPane, BorderLayout.CENTER);
+        }
+
+        public void changeButtons(String username, ChatRoomModel chatRoom) {
+            panel = new JPanel();
+            panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+            memberButtons = new ArrayList<>();
+            for (UserModel u : chatRoom.getUsers()) {
+                if (u.getUsername().contains(username)) {
+                    MembersPanel.MemberButton button = new MembersPanel.MemberButton(u.getUsername(),u.getStatus());
+                    memberButtons.add(button);
+                    panel.add(button);
+                }
+            }
+            scrollPane = new JScrollPane(panel);
+            scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+            this.add(scrollPane, BorderLayout.CENTER);
+            this.repaint();
+            this.revalidate();
+        }
+
 
         class MemberButton extends JButton {
             ImageIcon imageIcon;
             MemberPopupMenu popupMenu;
 
-            public MemberButton(String memberName) {
+            public MemberButton(String memberName, String status) {
                 this.setMinimumSize(new Dimension(175, 35));
                 this.setPreferredSize(new Dimension(200, 35));
                 this.setMaximumSize(new Dimension(200, 35));
@@ -445,7 +501,7 @@ public class AdminView extends JFrame {
 
         //add a new member button
         public void addNewMember(UserModel user){
-            MemberButton button = new MemberButton(user.getUsername());
+            MemberButton button = new MemberButton(user.getUsername(),user.getStatus());
             memberButtons.add(button);
             panel.add(button);
             this.revalidate();
