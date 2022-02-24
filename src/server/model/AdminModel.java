@@ -129,7 +129,29 @@ public class AdminModel{
             e.printStackTrace();
         }
     }
-    /*
+
+    //missing isAdmin method
+
+    public void addBookmark(String username) {
+        try {
+            outputStream.writeObject("add contact");
+            outputStream.writeObject(username);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    public void removeBookmark(String username) {
+        try {
+            outputStream.writeObject("remove bookmark");
+            outputStream.writeObject(username);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    // missing requestRoom method
+    // missing receiveRoom method
+
+        /* old code remove?
     public void receiveContact() {
         UserModel newUser = null;
         try {
@@ -143,15 +165,6 @@ public class AdminModel{
         user.getContacts().add(newUser);
     }
      */
-
-    public void addBookmark(String username) {
-        try {
-            outputStream.writeObject("add contact");
-            outputStream.writeObject(username);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 
 /*--- ADDING/KICKING OF CONTACT TO CHAT ROOM MODEL ---*/
 
