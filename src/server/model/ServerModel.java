@@ -45,7 +45,7 @@ public class ServerModel {
             try {
                 // Accept client connection
                 clientSocket = serverSocket.accept();
-                //clientSocket.setTcpNoDelay(true);
+                // clientSocket.setTcpNoDelay(true);
                 System.out.println("[SERVER]: Client connected: " + clientSocket);
                 ClientHandlerModel clientHandler = new ClientHandlerModel(clientSocket);
                 clients.add(clientHandler);
@@ -77,7 +77,6 @@ public class ServerModel {
         return registeredUsers;
     }
 
-
     public static void setRegisteredUsers(List<UserModel> newRegisteredUsers) {
         registeredUsers = newRegisteredUsers;
     }
@@ -106,9 +105,9 @@ public class ServerModel {
         return clients;
     }
 
-    public static boolean doesUsernameExist(String username){
-        for(UserModel u: registeredUsers){
-            if(u.getUsername().equals(username))
+    public static boolean doesUsernameExist(String username) {
+        for (UserModel u : registeredUsers) {
+            if (u.getUsername().equals(username))
                 return true;
         }
         return false;
@@ -117,11 +116,14 @@ public class ServerModel {
     public void setClients(List<ClientHandlerModel> clients) {
         this.clients = clients;
     }
+
     // Method to find a member based on username and returns a list
-    public List<UserModel> findMember(String search, List<UserModel> user){
-        return registeredUsers.stream().filter(userModel -> checkStringForMatches(userModel.getUsername(), search)).collect(Collectors.toList());
+    public List<UserModel> findMember(String search, List<UserModel> user) {
+        return registeredUsers.stream().filter(userModel -> checkStringForMatches(userModel.getUsername(), search))
+                .collect(Collectors.toList());
     }
-    private boolean checkStringForMatches(String word, String substring){
+
+    private boolean checkStringForMatches(String word, String substring) {
         return word.toLowerCase().contains(substring.toLowerCase());
     }
 

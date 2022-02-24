@@ -147,7 +147,6 @@ public class AdminView extends JFrame {
     public void changeUsername(String oldName, String newName){
         membersPanel.changeUsername(oldName,newName);
     }
-
     public void membersSearchActionListener(TextListener listener) {
         membersPanel.searchBar.addTextListener(listener);
     }
@@ -178,6 +177,30 @@ public class AdminView extends JFrame {
         contactsPanel.clear();
         contactsPanel.fillContactButtonsSearch(contactsPanel.getButtons());
         contactsPanel.revalidate();
+    }
+    public void promptErrorChangeUser() {
+        JOptionPane.showMessageDialog(this.getContentPane(), "Username is fixed for Admin", "Error",
+                JOptionPane.ERROR_MESSAGE);
+    }
+
+    public void setStatusImage(String username, String status) {
+        MembersPanel.MemberButton memberButton = null;
+        for (MembersPanel.MemberButton b : membersPanel.getMemberButtons()) {
+            if (b.getText().equals(username)) {
+                memberButton = b;
+                break;
+            }
+        }
+
+        switch (status) {
+            case "Online" -> memberButton.setIcon(scaleIcon("res/graphics/active-user.png"));
+            case "Offline", "Invisible" -> memberButton.setIcon(scaleIcon("res/graphics/user.png"));
+            case "Away from keyboard" -> memberButton.setIcon(scaleIcon("res/graphics/afk-user.png"));
+            case "Busy" -> memberButton.setIcon(scaleIcon("res/graphics/busy-user.png"));
+            case "Do not disturb" -> memberButton.setIcon(scaleIcon("res/graphics/dont disturb-user.png"));
+            case "Idle" -> memberButton.setIcon(scaleIcon("res/graphics/idle-user.png"));
+        }
+
     }
 
     /*---------- INNER CLASSES ----------*/
@@ -411,9 +434,9 @@ public class AdminView extends JFrame {
             settingsPanel.add(kickButton);
             settingsPanel.add(settingsButton);
             settingsPanel.setPreferredSize(new Dimension(200, 35));
-           if(!user.getUsername().equals(publicChat.getAdmin())){
+            if(!user.getUsername().equals(publicChat.getAdmin())){
                kickButton.setVisible(false);
-           }
+            }
             this.setLayout(new BorderLayout());
             this.setBackground(Color.GREEN);
 

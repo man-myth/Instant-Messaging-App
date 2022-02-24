@@ -1,6 +1,6 @@
 package server.model;
 
-import server.model.ChatRoomModel;
+import client.controller.LoginController;
 import server.model.MessageModel;
 import server.model.UserModel;
 
@@ -8,7 +8,7 @@ import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
-
+import java.util.Scanner;
 
 public class AdminModel{
 
@@ -19,7 +19,7 @@ public class AdminModel{
     UserModel user;
 
     public AdminModel(Socket clientSocket, ObjectInputStream inputStream, ObjectOutputStream outputStream,
-                      UserModel user, ChatRoomModel currentRoom) {
+            UserModel user, ChatRoomModel currentRoom) {
         this.clientSocket = clientSocket;
         this.inputStream = inputStream;
         this.outputStream = outputStream;
@@ -94,7 +94,6 @@ public class AdminModel{
         }
         return true;
     }
-
     public void sendMessage(MessageModel msg) {
         try {
             outputStream.writeObject("send message");
@@ -140,6 +139,7 @@ public class AdminModel{
             e.printStackTrace();
         }
     }
+
     public void addContact(String username) {
         try {
             outputStream.writeObject("add contact");
@@ -218,7 +218,7 @@ public class AdminModel{
     }
      */
 
-/*--- ADDING/KICKING OF CONTACT TO CHAT ROOM MODEL ---*/
+    /*--- ADDING/KICKING OF CONTACT TO CHAT ROOM MODEL ---*/
 
     // takes the list of contacts and put their usernames in a String array
     // for combo box view
@@ -265,5 +265,30 @@ public class AdminModel{
                 e.printStackTrace();
             }
         }
+
+    }
+
+    public void changeStatus(String status) {
+        try {
+            user.setStatus(status);
+            currentRoom.searchUser(user.getUsername()).setStatus(status);
+            outputStream.writeObject("change status");
+            outputStream.writeObject(status);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    public void readAllStatus(){
+        try{
+            outputStream.writeObject("read all status");
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    public String getUsernameStatusStream() throws Exception{
+        return (String) inputStream.readObject();
     }
 }//END OF ADMIN MODEL

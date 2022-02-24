@@ -8,11 +8,6 @@ import client.view.SettingsView;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.TextEvent;
-import java.awt.event.TextListener;
-
 import java.io.*;
 import java.net.Socket;
 import java.time.LocalDate;
@@ -22,7 +17,12 @@ import server.model.AdminModel;
 import server.model.ChatRoomModel;
 import server.model.MessageModel;
 import server.model.UserModel;
-
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.TextEvent;
+import java.awt.event.TextListener;
+import java.util.ArrayList;
+import java.util.List;
 
 import server.view.AdminView;
 import server.view.AuthenticatorView;
@@ -30,7 +30,6 @@ import server.view.AuthenticatorView;
 
 
 public class AdminController {
-
     private Socket socket;
     private ObjectInputStream inputStream;
     private ObjectOutputStream outputStream;
@@ -42,15 +41,18 @@ public class AdminController {
     KickContactFromRoomView kickUserView;
     SettingsView.AskNewName newName;
     SettingsView.AskNewPass newPass;
+    SettingsView.StatusView statusView;
 
     // -Constructor
+
+
     public AdminController(Socket socket, ObjectInputStream inputStream, ObjectOutputStream outputStream,
-                           UserModel user, ChatRoomModel publicChat) {
+                           UserModel admin, ChatRoomModel publicChat) {
         this.socket = socket;
         this.inputStream = inputStream;
         this.outputStream = outputStream;
         this.currentRoom = publicChat;
-        this.adminModel = new AdminModel(socket, inputStream, outputStream, user, publicChat);
+        this.adminModel = new AdminModel(socket, inputStream, outputStream, admin, publicChat);
     }
 
     // -Methods
@@ -60,6 +62,9 @@ public class AdminController {
         System.out.println("Logged in with user: " + adminModel.getUser());
         adminView = new AdminView(adminModel.getUser(), currentRoom);
         adminView.setWindowAdapter(new ExitOnCloseAdapter(socket));
+        adminView.setStatusImage(adminModel.getUser().getUsername(),adminModel.getUser().getStatus());
+        adminModel.changeStatus("Online");
+        adminModel.readAllStatus();
 
         //- settings actions
         adminView.settingsButtonListener(e -> {
@@ -94,6 +99,8 @@ public class AdminController {
                     newPass.changeSuccess(isPassValid);
                 });
             });
+
+            settingsView.changeStatusActionListener(new SetStatusListener());
 
         });
 
@@ -137,19 +144,19 @@ public class AdminController {
                     currentRoom.kickUser(roomMember);
                     adminView.kickMember(roomMember);
                     kickUserView.successMessage();
-                    //missing else noPermsMsg
                 } catch (NullPointerException error) {
                     kickUserView.errorInvalidAction();
                 }
             });
         });
-        /*
+
         //- broadcasting messages actions
+        /*
         adminView.setMessageListener(e -> {
             String message = adminView.getMessage();
             MessageModel msg = new MessageModel(adminModel.getUser(), currentRoom, message, LocalTime.now(),
                     LocalDate.now());
-            boolean doBroadcast = adminModel.broadcastMessage(msg);
+            boolean doBroadcast = adminModel.broadcastMessage(message, msg);
             if (doBroadcast) {
                 adminView.addMessage(msg);
                 adminView.clearTextArea();
@@ -190,7 +197,6 @@ public class AdminController {
         // Separate thread for GUI
         EventQueue.invokeLater(() -> adminView.setVisible(true));
 
-
         // Thread for receiving responses from the server
         new Thread(() -> {
             try {
@@ -199,10 +205,7 @@ public class AdminController {
                     System.out.println(event);
                     if (event.equals("broadcast")) { // do this if event = "broadcast"
                         MessageModel message = adminModel.getMessageFromStream();
-                        if (adminModel.getCurrentRoom().getName().equalsIgnoreCase("Public Chat")) {
-                            adminView.addMessage(message);
-                        }
-
+                        adminView.addMessage(message);
                     } else if (event.equals("contact added")) { // do this if event = "contact added"
                         adminModel.updateChatRooms();
                         adminModel.updateContacts();
@@ -237,12 +240,17 @@ public class AdminController {
                         adminView.setRemoveBookmarkButtonActionListener(new RemoveBookmarkListener());
                         adminView.setRemoveContactButtonActionListener(new RemoveContactListener());
                         adminView.contactsSearchListener(new ContactsSearchListener());
+                    } else if(event.equals("update status view")){
+                        String status = adminModel.getUsernameStatusStream();
+                        String username = adminModel.getUsernameStatusStream();
+                        adminModel.getCurrentRoom().searchUser(username).setStatus(status);
+                        adminModel.getUser().setStatus(status);
+                        adminView.setStatusImage(username,status);
                     }
                 }
-
             } catch (Exception e) {
-               //System.out.println(socket + "has disconnected.");
-                e.printStackTrace();
+                System.out.println(socket + "has disconnected.");
+                //e.printStackTrace();
             }
         }).start();
 
@@ -369,6 +377,55 @@ public class AdminController {
             String username = invokerButton.getText();
             System.out.println("remove " + username);
             adminModel.removeContact(username);
+        }
+    }
+    class SetStatusListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            String currStatus = adminModel.getUser().getStatus();
+            statusView = new SettingsView.StatusView();
+            statusView.setCurrentStatus(currStatus);
+            statusView.online.addActionListener(b -> {
+                adminModel.getUser().setStatus("Online");
+                adminModel.changeStatus("Online"); // change status in server side
+                statusView.setLabelOnline();
+            });
+
+            statusView.offline.addActionListener(b2 -> {
+                adminModel.getUser().setStatus("Offline");
+                adminModel.changeStatus("Offline"); // change status in server side
+                statusView.setLabelOffline();
+            });
+
+            statusView.afk.addActionListener(b2 -> {
+                adminModel.getUser().setStatus("Away from keyboard");
+                adminModel.changeStatus("Away from keyboard"); // change status in server side
+                statusView.setLabelAFK();
+            });
+
+            statusView.busy.addActionListener(b2 -> {
+                adminModel.getUser().setStatus("Busy");
+                adminModel.changeStatus("Busy"); // change status in server side
+                statusView.setLabelBusy();
+            });
+
+            statusView.disturb.addActionListener(b2 -> {
+                adminModel.getUser().setStatus("Do not disturb");
+                adminModel.changeStatus("Do not disturb"); // change status in server side
+                statusView.setLabelDisturb();
+            });
+
+            statusView.idle.addActionListener(b2 -> {
+                adminModel.getUser().setStatus("Idle");
+                adminModel.changeStatus("Idle"); // change status in server side
+                statusView.setLabelIdle();
+            });
+
+            statusView.invi.addActionListener(b2 -> {
+                adminModel.getUser().setStatus("Invisible");
+                adminModel.changeStatus("Invisible"); // change status in server side
+                statusView.setLabelInvi();
+            });
         }
     }
 }// END OF ADMIN CONTROLLER

@@ -23,13 +23,6 @@ public class LoginController {
 
     public LoginController() {
         loginView = new LoginView();
-        //log in
-        //if the users clicked the register button, open the registerController
-        // then show the Login GUI again
-        // validate the user
-    }
-
-    public void run() {
         try {
             socket = new Socket("localhost", PORT);
             socket.setTcpNoDelay(true);
@@ -39,7 +32,16 @@ public class LoginController {
         } catch (IOException e){
             e.printStackTrace();
         }
+    }
 
+    public LoginController(Socket socket, ObjectOutputStream outputStream, ObjectInputStream inputStream) {
+        this.socket = socket;
+        this.outputStream = outputStream;
+        this.inputStream = inputStream;
+        loginView = new LoginView();
+    }
+
+    public void run() {
         loginModel = new LoginModel(inputStream, outputStream);
 
         loginView.loginButton.addActionListener(e -> {
@@ -56,7 +58,6 @@ public class LoginController {
             if (loginModel.isUser(username, password)) {
                 System.out.println("Logged in!");
                 loginView.dispose();
-
                 try {
                     UserModel userModel = loginModel.getUserModel();
                     if (userModel.getUsername().equals("admin"))
