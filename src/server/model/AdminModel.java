@@ -10,14 +10,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-public class AdminModel{
+public class AdminModel {
 
     final private Socket clientSocket;
     private ObjectInputStream inputStream;
     final private ObjectOutputStream outputStream;
     UserModel user;
 
-    public AdminModel(Socket clientSocket, ObjectInputStream inputStream, ObjectOutputStream outputStream, UserModel user) {
+    public AdminModel(Socket clientSocket, ObjectInputStream inputStream, ObjectOutputStream outputStream,
+            UserModel user) {
         this.clientSocket = clientSocket;
         this.inputStream = inputStream;
         this.outputStream = outputStream;
@@ -48,7 +49,7 @@ public class AdminModel{
         this.user = user;
     }
 
-/*------------------------------- MODELS -------------------------------*/
+    /*------------------------------- MODELS -------------------------------*/
 
     /*--- BROADCASTING OF MESSAGE MODEL ---*/
     // added; method that gets message from stream
@@ -99,37 +100,22 @@ public class AdminModel{
         }
     }
 
-/*--- ADDING/KICKING OF CONTACT TO CHAT ROOM MODEL ---*/
+    /*--- ADDING/KICKING OF CONTACT TO CHAT ROOM MODEL ---*/
 
     // takes the list of contacts and put their usernames in a String array
     // for combo box view
     public String[] listToStringArrayAdd(List<UserModel> list) {
         ArrayList<String> contacts = new ArrayList<>();
         for (UserModel u : list) {
-            //continue if username is equals "your username" or "admin'
-            if(u.getUsername().equals(user.getUsername()) || u.getUsername().equals("admin"))
+            // continue if username is equals "your username" or "admin'
+            if (u.getUsername().equals(user.getUsername()) || u.getUsername().equals("admin"))
                 continue;
             contacts.add(u.getUsername());
         }
         return contacts.toArray(String[]::new);
     }
 
-/*--- SETTINGS MODEL ---*/
-    public boolean changeUsername(String newName, String oldName) {
-        if (newName.length() != 0) {
-            user.setUsername(newName);
-            try{
-                String[] names = {oldName,newName};
-                outputStream.writeObject("update username");
-                outputStream.writeObject(names);
-                return true;
-            }catch (Exception e){
-                e.printStackTrace();
-            }
-
-        }
-        return false;
-    }
+    /*--- SETTINGS MODEL ---*/
 
     public boolean isPassValid(String pass, String rePass) {
         return pass.equals(rePass);
@@ -138,13 +124,13 @@ public class AdminModel{
     public void changePassword(String pass, boolean isValid) {
         if (isValid) {
             user.setPassword(pass);
-            try{
+            try {
                 outputStream.writeObject("update password");
                 outputStream.writeObject(user.getUsername());
                 outputStream.writeObject(pass);
-            }catch (Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
     }
-}//END OF ADMIN MODEL
+}// END OF ADMIN MODEL

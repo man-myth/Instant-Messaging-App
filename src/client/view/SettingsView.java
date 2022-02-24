@@ -61,11 +61,13 @@ public class SettingsView extends JFrame {
     }
 
     // adds action listener to help button
-    public void helpActionListener(ActionListener listener) { help.addActionListener(listener); }
+    public void helpActionListener(ActionListener listener) {
+        help.addActionListener(listener);
+    }
 
     /*----- Inner Static Classes -----*/
 
-    //--- NEW USERNAME VIEW
+    // --- NEW USERNAME VIEW
     public static class AskNewName extends JFrame {
         // -Fields
         JButton change = new JButton("change");
@@ -110,13 +112,18 @@ public class SettingsView extends JFrame {
 
         }
 
-        public void promptError(){
+        public void promptError() {
+            JOptionPane.showMessageDialog(this.getContentPane(), "Please enter a username.", "Error",
+                    JOptionPane.ERROR_MESSAGE);
+        }
+
+        public void promptErrorAdmin() {
             JOptionPane.showMessageDialog(this.getContentPane(), "Please enter a username.", "Error",
                     JOptionPane.ERROR_MESSAGE);
         }
     }// end of AskNewName
 
-    //--- NEW PASSWORD VIEW
+    // --- NEW PASSWORD VIEW
     public static class AskNewPass extends JFrame {
         // -Fields
         JButton change = new JButton("change");
@@ -178,7 +185,7 @@ public class SettingsView extends JFrame {
         }
     }// end of AskNewPass
 
-    //---STATUS VIEW
+    // ---STATUS VIEW
     public static class StatusView extends JFrame {
         public JButton online = new JButton("Online");
         public JButton offline = new JButton("Offline");
@@ -189,8 +196,8 @@ public class SettingsView extends JFrame {
         public JButton invi = new JButton("Invisible");
         public JLabel status = new JLabel();
 
-        public StatusView(){
-            //buttons
+        public StatusView() {
+            // buttons
             online.setFocusable(false);
             online.setPreferredSize(new Dimension(150, 50));
 
@@ -218,7 +225,7 @@ public class SettingsView extends JFrame {
             this.setTitle("Set Status");
             this.setResizable(false);
 
-            //add components
+            // add components
             this.add(status);
             this.add(online);
             this.add(offline);
@@ -235,55 +242,58 @@ public class SettingsView extends JFrame {
             this.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         }
 
-        public void setCurrentStatus(String s){
-            status.setText("Current status:   "+s);
+        public void setCurrentStatus(String s) {
+            status.setText("Current status:   " + s);
         }
 
-        public void setLabelOnline(){
+        public void setLabelOnline() {
             status.setText("Current status:   Online");
         }
 
-        public void setLabelOffline(){
+        public void setLabelOffline() {
             status.setText("Current status:   Offline");
         }
 
-        public void setLabelAFK(){
+        public void setLabelAFK() {
             status.setText("Current status:   Away from keyboard");
         }
-        public void setLabelBusy(){
+
+        public void setLabelBusy() {
             status.setText("Current status:   Busy");
         }
-        public void setLabelDisturb(){
+
+        public void setLabelDisturb() {
             status.setText("Current status:   Do not disturb");
         }
-        public void setLabelIdle(){
+
+        public void setLabelIdle() {
             status.setText("Current status:   Idle");
         }
-        public void setLabelInvi(){
+
+        public void setLabelInvi() {
             status.setText("Current status:   Invisible");
         }
     }
 
-    //--- HELP MODULE VIEW
-    public static class HelpModule extends JFrame{
+    // --- HELP MODULE VIEW
+    public static class HelpModule extends JFrame {
         // -Fields
-       String guide ="<html><body width = '%1s'><h1>Questions:</h1>"
-                +"<p><br> Q1: How to kick a user from a chatroom?<br/>"
-                +"<br> Only admin users can kick a user.<br />"
-                +"<br>Q2: How to add a user to bookmarks? <br/>"
-                +"<br>Right click on the contact you want to bookmark and press 'Add to Contact'.<br/> "
-                +"<br>Q3: How to logout?<br/>"
-                +"Click on the logout option located at Menu where you will see the logout option </html>";
-       JLabel helpLabel = new JLabel(guide);
-
+        String guide = "<html><body width = '%1s'><h1>Questions:</h1>"
+                + "<p><br> Q1: How to kick a user from a chatroom?<br/>"
+                + "<br> Only admin users can kick a user.<br />"
+                + "<br>Q2: How to add a user to bookmarks? <br/>"
+                + "<br>Right click on the contact you want to bookmark and press 'Add to Contact'.<br/> "
+                + "<br>Q3: How to logout?<br/>"
+                + "Click on the logout option located at Menu where you will see the logout option </html>";
+        JLabel helpLabel = new JLabel(guide);
 
         // -Constructor
-        public HelpModule(){
+        public HelpModule() {
 
             // frame details
             this.setLayout(new FlowLayout());
             this.add(helpLabel);
-            helpLabel.setPreferredSize(new Dimension(250,270));
+            helpLabel.setPreferredSize(new Dimension(250, 270));
 
             // frame details 2
             this.setPreferredSize(new Dimension(300, 350));
