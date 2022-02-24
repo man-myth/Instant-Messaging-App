@@ -15,7 +15,7 @@ public class ClientHandlerModel implements Runnable {
     ObjectOutputStream outputStream;
     ObjectInputStream inputStream;
     UserModel currentUser;
-    int loginAttempts=0;
+    int loginAttempts = 0;
 
     // constructor
     public ClientHandlerModel(Socket socket) {
@@ -33,10 +33,9 @@ public class ClientHandlerModel implements Runnable {
         // Handle requests of the client
         currentUser = new UserModel();
         try {
-            while (!clientSocket.isClosed()) {
-                Object input;
-                input = inputStream.readObject();
-
+            while (true) {
+                String input = (String) inputStream.readObject();
+                System.out.println(input);
                 if (input.equals("login")) {
                     AuthenticatorController authenticate = new AuthenticatorController(inputStream, outputStream,
                             ServerModel.getRegisteredUsers());
@@ -48,9 +47,9 @@ public class ClientHandlerModel implements Runnable {
                         currentUser = getUserFromList(username, password);
                         writeObject(currentUser);
                         writeObject(ServerModel.getPublicChat());
-                        loginAttempts=0;
+                        loginAttempts = 0;
                     } else {
-                        if(ServerModel.doesUsernameExist(username)) {
+                        if (ServerModel.doesUsernameExist(username)) {
                             loginAttempts++;
                             authenticate.toggleChangePass(loginAttempts, username);
                         }
@@ -139,27 +138,27 @@ public class ClientHandlerModel implements Runnable {
                 } else if (input.equals("remove contact")) {
                     String username = (String) inputStream.readObject();
 
-                    for (ChatRoomModel chatRoom: currentUser.getChatRooms()){
-                        if(chatRoom.getName().equals(username)) {
+                    for (ChatRoomModel chatRoom : currentUser.getChatRooms()) {
+                        if (chatRoom.getName().equals(username)) {
                             currentUser.getChatRooms().remove(chatRoom);
                             break;
                         }
                     }
-                    for (UserModel contact: currentUser.getContacts()){
-                        if(contact.getUsername().equals(username)) {
+                    for (UserModel contact : currentUser.getContacts()) {
+                        if (contact.getUsername().equals(username)) {
                             currentUser.getContacts().remove(contact);
                             break;
                         }
                     }
                     ServerModel.updateUser(currentUser.getUsername(), currentUser);
-                        // Save data
+                    // Save data
                     Utility.exportUsersData(ServerModel.getRegisteredUsers());
                     ServerModel.setRegisteredUsers(Utility.readUsersData("res/data.dat"));
                     currentUser = getUserFromList(currentUser.getUsername());
                     outputStream.writeObject("contact updated");
                     outputStream.writeObject(currentUser);
 
-                }else if (input.equals("add bookmark")) {
+                } else if (input.equals("add bookmark")) {
                     String username = (String) inputStream.readObject();
                     System.out.println("adding " + username + " to bookmark");
 
@@ -184,14 +183,14 @@ public class ClientHandlerModel implements Runnable {
                         outputStream.writeObject(currentUser);
                     }
 
-                }  else if(input.equals("remove bookmark")){
+                } else if (input.equals("remove bookmark")) {
                     String username = (String) inputStream.readObject();
                     System.out.println("removing " + username + " to bookmark");
 
                     ChatRoomModel room = null;
                     // find the room to bookmark from list of chatrooms
-                    for(ChatRoomModel chat : currentUser.getBookmarks()){
-                        if(chat.getName().equals(username)){
+                    for (ChatRoomModel chat : currentUser.getBookmarks()) {
+                        if (chat.getName().equals(username)) {
                             System.out.println("before removing bookmark: " + currentUser.getBookmarks());
                             currentUser.getBookmarks().remove(chat);
                             System.out.println("after removing bookmark: " + currentUser.getBookmarks());
@@ -338,20 +337,24 @@ public class ClientHandlerModel implements Runnable {
                         }
                     }
 
-                }else if(input.equals("change status")){
+                } else if (input.equals("change status")) {
                     String status = (String) inputStream.readObject();
                     updateStatusToAll(status);
 
-                }else if(input.equals("read all status")){
+                } else if (input.equals("read all status")) {
                     for (ClientHandlerModel client : ServerModel.clients) {
                         if (client.equals(this)) {
                             continue;
-                        }if(client.clientSocket.isClosed())
+                        }
+                        if (client.clientSocket.isClosed())
                             continue;
                         outputStream.writeObject("update status view");
                         outputStream.writeObject(client.getCurrentUser().getStatus());
                         outputStream.writeObject(client.getCurrentUser().getUsername());
                     }
+                } else if (input.equals("logout")) {
+                    updateStatusToAll("Offline");
+                    currentUser = null;
                 }
 
 
@@ -404,7 +407,7 @@ public class ClientHandlerModel implements Runnable {
         return currentUser.getChatRooms().stream().filter(room -> room.getName().equals(roomName)).findAny().orElse(null);
     }
 
-    public void updateStatusToAll(String status) throws IOException{
+    public void updateStatusToAll(String status) throws IOException {
         currentUser.setStatus(status);
         outputStream.writeObject("update status view");
         outputStream.writeObject(status);
@@ -424,7 +427,7 @@ public class ClientHandlerModel implements Runnable {
         ServerModel.setRegisteredUsers(Utility.readUsersData("res/data.dat"));
     }
 
-    public UserModel getCurrentUser(){
+    public UserModel getCurrentUser() {
         return currentUser;
     }
 }
