@@ -373,4 +373,31 @@ public class AdminView extends JFrame {
             add.addActionListener(listener);
         }
     }
+
+    class ContactsPopupMenu extends JPopupMenu {
+        JMenuItem addtoBookmark;
+        JMenuItem removeBookmark;
+        JMenuItem removeContact;
+
+        public ContactsPopupMenu() {
+            addtoBookmark = new JMenuItem("Bookmark contact");
+            removeBookmark = new JMenuItem("Remove bookmark");
+            removeContact = new JMenuItem("Remove Contact");
+            this.add(addtoBookmark);
+            this.add(removeBookmark);
+            this.add(removeContact);
+        }
+
+        public void setBookmarkButtonActionListener(ActionListener listener) {
+            addtoBookmark.addActionListener(listener);
+        }
+
+        public void setRemoveBookmarkButtonActionListener(ActionListener listener) {
+            removeBookmark.addActionListener(listener);
+        }
+
+        public void setRemoveContactButtonActionListener(ActionListener listener) {
+            removeContact.addActionListener(listener);
+        }
+    }
 }
