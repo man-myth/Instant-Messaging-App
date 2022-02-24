@@ -1,6 +1,6 @@
 package server.model;
 
-import client.controller.LoginController;
+import server.model.ChatRoomModel;
 import server.model.MessageModel;
 import server.model.UserModel;
 
@@ -8,13 +8,13 @@ import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
+
 
 public class AdminModel{
 
-    final private Socket clientSocket;
-    private ObjectInputStream inputStream;
-    final private ObjectOutputStream outputStream;
+    private Socket clientSocket;
+    private final ObjectInputStream inputStream;
+    private final ObjectOutputStream outputStream;
     ChatRoomModel currentRoom;
     UserModel user;
 
@@ -51,12 +51,30 @@ public class AdminModel{
         this.user = user;
     }
 
+    public ChatRoomModel getCurrentRoom() {
+        return currentRoom;
+    }
+
+    public void setCurrentRoom(ChatRoomModel currentRoom) {
+        this.currentRoom = currentRoom;
+    }
+
 /*------------------------------- MODELS -------------------------------*/
 
     /*--- BROADCASTING OF MESSAGE MODEL ---*/
     // added; method that gets message from stream
-    public MessageModel getMessageFromStream() throws Exception {
+    public MessageModel getMessageFromStream() throws ClassNotFoundException, IOException {
         return (MessageModel) inputStream.readObject();
+    }
+
+    public boolean receiveMessage() {
+        try {
+            MessageModel newMessage = getMessageFromStream();
+            return newMessage.getReceiver().getName().equalsIgnoreCase(currentRoom.getName());
+        } catch (ClassNotFoundException | IOException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
     /*
@@ -64,8 +82,8 @@ public class AdminModel{
      * returns true to tell controller
      * to add message to client view and cleat text area
      */
-    public boolean broadcastMessage(String message, MessageModel msg) {
-        if (message.isEmpty()) {
+    public boolean broadcastMessage(MessageModel msg) {
+        if (msg.getContent().isEmpty()) {
             return false;
         }
         try {
