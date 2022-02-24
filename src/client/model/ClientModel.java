@@ -299,5 +299,14 @@ public class ClientModel {
         return (String) inputStream.readObject();
     }
 
+    public void logout() {
+        try {
+            user.setStatus("Offline");
+            user.setActive(false);
+            outputStream.writeObject("logout");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
 }// END OF CLIENT MODEL

@@ -52,6 +52,10 @@ public class ClientView extends JFrame {
         this.setResizable(false);
     }
 
+    public void setLogOutListener(ActionListener listener) {
+        logOut.addActionListener(listener);
+    }
+
     public void showErrorMessage(String message) {
         JOptionPane.showMessageDialog(this, message, "Error", JOptionPane.ERROR_MESSAGE);
     }
