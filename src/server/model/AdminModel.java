@@ -15,13 +15,16 @@ public class AdminModel{
     final private Socket clientSocket;
     private ObjectInputStream inputStream;
     final private ObjectOutputStream outputStream;
+    ChatRoomModel currentRoom;
     UserModel user;
 
-    public AdminModel(Socket clientSocket, ObjectInputStream inputStream, ObjectOutputStream outputStream, UserModel user) {
+    public AdminModel(Socket clientSocket, ObjectInputStream inputStream, ObjectOutputStream outputStream,
+                      UserModel user, ChatRoomModel currentRoom) {
         this.clientSocket = clientSocket;
         this.inputStream = inputStream;
         this.outputStream = outputStream;
         this.user = user;
+        this.currentRoom = currentRoom;
     }
 
     /*
@@ -77,6 +80,56 @@ public class AdminModel{
     /*--- ADDING CONTACT MODEL ---*/
 
     // adds the new user to contact list
+
+    public void updateChatRooms() {
+        List<ChatRoomModel> newChatRoomList = new ArrayList<>();
+        try {
+            newChatRoomList = (List<ChatRoomModel>) inputStream.readObject();
+        } catch (ClassNotFoundException| IOException e) {
+            e.printStackTrace();
+        }
+        user.setChatRooms(newChatRoomList);
+    }
+
+    public void updateContacts() {
+        try {
+            UserModel contact = (UserModel) inputStream.readObject();
+            if (!user.hasContact(contact.getUsername())) {
+                user.getContacts().add(contact);
+            }
+        } catch (ClassNotFoundException| IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // updated the UserModel
+
+    public void updateUser(){
+        try {
+            this.user = (UserModel) inputStream.readObject();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+    public void addContact(String username) {
+        try {
+            outputStream.writeObject("add contact");
+            outputStream.writeObject(username);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    public void removeContact(String username) {
+        try {
+            outputStream.writeObject("remove contact");
+            outputStream.writeObject(username);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    /*
     public void receiveContact() {
         UserModel newUser = null;
         try {
@@ -89,8 +142,9 @@ public class AdminModel{
         }
         user.getContacts().add(newUser);
     }
+     */
 
-    public void addContact(String username) {
+    public void addBookmark(String username) {
         try {
             outputStream.writeObject("add contact");
             outputStream.writeObject(username);
