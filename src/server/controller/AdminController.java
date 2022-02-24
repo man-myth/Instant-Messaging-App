@@ -227,6 +227,16 @@ public class AdminController {
                         adminView.setRemoveBookmarkButtonActionListener(new RemoveBookmarkListener());
                         adminView.setRemoveContactButtonActionListener(new RemoveContactListener());
                         adminView.contactsSearchListener(new ContactsSearchListener());
+                    }  else if (event.equals("bookmark updated")) { // do this if event = "bookmark added/removed"
+                        adminModel.updateUser();
+                        System.out.println("updating contacts....");
+                        adminView.updateContacts(adminModel.getUser());
+                        // Re-set action listeners
+                        adminView.setContactButtonsActionListener(new ContactButtonActionListener());
+                        adminView.setBookmarkButtonActionListener(new AddBookmarkListener());
+                        adminView.setRemoveBookmarkButtonActionListener(new RemoveBookmarkListener());
+                        adminView.setRemoveContactButtonActionListener(new RemoveContactListener());
+                        adminView.contactsSearchListener(new ContactsSearchListener());
                     }
                 }
 
