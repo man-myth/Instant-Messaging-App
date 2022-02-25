@@ -30,7 +30,7 @@ public class LoginModel {
         return false;
     }
 
-    public UserModel getUserModel() throws Exception{
+    public UserModel getUserModel() throws Exception {
         return (UserModel) inputStream.readObject();
     }
 }

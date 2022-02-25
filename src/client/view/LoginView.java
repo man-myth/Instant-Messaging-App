@@ -6,10 +6,10 @@ import java.awt.event.WindowAdapter;
 
 public class LoginView extends JFrame {
 
-    JPanel mainPanel, buttonsPanel;
     public JTextField usernameTextField;
     public JPasswordField passwordTextField;
     public JButton loginButton, registerButton;
+    JPanel mainPanel, buttonsPanel;
     Dimension dimension;
 
     public LoginView() {

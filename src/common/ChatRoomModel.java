@@ -91,6 +91,7 @@ public class ChatRoomModel implements Serializable {
     public void setChatHistory(List<MessageModel> chatHistory) {
         this.chatHistory = chatHistory;
     }
+
     public String getAdmin() {
         return admin;
     }

@@ -11,7 +11,7 @@ public class MessageModel implements Serializable {
     private LocalTime time;
     private LocalDate date;
 
-    public MessageModel(UserModel sender, ChatRoomModel receiver, String content, LocalTime time, LocalDate date){
+    public MessageModel(UserModel sender, ChatRoomModel receiver, String content, LocalTime time, LocalDate date) {
         this.sender = sender;
         this.receiver = receiver;
         this.content = content;
@@ -20,8 +20,12 @@ public class MessageModel implements Serializable {
     }
 
     //returns true if thisMessage is equals to anotherMessage
-    public boolean equals(MessageModel thisMessage, MessageModel anotherMessage){
+    public boolean equals(MessageModel thisMessage, MessageModel anotherMessage) {
         return thisMessage.content.equals(anotherMessage.content);
+    }
+
+    public UserModel getSender() {
+        return sender;
     }
 
     //-----Setters and Getters-----
@@ -29,39 +33,35 @@ public class MessageModel implements Serializable {
         this.sender = sender;
     }
 
-    public void setReceiver(ChatRoomModel receiver) {
-        this.receiver = receiver;
-    }
-
-    public void setTime(LocalTime time) {
-        this.time = time;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
-    }
-
-    public void setDate(LocalDate date) {
-        this.date = date;
-    }
-
-    public UserModel getSender() {
-        return sender;
-    }
-
     public ChatRoomModel getReceiver() {
         return receiver;
+    }
+
+    public void setReceiver(ChatRoomModel receiver) {
+        this.receiver = receiver;
     }
 
     public String getContent() {
         return content;
     }
 
+    public void setContent(String content) {
+        this.content = content;
+    }
+
     public LocalTime getTime() {
         return time;
     }
 
+    public void setTime(LocalTime time) {
+        this.time = time;
+    }
+
     public LocalDate getDate() {
         return date;
+    }
+
+    public void setDate(LocalDate date) {
+        this.date = date;
     }
 }

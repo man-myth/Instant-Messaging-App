@@ -12,21 +12,21 @@ import javax.swing.text.StyledDocument;
 import java.awt.*;
 import java.awt.event.ActionListener;
 import java.awt.event.TextListener;
+import java.awt.event.WindowAdapter;
 import java.util.ArrayList;
 import java.util.List;
-import java.awt.event.WindowAdapter;
 
 public class ClientView extends JFrame {
 
-    JPanel mainPanel;
+    static Font headingFont = new Font("Calibri", Font.PLAIN, 20);
     public ContactsPanel contactsPanel;
+    JPanel mainPanel;
     // Changes: Jpanel -> MembersPanel
     MembersPanel membersPanel;
     ChatPanel chatPanel;
     JMenuBar menuBar;
     JMenu menu;
     JMenuItem logOut;
-    static Font headingFont = new Font("Calibri", Font.PLAIN, 20);
 
     public ClientView(UserModel user, ChatRoomModel publicChat) {
         menuBar = new JMenuBar();
@@ -50,6 +50,15 @@ public class ClientView extends JFrame {
         this.setLocationRelativeTo(null);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setResizable(false);
+    }
+
+    public static ImageIcon scaleIcon(String filename) {
+        ImageIcon imageIcon = new ImageIcon(filename);
+        Image image = imageIcon.getImage();
+        Image scaledImage = image.getScaledInstance(30, 30, java.awt.Image.SCALE_SMOOTH);
+        imageIcon = new ImageIcon(scaledImage);
+
+        return imageIcon;
     }
 
     public void setLogOutListener(ActionListener listener) {
@@ -126,19 +135,10 @@ public class ClientView extends JFrame {
         mainPanel.revalidate();
     }
 
-    public static ImageIcon scaleIcon(String filename) {
-        ImageIcon imageIcon = new ImageIcon(filename);
-        Image image = imageIcon.getImage();
-        Image scaledImage = image.getScaledInstance(30, 30, java.awt.Image.SCALE_SMOOTH);
-        imageIcon = new ImageIcon(scaledImage);
-
-        return imageIcon;
-    }
-
-    public void setStatusImage(String username, String status){
+    public void setStatusImage(String username, String status) {
         MembersPanel.MemberButton memberButton = null;
-        for(MembersPanel.MemberButton b: membersPanel.getMemberButtons()){
-            if(b.getText().equals(username)) {
+        for (MembersPanel.MemberButton b : membersPanel.getMemberButtons()) {
+            if (b.getText().equals(username)) {
                 memberButton = b;
                 break;
             }
@@ -222,7 +222,7 @@ public class ClientView extends JFrame {
     /**
      * Outputs dialog box stating user does not have proper permissions.
      */
-    public void noPermsMsg(){
+    public void noPermsMsg() {
         JOptionPane.showMessageDialog(null,
                 "You do not have permission to use this feature.");
     }
@@ -238,9 +238,9 @@ public class ClientView extends JFrame {
 
     /*ChatPanel Class*/
     class ChatPanel extends JPanel {
+        public JTextField messageTextArea;
         JLabel roomName;
         JTextPane content;
-        public JTextField messageTextArea;
         JScrollPane scrollPane;
 
         ChatPanel(ChatRoomModel chatRoom) {
@@ -439,10 +439,10 @@ public class ClientView extends JFrame {
 
     /*MembersPanel Class*/
     class MembersPanel extends JPanel {
+        public List<MemberButton> memberButtons;
         JPanel panel, settingsPanel;
         JButton addButton, kickButton, settingsButton;
         JScrollPane scrollPane;
-        public List<MemberButton> memberButtons;
         TextField searchBar;
         UserModel user;
 
@@ -494,7 +494,7 @@ public class ClientView extends JFrame {
             panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
             memberButtons = new ArrayList<>();
             for (UserModel u : users) {
-                MemberButton button = new MemberButton(u.getUsername(),u.getStatus());
+                MemberButton button = new MemberButton(u.getUsername(), u.getStatus());
                 memberButtons.add(button);
                 panel.add(button);
             }
@@ -510,7 +510,7 @@ public class ClientView extends JFrame {
             memberButtons = new ArrayList<>();
             for (UserModel u : chatRoom.getUsers()) {
                 if (u.getUsername().contains(username)) {
-                    MemberButton button = new MemberButton(u.getUsername(),u.getStatus());
+                    MemberButton button = new MemberButton(u.getUsername(), u.getStatus());
                     memberButtons.add(button);
                     panel.add(button);
                 }
@@ -520,6 +520,49 @@ public class ClientView extends JFrame {
             this.add(scrollPane, BorderLayout.CENTER);
             this.repaint();
             this.revalidate();
+        }
+
+        public void setMemberButtonsActionListener(ActionListener listener) {
+            for (MemberButton button : memberButtons) {
+                button.addActionListener(listener);
+            }
+        }
+
+        public List<MemberButton> getMemberButtons() {
+            return memberButtons;
+        }
+
+        //add a new member button
+        public void addNewMember(UserModel user) {
+            MemberButton button = new MemberButton(user.getUsername(), user.getStatus());
+            memberButtons.add(button);
+            panel.add(button);
+            this.revalidate();
+        }
+
+        //remove a member button
+        public void kickMember(UserModel user) {
+            String name = user.getUsername();
+            //loops to find the button with the same name
+            for (JButton b : memberButtons) {
+                if (b.getText().equals(name)) {
+                    panel.remove(b);
+                    break;
+                }
+            }
+            memberButtons.removeIf(e -> e.getText().equals(name));
+            this.repaint();
+            this.revalidate();
+        }
+
+        //change username button
+        public void changeUsername(String oldName, String newName) {
+            for (JButton b : memberButtons) {
+                if (b.getText().equals(oldName)) {
+                    b.setText(newName);
+                    break;
+                }
+            }
         }
 
         class MemberButton extends JButton {
@@ -554,49 +597,6 @@ public class ClientView extends JFrame {
 
             public MemberPopupMenu getPopupMenu() {
                 return popupMenu;
-            }
-        }
-
-        public void setMemberButtonsActionListener(ActionListener listener) {
-            for (MemberButton button : memberButtons) {
-                button.addActionListener(listener);
-            }
-        }
-
-        public List<MemberButton> getMemberButtons() {
-            return memberButtons;
-        }
-
-        //add a new member button
-        public void addNewMember(UserModel user) {
-            MemberButton button = new MemberButton(user.getUsername(),user.getStatus());
-            memberButtons.add(button);
-            panel.add(button);
-            this.revalidate();
-        }
-
-        //remove a member button
-        public void kickMember(UserModel user) {
-            String name = user.getUsername();
-            //loops to find the button with the same name
-            for (JButton b : memberButtons) {
-                if (b.getText().equals(name)) {
-                    panel.remove(b);
-                    break;
-                }
-            }
-            memberButtons.removeIf(e -> e.getText().equals(name));
-            this.repaint();
-            this.revalidate();
-        }
-
-        //change username button
-        public void changeUsername(String oldName, String newName) {
-            for (JButton b : memberButtons) {
-                if (b.getText().equals(oldName)) {
-                    b.setText(newName);
-                    break;
-                }
             }
         }
 

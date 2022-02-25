@@ -4,31 +4,66 @@ import common.ChatRoomModel;
 import common.MessageModel;
 import common.UserModel;
 
-import java.io.*;
+import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.stream.*;
+import java.util.stream.Collectors;
 
 /**
  * This will initialize and run the server
  */
 public class ServerModel {
     private static final int PORT = 2022;
+    static List<UserModel> registeredUsers;
+    static ChatRoomModel publicChat;
+    static List<ClientHandlerModel> clients;
     private static ServerSocket serverSocket;
     private static Socket clientSocket;
     private static ExecutorService pool;
 
-    static List<UserModel> registeredUsers;
-    static ChatRoomModel publicChat;
-    static List<ClientHandlerModel> clients;
-
     public ServerModel(List<UserModel> registeredUsers, ChatRoomModel publicChat) {
         ServerModel.registeredUsers = registeredUsers;
         ServerModel.publicChat = publicChat;
+    }
+
+    public static List<UserModel> getRegisteredUsers() {
+        return registeredUsers;
+    }
+
+    public static void setRegisteredUsers(List<UserModel> newRegisteredUsers) {
+        registeredUsers = newRegisteredUsers;
+    }
+
+    public static void updateUser(String username, UserModel updatedUser) {
+        for (int i = 0; i < registeredUsers.size(); i++) {
+            if (registeredUsers.get(i).getUsername().equals(username)) {
+                registeredUsers.set(i, updatedUser);
+            }
+        }
+    }
+
+    public static void addRegisteredUser(UserModel user) {
+        registeredUsers.add(user);
+    }
+
+    public static ChatRoomModel getPublicChat() {
+        return publicChat;
+    }
+
+    public static void setPublicChat(ChatRoomModel newPublicChat) {
+        publicChat = newPublicChat;
+    }
+
+    public static boolean doesUsernameExist(String username) {
+        for (UserModel u : registeredUsers) {
+            if (u.getUsername().equals(username))
+                return true;
+        }
+        return false;
     }
 
     public void run() {
@@ -77,44 +112,8 @@ public class ServerModel {
 
     }
 
-    public static List<UserModel> getRegisteredUsers() {
-        return registeredUsers;
-    }
-
-    public static void setRegisteredUsers(List<UserModel> newRegisteredUsers) {
-        registeredUsers = newRegisteredUsers;
-    }
-
-    public static void updateUser(String username, UserModel updatedUser) {
-        for (int i = 0; i < registeredUsers.size(); i++) {
-            if (registeredUsers.get(i).getUsername().equals(username)) {
-                registeredUsers.set(i, updatedUser);
-            }
-        }
-    }
-
-    public static void addRegisteredUser(UserModel user) {
-        registeredUsers.add(user);
-    }
-
-    public static ChatRoomModel getPublicChat() {
-        return publicChat;
-    }
-
-    public static void setPublicChat(ChatRoomModel newPublicChat) {
-        publicChat = newPublicChat;
-    }
-
     public List<ClientHandlerModel> getClients() {
         return clients;
-    }
-
-    public static boolean doesUsernameExist(String username) {
-        for (UserModel u : registeredUsers) {
-            if (u.getUsername().equals(username))
-                return true;
-        }
-        return false;
     }
 
     public void setClients(List<ClientHandlerModel> clients) {

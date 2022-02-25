@@ -23,21 +23,22 @@ public class AuthenticatorModel {
      * @return
      */
     public String verifyUser(String username, String password) {
-        if(username.length()==0)
+        if (username.length() == 0)
             return "enter username";
         for (UserModel user : users) {
-            if (user.getUsername().compareTo(username) == 0 && user.getPassword().compareTo(password) == 0){
-                if (user.isActive()) { return "is active"; }
+            if (user.getUsername().compareTo(username) == 0 && user.getPassword().compareTo(password) == 0) {
+                if (user.isActive()) {
+                    return "is active";
+                }
                 user.setActive(true);
                 return "verified";
-            }
-            else if (user.getUsername().equals(username) && !user.getPassword().equals(password))
+            } else if (user.getUsername().equals(username) && !user.getPassword().equals(password))
                 return "wrong pass";
         }
         return "does not exist";
     }
 
-    public boolean toggleChangePass(int attempts){
+    public boolean toggleChangePass(int attempts) {
         return attempts % 3 == 0;
     }
 
@@ -48,7 +49,7 @@ public class AuthenticatorModel {
     public void changePassword(String pass, boolean isValid, String username) {
         if (isValid) {
             UserModel u = new UserModel();
-            for(UserModel user : users) {
+            for (UserModel user : users) {
                 if (user.getUsername().equals(username))
                     u = user;
             }

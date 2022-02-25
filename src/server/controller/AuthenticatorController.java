@@ -1,7 +1,7 @@
 package server.controller;
 
-import server.model.AuthenticatorModel;
 import common.UserModel;
+import server.model.AuthenticatorModel;
 import server.view.AuthenticatorView;
 
 import javax.swing.*;
@@ -15,39 +15,39 @@ public class AuthenticatorController {
     AuthenticatorView view;
     AuthenticatorView.AskNewPass newPass;
 
-    public AuthenticatorController(ObjectInputStream inputStream, ObjectOutputStream outputStream, List<UserModel> users){
-        model = new AuthenticatorModel(inputStream,outputStream,users);
+    public AuthenticatorController(ObjectInputStream inputStream, ObjectOutputStream outputStream, List<UserModel> users) {
+        model = new AuthenticatorModel(inputStream, outputStream, users);
         view = new AuthenticatorView();
     }
 
     public boolean isVerified(String username, String password) throws IOException {
-        String isVerified = model.verifyUser(username,password);
-        if(isVerified.equals("enter username")){
+        String isVerified = model.verifyUser(username, password);
+        if (isVerified.equals("enter username")) {
             view.promptEnterUsername();
             return false;
         }
 
-        if(isVerified.equals("is active")) {
+        if (isVerified.equals("is active")) {
             view.promptAlreadyLoggedIn(username, password);
             return false;
         }
 
-        if(isVerified.equals("wrong pass")){
+        if (isVerified.equals("wrong pass")) {
             view.promptWrongPassword();
             return false;
         }
 
-        if(isVerified.equals("does not exist")){
+        if (isVerified.equals("does not exist")) {
             view.promptDoesNotExist(username);
             return false;
         }
         return true;
     }
 
-    public void toggleChangePass(int attempts, String username){
-        if(model.toggleChangePass(attempts)){
-            int ans =view.promptChangePass();
-            if(ans == JOptionPane.YES_OPTION){
+    public void toggleChangePass(int attempts, String username) {
+        if (model.toggleChangePass(attempts)) {
+            int ans = view.promptChangePass();
+            if (ans == JOptionPane.YES_OPTION) {
                 newPass = new AuthenticatorView.AskNewPass(); // access the AskNewPass class from SettingsView
                 newPass.changeListener(f -> { // action listener for the button in AskNewPass
                     String enteredPass = newPass.getPass();

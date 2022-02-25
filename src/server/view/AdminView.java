@@ -14,12 +14,13 @@ import javax.swing.text.StyledDocument;
 import java.awt.*;
 import java.awt.event.ActionListener;
 import java.awt.event.TextListener;
+import java.awt.event.WindowAdapter;
 import java.util.ArrayList;
 import java.util.List;
-import java.awt.event.WindowAdapter;
 
 public class AdminView extends JFrame {
 
+    static Font headingFont = new Font("Calibri", Font.PLAIN, 20);
     JPanel mainPanel;
     //Changes: Jpanel -> MembersPanel
     ContactsPanel contactsPanel;
@@ -28,7 +29,6 @@ public class AdminView extends JFrame {
     JMenuBar menuBar;
     JMenu menu;
     JMenuItem logOut;
-    static Font headingFont = new Font("Calibri", Font.PLAIN, 20);
 
     public AdminView(UserModel user, ChatRoomModel publicChat) {
         menuBar = new JMenuBar();
@@ -54,6 +54,15 @@ public class AdminView extends JFrame {
         this.setResizable(false);
     }
 
+    public static ImageIcon scaleIcon(String filename) {
+        ImageIcon imageIcon = new ImageIcon(filename);
+        Image image = imageIcon.getImage();
+        Image scaledImage = image.getScaledInstance(30, 30, java.awt.Image.SCALE_SMOOTH);
+        imageIcon = new ImageIcon(scaledImage);
+
+        return imageIcon;
+    }
+
     public void setLogOutListener(ActionListener listener) {
         logOut.addActionListener(listener);
     }
@@ -61,6 +70,7 @@ public class AdminView extends JFrame {
     public void showErrorMessage(String message) {
         JOptionPane.showMessageDialog(this, message, "Error", JOptionPane.ERROR_MESSAGE);
     }
+
     public String getInput(String prompt) {
         return JOptionPane.showInputDialog(this, prompt);
     }
@@ -86,6 +96,7 @@ public class AdminView extends JFrame {
             button.getPopupMenu().setAddItemActionListener(listener);
         }
     }
+
     public void setContactButtonsActionListener(ActionListener listener) {
         contactsPanel.setContactButtonsActionListener(listener);
     }
@@ -107,7 +118,6 @@ public class AdminView extends JFrame {
             button.getPopupMenu().setRemoveContactButtonActionListener(listener);
         }
     }
-
 
     public void setRoom(String roomName) {
 
@@ -131,15 +141,6 @@ public class AdminView extends JFrame {
         mainPanel.revalidate();
     }
 
-    public static ImageIcon scaleIcon(String filename) {
-        ImageIcon imageIcon = new ImageIcon(filename);
-        Image image = imageIcon.getImage();
-        Image scaledImage = image.getScaledInstance(30, 30, java.awt.Image.SCALE_SMOOTH);
-        imageIcon = new ImageIcon(scaledImage);
-
-        return imageIcon;
-    }
-
     public void setMemberButtonsActionListener(ActionListener listener) {
         membersPanel.setMemberButtonsActionListener(listener);
     }
@@ -152,7 +153,7 @@ public class AdminView extends JFrame {
         membersPanel.addButton.addActionListener(listener);
     }
 
-    public void setKickButtonActionListener(ActionListener listener){
+    public void setKickButtonActionListener(ActionListener listener) {
         membersPanel.kickButton.addActionListener(listener);
     }
 
@@ -160,16 +161,16 @@ public class AdminView extends JFrame {
         membersPanel.settingsButton.addActionListener(listener);
     }
 
-    public void addNewMember(UserModel user){
+    public void addNewMember(UserModel user) {
         membersPanel.addNewMember(user);
     }
 
-    public void kickMember(UserModel user){
+    public void kickMember(UserModel user) {
         membersPanel.kickMember(user);
     }
 
-    public void changeUsername(String oldName, String newName){
-        membersPanel.changeUsername(oldName,newName);
+    public void changeUsername(String oldName, String newName) {
+        membersPanel.changeUsername(oldName, newName);
     }
 
     public void membersSearchActionListener(TextListener listener) {
@@ -203,10 +204,12 @@ public class AdminView extends JFrame {
         contactsPanel.fillContactButtonsSearch(contactsPanel.getButtons());
         contactsPanel.revalidate();
     }
+
     public void promptErrorChangeUser() {
         JOptionPane.showMessageDialog(this.getContentPane(), "Username is fixed for Admin", "Error",
                 JOptionPane.ERROR_MESSAGE);
     }
+
     public void updateSettingsPanel(ChatRoomModel currentRoom) {
         membersPanel.updateSettingsPanel(currentRoom);
     }
@@ -234,9 +237,9 @@ public class AdminView extends JFrame {
     /*---------- INNER CLASSES ----------*/
 
     class ChatPanel extends JPanel {
+        public JTextField messageTextArea;
         JLabel roomName;
         JTextPane content;
-        public JTextField messageTextArea;
         JScrollPane scrollPane;
 
         ChatPanel(ChatRoomModel chatRoom) {
@@ -268,9 +271,10 @@ public class AdminView extends JFrame {
             this.revalidate();
         }
 
-        public void setKickButtonActionListener(ActionListener listener){
+        public void setKickButtonActionListener(ActionListener listener) {
             membersPanel.kickButton.addActionListener(listener);
         }
+
         public void addText(JTextPane pane, String text) {
             StyledDocument doc = pane.getStyledDocument();
 
@@ -347,11 +351,13 @@ public class AdminView extends JFrame {
             this.setPreferredSize(new Dimension(200, 500));
             this.setMaximumSize(new Dimension(200, 500));
         }
+
         public void setContactButtonsActionListener(ActionListener listener) {
             for (ContactButton button : buttons) {
                 button.addActionListener(listener);
             }
         }
+
         public void fillContactButtonsSearch(List<ContactButton> contactButtons) {
             panel = new JPanel();
             panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
@@ -435,11 +441,11 @@ public class AdminView extends JFrame {
 
     /*MembersPanel Class*/
     class MembersPanel extends JPanel {
+        public List<MemberButton> memberButtons;
         JPanel panel, settingsPanel;
         JButton addButton, kickButton, settingsButton;
         JScrollPane scrollPane;
         TextField searchBar;
-        public List<MemberButton> memberButtons;
         UserModel user;
 
         public MembersPanel(UserModel user, ChatRoomModel publicChat) {
@@ -452,7 +458,7 @@ public class AdminView extends JFrame {
             panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
             memberButtons = new ArrayList<>();
              */
-           // scrollPane = new JScrollPane(panel);
+            // scrollPane = new JScrollPane(panel);
             scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 
             settingsPanel = new JPanel(new GridLayout());
@@ -481,6 +487,7 @@ public class AdminView extends JFrame {
             this.setPreferredSize(new Dimension(200, 500));
             this.setMaximumSize(new Dimension(200, 500));
         }
+
         public void updateSettingsPanel(ChatRoomModel chatRoom) {
             if (user.getUsername().equals(chatRoom.getAdmin())) {
                 System.out.println("User is admin");
@@ -492,15 +499,17 @@ public class AdminView extends JFrame {
                 settingsPanel.revalidate();
             }
         }
+
         public void clear() {
             membersPanel.remove(scrollPane);
         }
+
         public void fillButtons(List<UserModel> users) {
             panel = new JPanel();
             panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
             memberButtons = new ArrayList<>();
             for (UserModel u : users) {
-                MembersPanel.MemberButton button = new MembersPanel.MemberButton(u.getUsername(),u.getStatus());
+                MembersPanel.MemberButton button = new MembersPanel.MemberButton(u.getUsername(), u.getStatus());
                 memberButtons.add(button);
                 panel.add(button);
             }
@@ -516,7 +525,7 @@ public class AdminView extends JFrame {
             memberButtons = new ArrayList<>();
             for (UserModel u : chatRoom.getUsers()) {
                 if (u.getUsername().contains(username)) {
-                    MembersPanel.MemberButton button = new MembersPanel.MemberButton(u.getUsername(),u.getStatus());
+                    MembersPanel.MemberButton button = new MembersPanel.MemberButton(u.getUsername(), u.getStatus());
                     memberButtons.add(button);
                     panel.add(button);
                 }
@@ -528,6 +537,48 @@ public class AdminView extends JFrame {
             this.revalidate();
         }
 
+        public void setMemberButtonsActionListener(ActionListener listener) {
+            for (MemberButton button : memberButtons) {
+                button.addActionListener(listener);
+            }
+        }
+
+        public List<MemberButton> getMemberButtons() {
+            return memberButtons;
+        }
+
+        //add a new member button
+        public void addNewMember(UserModel user) {
+            MemberButton button = new MemberButton(user.getUsername(), user.getStatus());
+            memberButtons.add(button);
+            panel.add(button);
+            this.revalidate();
+        }
+
+        //remove a member button
+        public void kickMember(UserModel user) {
+            String name = user.getUsername();
+            //loops to find the button with the same name
+            for (JButton b : memberButtons) {
+                if (b.getText().equals(name)) {
+                    panel.remove(b);
+                    break;
+                }
+            }
+            memberButtons.removeIf(e -> e.getText().equals(name));
+            this.repaint();
+            this.revalidate();
+        }
+
+        //change username button
+        public void changeUsername(String oldName, String newName) {
+            for (JButton b : memberButtons) {
+                if (b.getText().equals(oldName)) {
+                    b.setText(newName);
+                    break;
+                }
+            }
+        }
 
         class MemberButton extends JButton {
             ImageIcon imageIcon;
@@ -554,49 +605,6 @@ public class AdminView extends JFrame {
 
             public MemberPopupMenu getPopupMenu() {
                 return popupMenu;
-            }
-        }
-
-        public void setMemberButtonsActionListener(ActionListener listener) {
-            for (MemberButton button : memberButtons) {
-                button.addActionListener(listener);
-            }
-        }
-
-        public List<MemberButton> getMemberButtons() {
-            return memberButtons;
-        }
-
-        //add a new member button
-        public void addNewMember(UserModel user){
-            MemberButton button = new MemberButton(user.getUsername(),user.getStatus());
-            memberButtons.add(button);
-            panel.add(button);
-            this.revalidate();
-        }
-
-        //remove a member button
-        public void kickMember(UserModel user){
-            String name = user.getUsername();
-            //loops to find the button with the same name
-            for(JButton b: memberButtons){
-                if(b.getText().equals(name)) {
-                    panel.remove(b);
-                    break;
-                }
-            }
-            memberButtons.removeIf(e -> e.getText().equals(name));
-            this.repaint();
-            this.revalidate();
-        }
-
-        //change username button
-        public void changeUsername(String oldName, String newName){
-            for(JButton b: memberButtons){
-                if(b.getText().equals(oldName)) {
-                    b.setText(newName);
-                    break;
-                }
             }
         }
 

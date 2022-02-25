@@ -3,7 +3,6 @@ package client.view;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
 
 //Adding contact to room
 public class KickContactFromRoomView extends JFrame {
@@ -45,7 +44,7 @@ public class KickContactFromRoomView extends JFrame {
         this.dispose();
     }
 
-    public void errorInvalidAction(){
+    public void errorInvalidAction() {
         JOptionPane.showMessageDialog(this.getContentPane(), "No user found.", "Error",
                 JOptionPane.ERROR_MESSAGE);
     }

@@ -3,23 +3,25 @@ package client.controller;
 import client.model.LoginModel;
 import client.view.ExitOnCloseAdapter;
 import client.view.LoginView;
-import server.controller.AdminController;
 import common.ChatRoomModel;
 import common.UserModel;
+import server.controller.AdminController;
 
 import javax.swing.*;
-import java.io.*;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.Socket;
 
 public class LoginController {
-    private RegisterController register;
-    private UserModel user;
-    private final LoginView loginView;
-    private LoginModel loginModel;
-    Socket socket;
     final int PORT = 2022;
+    private final LoginView loginView;
+    Socket socket;
     ObjectInputStream inputStream;
     ObjectOutputStream outputStream;
+    private RegisterController register;
+    private UserModel user;
+    private LoginModel loginModel;
 
     public LoginController() {
         loginView = new LoginView();
@@ -29,7 +31,7 @@ public class LoginController {
             outputStream = new ObjectOutputStream(socket.getOutputStream());
             outputStream.flush();
             inputStream = new ObjectInputStream(socket.getInputStream());
-        } catch (IOException e){
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
@@ -49,7 +51,7 @@ public class LoginController {
                 outputStream.writeObject("login");
             } catch (IOException ex) {
                 ex.printStackTrace();
-            } catch (NullPointerException nu){
+            } catch (NullPointerException nu) {
                 JOptionPane.showMessageDialog(loginView, "Oops! The server is offline. \n Please try again later", "Error", JOptionPane.ERROR_MESSAGE);
             }
             String username = loginView.usernameTextField.getText();
@@ -63,7 +65,7 @@ public class LoginController {
                     if (userModel.getUsername().equals("admin"))
                         new AdminController(socket, inputStream, outputStream,
                                 userModel, (ChatRoomModel) inputStream.readObject()).run();
-                    else{
+                    else {
                         ClientController clientController = new ClientController(socket, inputStream,
                                 outputStream, userModel, (ChatRoomModel) inputStream.readObject());
                         clientController.run();

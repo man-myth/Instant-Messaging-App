@@ -8,32 +8,33 @@ import java.awt.event.ActionListener;
 
 public class AuthenticatorView {
     JFrame frame = new JFrame();
-    public AuthenticatorView(){
+
+    public AuthenticatorView() {
         frame.setAlwaysOnTop(true);
     }
 
-    public void promptEnterUsername(){
-        JOptionPane.showMessageDialog(frame, "Error! Please enter a username.","Error", JOptionPane.ERROR_MESSAGE);
+    public void promptEnterUsername() {
+        JOptionPane.showMessageDialog(frame, "Error! Please enter a username.", "Error", JOptionPane.ERROR_MESSAGE);
         frame.dispose();
     }
 
-    public void promptAlreadyLoggedIn(String username, String password){
-        JOptionPane.showMessageDialog(frame, username + " is already logged in!","Error", JOptionPane.ERROR_MESSAGE);
+    public void promptAlreadyLoggedIn(String username, String password) {
+        JOptionPane.showMessageDialog(frame, username + " is already logged in!", "Error", JOptionPane.ERROR_MESSAGE);
         frame.dispose();
     }
 
-    public void promptDoesNotExist(String username){
-        JOptionPane.showMessageDialog(frame, username + " does not exist!","Error", JOptionPane.ERROR_MESSAGE);
+    public void promptDoesNotExist(String username) {
+        JOptionPane.showMessageDialog(frame, username + " does not exist!", "Error", JOptionPane.ERROR_MESSAGE);
         frame.dispose();
     }
 
-    public void promptWrongPassword(){
-        JOptionPane.showMessageDialog(frame, "Wrong password! Try again.","Error", JOptionPane.ERROR_MESSAGE);
+    public void promptWrongPassword() {
+        JOptionPane.showMessageDialog(frame, "Wrong password! Try again.", "Error", JOptionPane.ERROR_MESSAGE);
         frame.dispose();
     }
 
-    public int promptChangePass(){
-        return JOptionPane.showConfirmDialog(frame, "Do you want to change password?", "Change password", JOptionPane.YES_NO_OPTION,JOptionPane.QUESTION_MESSAGE);
+    public int promptChangePass() {
+        return JOptionPane.showConfirmDialog(frame, "Do you want to change password?", "Change password", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
     }
 
     //--- NEW PASSWORD VIEW

@@ -5,24 +5,24 @@ import client.view.AddContactToRoomView;
 import client.view.ExitOnCloseAdapter;
 import client.view.KickContactFromRoomView;
 import client.view.SettingsView;
-import server.model.AdminModel;
 import common.ChatRoomModel;
 import common.MessageModel;
 import common.UserModel;
+import server.model.AdminModel;
+import server.view.AdminView;
 
 import javax.swing.*;
 import java.awt.*;
-import java.io.*;
-import java.net.Socket;
-import java.time.LocalDate;
-import java.time.LocalTime;
-
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.TextEvent;
 import java.awt.event.TextListener;
-
-import server.view.AdminView;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.net.Socket;
+import java.time.LocalDate;
+import java.time.LocalTime;
 
 
 public class AdminController implements Runnable {
@@ -30,9 +30,6 @@ public class AdminController implements Runnable {
     private final Socket socket;
     ObjectInputStream inputStream;
     ObjectOutputStream outputStream;
-
-    private UserModel user;
-
     ChatRoomModel currentRoom;
     AdminView adminView;
     AdminModel adminModel;
@@ -43,6 +40,7 @@ public class AdminController implements Runnable {
     SettingsView.AskNewPass newPass;
     SettingsView.StatusView statusView;
     SettingsView.HelpModule helpModule;
+    private UserModel user;
 
     // -Constructor
 
@@ -53,7 +51,7 @@ public class AdminController implements Runnable {
         this.inputStream = inputStream;
         this.outputStream = outputStream;
         this.currentRoom = publicChat;
-        this.adminModel = new AdminModel(socket, inputStream, outputStream,user, publicChat);
+        this.adminModel = new AdminModel(socket, inputStream, outputStream, user, publicChat);
     }
 
     // -Methods
@@ -63,7 +61,7 @@ public class AdminController implements Runnable {
         System.out.println("Logged in with user: " + adminModel.getUser());
         adminView = new AdminView(adminModel.getUser(), adminModel.getCurrentRoom());
         adminView.setWindowAdapter(new ExitOnCloseAdapter(socket));
-        adminView.setStatusImage(adminModel.getUser().getUsername(),adminModel.getUser().getStatus());
+        adminView.setStatusImage(adminModel.getUser().getUsername(), adminModel.getUser().getStatus());
         adminModel.changeStatus("Online");
         adminModel.readAllStatus();
 
@@ -93,13 +91,11 @@ public class AdminController implements Runnable {
 
             //set status listener
             settingsView.changeStatusActionListener(new SetStatusListener());
-                    settingsView.helpActionListener(e3 -> {
-                                helpModule = new SettingsView.HelpModule();
-                            });
+            settingsView.helpActionListener(e3 -> {
+                helpModule = new SettingsView.HelpModule();
+            });
             //help module display
         });
-
-
 
 
         //- adding of contact to a room actions
@@ -124,7 +120,7 @@ public class AdminController implements Runnable {
                         adminView.addNewMember(newMember);
                         addToRoomView.successMessage();
                     }
-                }catch (NullPointerException error){
+                } catch (NullPointerException error) {
                     addToRoomView.errorInvalidAction();
                 }
             });
@@ -230,7 +226,7 @@ public class AdminController implements Runnable {
                         adminView.setRemoveBookmarkButtonActionListener(new RemoveBookmarkListener());
                         adminView.setRemoveContactButtonActionListener(new RemoveContactListener());
                         adminView.contactsSearchListener(new ContactsSearchListener());
-                    }  else if (event.equals("bookmark updated")) { // do this if event = "bookmark added/removed"
+                    } else if (event.equals("bookmark updated")) { // do this if event = "bookmark added/removed"
                         adminModel.updateUser();
                         System.out.println("updating contacts....");
                         adminView.updateContacts(adminModel.getUser());
@@ -240,14 +236,14 @@ public class AdminController implements Runnable {
                         adminView.setRemoveBookmarkButtonActionListener(new RemoveBookmarkListener());
                         adminView.setRemoveContactButtonActionListener(new RemoveContactListener());
                         adminView.contactsSearchListener(new ContactsSearchListener());
-                    }else if (event.equals("return room")) {
+                    } else if (event.equals("return room")) {
                         adminModel.receiveRoom();
                         adminView.updateRoom(adminModel.getCurrentRoom());
 
                         // Re-set action listeners
                         adminView.setAddItemActionListener(new AddContactListener());
                         adminView.setMessageListener(new MessageListener());
-                    }else if (event.equals("new message")) {
+                    } else if (event.equals("new message")) {
                         // Update GUI if current room has new message
                         MessageModel message = adminModel.getMessageFromStream();
                         if (message.getReceiver().getName().equalsIgnoreCase(adminModel.getCurrentRoom().getName())) {
@@ -262,12 +258,12 @@ public class AdminController implements Runnable {
                     } else if (event.equals("get room name")) {
                         adminModel.writeString(adminView.getInput("Enter new room name."));
                         addToRoomView.successMessage();
-                    } else if(event.equals("update status view")){
+                    } else if (event.equals("update status view")) {
                         String status = adminModel.getUsernameStatusStream();
                         String username = adminModel.getUsernameStatusStream();
                         adminModel.getCurrentRoom().searchUser(username).setStatus(status);
                         adminModel.getUser().setStatus(status);
-                        adminView.setStatusImage(username,status);
+                        adminView.setStatusImage(username, status);
                     }
                 }
             } catch (Exception e) {
@@ -305,10 +301,10 @@ public class AdminController implements Runnable {
             TextField tf = (TextField) e.getSource();
             String username = tf.getText();
             if (!username.equals("")) {
-              adminView.changeMemberButtonPanel(username, adminModel.getCurrentRoom());
+                adminView.changeMemberButtonPanel(username, adminModel.getCurrentRoom());
             } else
-               adminView.originalMemberButtonPanel(adminModel.getCurrentRoom());
-           adminView.setAddItemActionListener(new AddContactListener());
+                adminView.originalMemberButtonPanel(adminModel.getCurrentRoom());
+            adminView.setAddItemActionListener(new AddContactListener());
         }
     }
 
@@ -320,7 +316,7 @@ public class AdminController implements Runnable {
             if (!username.equals("")) {
                 adminView.changeContactButtons(username, adminModel.getUser());
             } else
-               adminView.originalContactButtons();
+                adminView.originalContactButtons();
         }
     }
 
@@ -356,6 +352,7 @@ public class AdminController implements Runnable {
             }
         }
     }
+
     class AddContactListener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
             JMenuItem menuItem = (JMenuItem) e.getSource();
@@ -368,6 +365,7 @@ public class AdminController implements Runnable {
 
         }
     }
+
     class AddBookmarkListener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
             System.out.println("Inside bookmark listener");
@@ -409,6 +407,7 @@ public class AdminController implements Runnable {
             new LoginController(socket, outputStream, inputStream).run();
         }
     }
+
     class SetStatusListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
