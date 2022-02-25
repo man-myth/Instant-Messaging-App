@@ -103,6 +103,14 @@ public class AdminModel{
         }
     }
 
+    public void writeString(String string) {
+        try {
+            outputStream.writeObject(string);
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+    }
+
     /*--- ADDING CONTACT MODEL ---*/
 
     // adds the new user to contact list
@@ -291,4 +299,14 @@ public class AdminModel{
     public String getUsernameStatusStream() throws Exception{
         return (String) inputStream.readObject();
     }
+    public void logout() {
+        try {
+            user.setStatus("Offline");
+            user.setActive(false);
+            outputStream.writeObject("logout");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 }//END OF ADMIN MODEL

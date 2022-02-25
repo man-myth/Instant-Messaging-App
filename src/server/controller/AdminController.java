@@ -1,10 +1,15 @@
 package server.controller;
 
 import client.controller.ClientController;
+import client.controller.LoginController;
 import client.view.AddContactToRoomView;
 import client.view.ExitOnCloseAdapter;
 import client.view.KickContactFromRoomView;
 import client.view.SettingsView;
+import server.model.AdminModel;
+import server.model.ChatRoomModel;
+import server.model.MessageModel;
+import server.model.UserModel;
 
 import javax.swing.*;
 import java.awt.*;
@@ -13,10 +18,6 @@ import java.net.Socket;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
-import server.model.AdminModel;
-import server.model.ChatRoomModel;
-import server.model.MessageModel;
-import server.model.UserModel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.TextEvent;
@@ -29,16 +30,20 @@ import server.view.AuthenticatorView;
 
 
 
-public class AdminController {
-    private Socket socket;
-    private ObjectInputStream inputStream;
-    private ObjectOutputStream outputStream;
-    private UserModel admin;
+public class AdminController implements Runnable {
+    // -Fields
+    private final Socket socket;
+    ObjectInputStream inputStream;
+    ObjectOutputStream outputStream;
+
+    private UserModel user;
+
     ChatRoomModel currentRoom;
     AdminView adminView;
     AdminModel adminModel;
     AddContactToRoomView addToRoomView;
     KickContactFromRoomView kickUserView;
+    SettingsView settingsView;
     SettingsView.AskNewName newName;
     SettingsView.AskNewPass newPass;
     SettingsView.StatusView statusView;
@@ -47,12 +52,12 @@ public class AdminController {
 
 
     public AdminController(Socket socket, ObjectInputStream inputStream, ObjectOutputStream outputStream,
-                           UserModel admin, ChatRoomModel publicChat) {
+                           UserModel user, ChatRoomModel publicChat) {
         this.socket = socket;
         this.inputStream = inputStream;
         this.outputStream = outputStream;
         this.currentRoom = publicChat;
-        this.adminModel = new AdminModel(socket, inputStream, outputStream, admin, publicChat);
+        this.adminModel = new AdminModel(socket, inputStream, outputStream,user, publicChat);
     }
 
     // -Methods
@@ -60,7 +65,7 @@ public class AdminController {
     // run method when calling admin controller
     public void run() {
         System.out.println("Logged in with user: " + adminModel.getUser());
-        adminView = new AdminView(adminModel.getUser(), currentRoom);
+        adminView = new AdminView(adminModel.getUser(), adminModel.getCurrentRoom());
         adminView.setWindowAdapter(new ExitOnCloseAdapter(socket));
         adminView.setStatusImage(adminModel.getUser().getUsername(),adminModel.getUser().getStatus());
         adminModel.changeStatus("Online");
@@ -69,21 +74,10 @@ public class AdminController {
         //- settings actions
         adminView.settingsButtonListener(e -> {
             //asking new username listener
-            SettingsView settingsView = new SettingsView();
+            settingsView = new SettingsView();
             settingsView.changeNameActionListener(e1 -> {
-                newName = new SettingsView.AskNewName(); // access the AskNewName class from SettingsView
-                newName.changeListener(f -> { // action listener for the button in AskNewNAme
-                    String enteredName = newName.getText();
-                    String oldName = adminModel.getUser().getUsername();
-                    boolean isChanged = adminModel.changeUsername(enteredName, oldName);
-                    if(isChanged) {
-                        adminView.changeUsername(oldName, enteredName); //change button text of username
-                        currentRoom.searchUser(oldName).setUsername(enteredName); //change the username from chatroom list
-                        newName.changeSuccess(oldName, enteredName);
-                    }else{
-                        newName.promptError();
-                    }
-                });
+                adminView.promptErrorChangeUser(); // admin cannot access the AskNewName class from SettingsView, prompt error
+
             });
 
             //asking new password listener
@@ -100,9 +94,15 @@ public class AdminController {
                 });
             });
 
+
+            //set status listener
             settingsView.changeStatusActionListener(new SetStatusListener());
 
+            //help module display
         });
+
+
+
 
         //- adding of contact to a room actions
         adminView.setAddButtonActionListener(e -> {
@@ -194,6 +194,8 @@ public class AdminController {
 
         adminView.setRemoveContactButtonActionListener(new RemoveContactListener());
 
+        adminView.setLogOutListener(new LogOutListener());
+
         // Separate thread for GUI
         EventQueue.invokeLater(() -> adminView.setVisible(true));
 
@@ -240,6 +242,28 @@ public class AdminController {
                         adminView.setRemoveBookmarkButtonActionListener(new RemoveBookmarkListener());
                         adminView.setRemoveContactButtonActionListener(new RemoveContactListener());
                         adminView.contactsSearchListener(new ContactsSearchListener());
+                    }else if (event.equals("return room")) {
+                        adminModel.receiveRoom();
+                        adminView.updateRoom(adminModel.getCurrentRoom());
+
+                        // Re-set action listeners
+                        adminView.setAddItemActionListener(new AddContactListener());
+                        adminView.setMessageListener(new MessageListener());
+                    }else if (event.equals("new message")) {
+                        // Update GUI if current room has new message
+                        MessageModel message = adminModel.getMessageFromStream();
+                        if (message.getReceiver().getName().equalsIgnoreCase(adminModel.getCurrentRoom().getName())) {
+                            adminView.addMessage(message);
+                        }
+                    } else if (event.equals("update chat rooms")) {
+                        adminModel.updateChatRooms();
+                        adminView.updateContacts(adminModel.getUser());
+
+                        // Re-set action listeners
+                        adminView.setContactButtonsActionListener(new ContactButtonActionListener());
+                    } else if (event.equals("get room name")) {
+                        adminModel.writeString(adminView.getInput("Enter new room name."));
+                        addToRoomView.successMessage();
                     } else if(event.equals("update status view")){
                         String status = adminModel.getUsernameStatusStream();
                         String username = adminModel.getUsernameStatusStream();
@@ -377,6 +401,14 @@ public class AdminController {
             String username = invokerButton.getText();
             System.out.println("remove " + username);
             adminModel.removeContact(username);
+        }
+    }
+
+    class LogOutListener implements ActionListener {
+        public void actionPerformed(ActionEvent e) {
+            adminModel.logout();
+            adminView.dispose();
+            new LoginController(socket, outputStream, inputStream).run();
         }
     }
     class SetStatusListener implements ActionListener {

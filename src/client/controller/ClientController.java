@@ -28,6 +28,7 @@ public class ClientController implements Runnable {
     ObjectOutputStream outputStream;
     ObjectInputStream inputStream;
 
+    ChatRoomModel currentRoom;
     ClientView clientView;
     ClientModel clientModel;
     AddContactToRoomView addToRoomView;
@@ -44,6 +45,7 @@ public class ClientController implements Runnable {
         this.socket = socket;
         this.outputStream = outputStream;
         this.inputStream = inputStream;
+        this.currentRoom = publicChat;
         this.clientModel = new ClientModel(socket, inputStream, outputStream, user, publicChat);
 
     }
