@@ -280,10 +280,6 @@ public class ClientHandlerModel implements Runnable {
                 } else if (input.equals("add contact to room")) {
                     UserModel newMember = (UserModel) inputStream.readObject();
                     ChatRoomModel room = getChatRoomFromList(currentUser, (String) inputStream.readObject());
-                    for (UserModel member : room.getUsers()) {
-                        System.out.print(member.getUsername() + " ");
-                    }
-                    System.out.println();
                     // If added member to private chat room
                     if (room.getAdmin().equals("")) {
                         // Create new group chat
@@ -305,13 +301,15 @@ public class ClientHandlerModel implements Runnable {
                         room.addUser(newMember);
                         currentUser.updateChatroom(room.getName(), room);
                         for (UserModel user : room.getUsers()) {
-                            if (user.getUsername().equals(currentUser.getUsername())) {
+                            if (user.getUsername().equals(currentUser.getUsername()) || user.getUsername().equals(newMember.getUsername())) {
                                 continue;
                             }
                             System.out.println("Adding " + user.getUsername() + " to " + room.getName());
                             user.updateChatroom(room.getName(), room);
                             ServerModel.updateUser(user.getUsername(), user);
                         }
+                        newMember.addChatRoom(room);
+                        ServerModel.updateUser(newMember.getUsername(), newMember);
                     }
 
 
