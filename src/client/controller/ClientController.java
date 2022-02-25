@@ -194,7 +194,7 @@ public class ClientController implements Runnable {
 
                     } else if (event.equals("adding self")) {
                         clientView.showErrorMessage("You are adding yourself!");
-                    } else if (event.equals("contact updated")) { // do this if event = "contact added"
+                    } else if (event.equals("contact updated")) { // do this if event = "contact added/removed"
                         clientModel.updateUser();
                         clientView.updateContacts(clientModel.getUser());
 
