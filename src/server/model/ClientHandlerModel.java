@@ -211,6 +211,7 @@ public class ClientHandlerModel implements Runnable {
                     String roomName = (String) inputStream.readObject();
                     outputStream.writeObject("return room");
                     ChatRoomModel chatRoom = roomName.equals("Public Chat") ? ServerModel.getPublicChat() : getChatRoomFromList(currentUser, roomName);
+                    System.out.println(chatRoom.getAdmin());
                     outputStream.writeObject(chatRoom);
                 } else if (input.equals("send message")) {
                     currentUser = getUserFromList(currentUser.getUsername());

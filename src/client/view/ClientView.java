@@ -121,6 +121,7 @@ public class ClientView extends JFrame {
         membersPanel.clear();
         membersPanel.fillButtons(room.getUsers());
         membersPanel.revalidate();
+        membersPanel.updateSettingsPanel(room);
         mainPanel.add(chatPanel, BorderLayout.CENTER);
         mainPanel.revalidate();
     }
@@ -224,6 +225,10 @@ public class ClientView extends JFrame {
     public void noPermsMsg(){
         JOptionPane.showMessageDialog(null,
                 "You do not have permission to use this feature.");
+    }
+
+    public void updateSettingsPanel(ChatRoomModel currentRoom) {
+        membersPanel.updateSettingsPanel(currentRoom);
     }
 
 
@@ -439,11 +444,13 @@ public class ClientView extends JFrame {
         JScrollPane scrollPane;
         public List<MemberButton> memberButtons;
         TextField searchBar;
+        UserModel user;
 
-        public MembersPanel(UserModel user, ChatRoomModel publicChat) {
+        public MembersPanel(UserModel user, ChatRoomModel chatRoom) {
+            this.user = user;
             searchBar = new HintTextField("Search Members");
             searchBar.setPreferredSize(new Dimension(200, 25));
-            fillButtons(publicChat.getUsers());
+            fillButtons(chatRoom.getUsers());
 
             settingsPanel = new JPanel(new GridLayout());
             addButton = new JButton(ClientView.scaleIcon("res/graphics/add-user.png"));
@@ -456,9 +463,7 @@ public class ClientView extends JFrame {
             settingsPanel.add(kickButton);
             settingsPanel.add(settingsButton);
             settingsPanel.setPreferredSize(new Dimension(200, 35));
-            if (!user.getUsername().equals(publicChat.getAdmin())) {
-                kickButton.setVisible(false);
-            }
+            updateSettingsPanel(chatRoom);
 
             this.setLayout(new BorderLayout());
             this.setBackground(Color.GREEN);
@@ -468,6 +473,18 @@ public class ClientView extends JFrame {
             this.setMinimumSize(new Dimension(200, 500));
             this.setPreferredSize(new Dimension(200, 500));
             this.setMaximumSize(new Dimension(200, 500));
+        }
+
+        public void updateSettingsPanel(ChatRoomModel chatRoom) {
+            if (user.getUsername().equals(chatRoom.getAdmin())) {
+                System.out.println("User is admin");
+                kickButton.setVisible(true);
+                settingsPanel.revalidate();
+            } else {
+                System.out.println("User is not admin");
+                kickButton.setVisible(false);
+                settingsPanel.revalidate();
+            }
         }
 
         public void clear() {
