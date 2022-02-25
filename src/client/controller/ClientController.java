@@ -189,7 +189,7 @@ public class ClientController implements Runnable {
         // Thread for receiving responses from the server
         new Thread(() -> {
             try {
-                while (clientModel.getUser().isActive()) {
+                while (true) { //clientModel.getUser().isActive()
                     String event = clientModel.getEvent();
                     System.out.println("Event: " + event);
                     if (event.equals("broadcast")) { // do this if event = "broadcast"

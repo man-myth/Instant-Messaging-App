@@ -117,9 +117,11 @@ public class ClientHandlerModel implements Runnable {
                         ServerModel.setRegisteredUsers(Utility.readUsersData("res/data.dat"));
                         currentUser = getUserFromList(currentUser.getUsername());
 
-                        outputStream.writeObject("contact added");
-                        outputStream.writeObject(currentUser.getChatRooms());
-                        outputStream.writeObject(user);
+                        outputStream.writeObject("contact updated");
+                        /*outputStream.writeObject(currentUser.getChatRooms());
+                        outputStream.writeObject(user);*/
+                        outputStream.writeObject(currentUser);
+
 
                         // Update client view of new contact if new contact is logged in
                         for (ClientHandlerModel client : ServerModel.clients) {
@@ -128,8 +130,8 @@ public class ClientHandlerModel implements Runnable {
                             }
                             if (client.currentUser.getUsername().equals(user.getUsername())) {
                                 client.currentUser = getUserFromList(user.getUsername());
-                                client.writeObject("contact added");
-                                client.writeObject(client.currentUser.getChatRooms());
+                                client.writeObject("contact updated");
+                                client.writeObject(client.currentUser);
                                 client.writeObject(user);
                                 break;
                             }
@@ -311,7 +313,6 @@ public class ClientHandlerModel implements Runnable {
                         newMember.addChatRoom(room);
                         ServerModel.updateUser(newMember.getUsername(), newMember);
                     }
-
 
                     // Save .dat file
                     ServerModel.updateUser(currentUser.getUsername(), currentUser);
