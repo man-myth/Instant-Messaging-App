@@ -161,6 +161,16 @@ public class ClientModel {
         }
     }
 
+    /**
+     * Returns true if inputted user is an admin, otherwise returns false
+     * @param user
+     * @return boolean
+     */
+    public boolean isAdmin(UserModel user){
+        return user.getUsername().equals("admin") ||
+                user.getUsername().equals(currentRoom.getAdmin());
+    }
+
     public void addBookmark(String username) {
         try {
             outputStream.writeObject("add bookmark");
@@ -267,14 +277,36 @@ public class ClientModel {
 
     public void changeStatus(String status){
         try {
-            outputStream.writeObject("update status");
+            user.setStatus(status);
+            currentRoom.searchUser(user.getUsername()).setStatus(status);
+            outputStream.writeObject("change status");
             outputStream.writeObject(status);
-            outputStream.writeObject(user.getUsername());
         }catch (Exception e){
             e.printStackTrace();
         }
 
     }
 
+    public void readAllStatus(){
+        try{
+            outputStream.writeObject("read all status");
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    public String getUsernameStatusStream() throws Exception{
+        return (String) inputStream.readObject();
+    }
+
+    public void logout() {
+        try {
+            user.setStatus("Offline");
+            user.setActive(false);
+            outputStream.writeObject("logout");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
 }// END OF CLIENT MODEL

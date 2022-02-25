@@ -30,6 +30,7 @@ public class Utility {
             while (true) {
                 try {
                     u = (UserModel) inputStream.readObject();
+                    u.setStatus("Offline");
                     u.setActive(false);
                     users.add(u);
                 } catch (EOFException e) {

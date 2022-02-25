@@ -2,6 +2,7 @@ package server.view;
 
 import client.view.ClientView;
 import client.view.HintJTextField;
+import client.view.HintTextField;
 import server.model.ChatRoomModel;
 import server.model.MessageModel;
 import server.model.UserModel;
@@ -13,14 +14,16 @@ import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
 import java.awt.*;
 import java.awt.event.ActionListener;
+import java.awt.event.TextListener;
 import java.util.ArrayList;
 import java.util.List;
 import java.awt.event.WindowAdapter;
 
 public class AdminView extends JFrame {
 
-    JPanel mainPanel, contactsPanel;
+    JPanel mainPanel;
     //Changes: Jpanel -> MembersPanel
+    ContactsPanel contactsPanel;
     MembersPanel membersPanel;
     ChatPanel chatPanel;
     JMenuBar menuBar;
@@ -29,8 +32,14 @@ public class AdminView extends JFrame {
     static Font headingFont = new Font("Calibri", Font.PLAIN, 20);
 
     public AdminView(UserModel user, ChatRoomModel publicChat) {
+        menuBar = new JMenuBar();
+        menu = new JMenu("Menu");
+        logOut = new JMenuItem("Log Out");
+        menu.add(logOut);
+        menuBar.add(menu);
+
         mainPanel = new JPanel(new BorderLayout());
-        contactsPanel = new ContactsPanel(user.getContacts());
+        contactsPanel = new ContactsPanel(user);
         chatPanel = new ChatPanel(publicChat);
         membersPanel = new MembersPanel(user, publicChat);
         mainPanel.add(contactsPanel, BorderLayout.WEST);
@@ -38,11 +47,23 @@ public class AdminView extends JFrame {
         mainPanel.add(membersPanel, BorderLayout.EAST);
         mainPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         this.add(mainPanel);
+        this.setJMenuBar(menuBar);
         this.setTitle("Admin");
         this.pack();
         this.setLocationRelativeTo(null);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setResizable(false);
+    }
+
+    public void setLogOutListener(ActionListener listener) {
+        logOut.addActionListener(listener);
+    }
+
+    public void showErrorMessage(String message) {
+        JOptionPane.showMessageDialog(this, message, "Error", JOptionPane.ERROR_MESSAGE);
+    }
+    public String getInput(String prompt) {
+        return JOptionPane.showInputDialog(this, prompt);
     }
 
     public String getMessage() {
@@ -66,15 +87,48 @@ public class AdminView extends JFrame {
             button.getPopupMenu().setAddItemActionListener(listener);
         }
     }
+    public void setContactButtonsActionListener(ActionListener listener) {
+        contactsPanel.setContactButtonsActionListener(listener);
+    }
+
+    public void setBookmarkButtonActionListener(ActionListener listener) {
+        for (ContactsPanel.ContactButton button : contactsPanel.getButtons()) {
+            button.getPopupMenu().setBookmarkButtonActionListener(listener);
+        }
+    }
+
+    public void setRemoveBookmarkButtonActionListener(ActionListener listener) {
+        for (ContactsPanel.ContactButton button : contactsPanel.getButtons()) {
+            button.getPopupMenu().setRemoveBookmarkButtonActionListener(listener);
+        }
+    }
+
+    public void setRemoveContactButtonActionListener(ActionListener listener) {
+        for (ContactsPanel.ContactButton button : contactsPanel.getButtons()) {
+            button.getPopupMenu().setRemoveContactButtonActionListener(listener);
+        }
+    }
+
 
     public void setRoom(String roomName) {
 
     }
 
-    public void updateContacts(List<UserModel> users) {
+    public void updateContacts(UserModel users) {
         mainPanel.remove(contactsPanel);
         contactsPanel = new ContactsPanel(users);
         mainPanel.add(contactsPanel, BorderLayout.WEST);
+        mainPanel.revalidate();
+    }
+
+    public void updateRoom(ChatRoomModel room) {
+        mainPanel.remove(chatPanel);
+        chatPanel = new ChatPanel(room);
+        membersPanel.clear();
+        membersPanel.fillButtons(room.getUsers());
+        membersPanel.revalidate();
+        membersPanel.updateSettingsPanel(room);
+        mainPanel.add(chatPanel, BorderLayout.CENTER);
         mainPanel.revalidate();
     }
 
@@ -117,6 +171,65 @@ public class AdminView extends JFrame {
 
     public void changeUsername(String oldName, String newName){
         membersPanel.changeUsername(oldName,newName);
+    }
+
+    public void membersSearchActionListener(TextListener listener) {
+        membersPanel.searchBar.addTextListener(listener);
+    }
+
+    public void contactsSearchListener(TextListener listener) {
+        contactsPanel.searchBar.addTextListener(listener);
+    }
+
+    public void changeMemberButtonPanel(String username, ChatRoomModel room) {
+        membersPanel.clear();
+        membersPanel.changeButtons(username, room);
+        membersPanel.revalidate();
+    }
+
+    public void originalMemberButtonPanel(ChatRoomModel room) {
+        membersPanel.clear();
+        membersPanel.fillButtons(room.getUsers());
+        membersPanel.revalidate();
+    }
+
+    public void changeContactButtons(String username, UserModel u) {
+        contactsPanel.clear();
+        contactsPanel.changeContactButtons(username, u);
+        contactsPanel.revalidate();
+    }
+
+    public void originalContactButtons() {
+        contactsPanel.clear();
+        contactsPanel.fillContactButtonsSearch(contactsPanel.getButtons());
+        contactsPanel.revalidate();
+    }
+    public void promptErrorChangeUser() {
+        JOptionPane.showMessageDialog(this.getContentPane(), "Username is fixed for Admin", "Error",
+                JOptionPane.ERROR_MESSAGE);
+    }
+    public void updateSettingsPanel(ChatRoomModel currentRoom) {
+        membersPanel.updateSettingsPanel(currentRoom);
+    }
+
+    public void setStatusImage(String username, String status) {
+        MembersPanel.MemberButton memberButton = null;
+        for (MembersPanel.MemberButton b : membersPanel.getMemberButtons()) {
+            if (b.getText().equals(username)) {
+                memberButton = b;
+                break;
+            }
+        }
+
+        switch (status) {
+            case "Online" -> memberButton.setIcon(scaleIcon("res/graphics/active-user.png"));
+            case "Offline", "Invisible" -> memberButton.setIcon(scaleIcon("res/graphics/user.png"));
+            case "Away from keyboard" -> memberButton.setIcon(scaleIcon("res/graphics/afk-user.png"));
+            case "Busy" -> memberButton.setIcon(scaleIcon("res/graphics/busy-user.png"));
+            case "Do not disturb" -> memberButton.setIcon(scaleIcon("res/graphics/dont disturb-user.png"));
+            case "Idle" -> memberButton.setIcon(scaleIcon("res/graphics/idle-user.png"));
+        }
+
     }
 
     /*---------- INNER CLASSES ----------*/
@@ -190,21 +303,41 @@ public class AdminView extends JFrame {
 
     class ContactsPanel extends JPanel {
         JPanel panel;
-        JTextField searchBar;
+        List<ContactButton> buttons;
+        TextField searchBar;
+        JScrollPane scrollPane;
+        ContactButton publicChatButton;
 
-        public ContactsPanel(List<UserModel> users) {
+        public ContactsPanel(UserModel user) {
             JLabel contactsLabel = new JLabel("Contacts", SwingConstants.CENTER);
             contactsLabel.setFont(AdminView.headingFont);
+            List<ChatRoomModel> rooms = user.getChatRooms();
+            List<ChatRoomModel> bookmarkedRooms = user.getBookmarks();
 
             panel = new JPanel();
             panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-            panel.add(new ContactButton("Public Chat", false));
-            for (UserModel user : users) {
-                panel.add(new ContactButton(user.getUsername(), user.getUnreadMessages() == null));
-            }
-            panel.setPreferredSize(new Dimension(100, 430));
+            publicChatButton = new ContactButton("Public Chat", false, true);
+            buttons = new ArrayList<>();
+            buttons.add(publicChatButton);
+            panel.add(publicChatButton);
 
-            searchBar = new HintJTextField("Search Contacts");
+            for (ChatRoomModel bookmarkedRoom : bookmarkedRooms) {
+                ContactButton button = new ContactButton(bookmarkedRoom.getName(), false, true);
+                buttons.add(button);
+                panel.add(button);
+
+            }
+            for (ChatRoomModel room : rooms) {
+                if (!bookmarkedRooms.contains(room)) {
+                    ContactButton button = new ContactButton(room.getName(), false, false);
+                    buttons.add(button);
+                    panel.add(button);
+                }
+            }
+            scrollPane = new JScrollPane(panel);
+            scrollPane.setPreferredSize(new Dimension(100, 430));
+
+            searchBar = new HintTextField("Search Contacts");
             searchBar.setPreferredSize(new Dimension(200, 35));
 
             this.setLayout(new BorderLayout());
@@ -215,11 +348,58 @@ public class AdminView extends JFrame {
             this.setPreferredSize(new Dimension(200, 500));
             this.setMaximumSize(new Dimension(200, 500));
         }
+        public void setContactButtonsActionListener(ActionListener listener) {
+            for (ContactButton button : buttons) {
+                button.addActionListener(listener);
+            }
+        }
+        public void fillContactButtonsSearch(List<ContactButton> contactButtons) {
+            panel = new JPanel();
+            panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+            panel.add(publicChatButton);
+
+            for (ContactButton b : contactButtons) {
+                panel.add(b);
+            }
+            scrollPane = new JScrollPane(panel);
+            scrollPane.setPreferredSize(new Dimension(100, 430));
+            this.add(scrollPane, BorderLayout.CENTER);
+        }
+
+        public void changeContactButtons(String username, UserModel user) {
+            panel = new JPanel();
+            panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+
+            for (UserModel u : user.getContacts()) {
+                if (u.getUsername().contains(username)) {
+                    for (ContactButton c : buttons) {
+                        if (c.getText().contains(username))
+                            panel.add(c);
+                    }
+                }
+            }
+            scrollPane = new JScrollPane(panel);
+            scrollPane.setPreferredSize(new Dimension(100, 430));
+            this.add(scrollPane, BorderLayout.CENTER);
+            this.repaint();
+            this.revalidate();
+        }
+
+        public void clear() {
+            contactsPanel.remove(scrollPane);
+        }
+
+        public List<ContactButton> getButtons() {
+            return buttons;
+        }
 
         class ContactButton extends JButton {
             ImageIcon imageIcon;
+            ContactsPopupMenu popupMenu;
+            Boolean isBookmarked;
 
-            public ContactButton(String contactName, boolean hasUnread) {
+            public ContactButton(String contactName, boolean hasUnread, boolean isBookmarked) {
+                this.isBookmarked = isBookmarked;
                 this.setMaximumSize(new Dimension(Integer.MAX_VALUE, 35));
                 this.setText(contactName);
                 if (hasUnread) {
@@ -227,58 +407,74 @@ public class AdminView extends JFrame {
                 } else {
                     imageIcon = new ImageIcon("res/graphics/user.png");
                 }
+                popupMenu = new ContactsPopupMenu();
+                this.setComponentPopupMenu(popupMenu);
 
                 Image image = imageIcon.getImage();
                 Image scaledImage = image.getScaledInstance(30, 30, java.awt.Image.SCALE_SMOOTH);
                 imageIcon = new ImageIcon(scaledImage);
                 this.setIcon(imageIcon);
                 this.setHorizontalAlignment(SwingConstants.LEFT);
-                this.setBackground(Color.WHITE);
+                //this.setBackground(Color.WHITE);
+                if (!isBookmarked) {
+                    this.setBackground(Color.WHITE);
+                } else {
+                    this.setBackground(Color.LIGHT_GRAY);
+                }
             }
-        }
-    }
+
+            public ContactsPopupMenu getPopupMenu() {
+                return popupMenu;
+            }
+
+            public void setBookmarked(Boolean bookmarked) {
+                isBookmarked = bookmarked;
+            }
+
+        } //end of ContactButton
+    } //end of ContactsPanel
 
     /*MembersPanel Class*/
     class MembersPanel extends JPanel {
         JPanel panel, settingsPanel;
         JButton addButton, kickButton, settingsButton;
         JScrollPane scrollPane;
-        JTextField searchBar;
-        List<MemberButton> memberButtons;
+        TextField searchBar;
+        public List<MemberButton> memberButtons;
+        UserModel user;
 
         public MembersPanel(UserModel user, ChatRoomModel publicChat) {
-            List<UserModel> users =  publicChat.getUsers();
-            searchBar = new HintJTextField("Search Members");
+            this.user = user;
+            searchBar = new HintTextField("Search Members");
             searchBar.setPreferredSize(new Dimension(200, 25));
+            fillButtons(publicChat.getUsers());
 
-            panel = new JPanel();
+            /*panel = new JPanel();
             panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
             memberButtons = new ArrayList<>();
-            for (UserModel u : users) {
-                MemberButton button = new MemberButton(u.getUsername());
-                memberButtons.add(button);
-                panel.add(button);
-            }
-
-            scrollPane = new JScrollPane(panel);
+             */
+           // scrollPane = new JScrollPane(panel);
             scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+
             settingsPanel = new JPanel(new GridLayout());
-            addButton = new JButton(ClientView.scaleIcon("res/graphics/add-user.png"));
+            addButton = new JButton(AdminView.scaleIcon("res/graphics/add-user.png"));
             addButton.setBackground(Color.WHITE);
-            kickButton = new JButton(ClientView.scaleIcon("res/graphics/remove-user.png"));
+            kickButton = new JButton(AdminView.scaleIcon("res/graphics/remove-user.png"));
             kickButton.setBackground(Color.WHITE);
-            settingsButton = new JButton(ClientView.scaleIcon("res/graphics/gear.png"));
+            settingsButton = new JButton(AdminView.scaleIcon("res/graphics/gear.png"));
             settingsButton.setBackground(Color.WHITE);
             settingsPanel.add(addButton);
             settingsPanel.add(kickButton);
             settingsPanel.add(settingsButton);
             settingsPanel.setPreferredSize(new Dimension(200, 35));
-//            if(!user.getUsername().equals(publicChat.getAdmin())){
-//                kickButton.setVisible(false);
-//            }
+            /* if(!user.getUsername().equals(publicChat.getAdmin())){
+               kickButton.setVisible(false);
+            }
+             */
+            updateSettingsPanel(publicChat);
+
             this.setLayout(new BorderLayout());
             this.setBackground(Color.GREEN);
-
             this.add(searchBar, BorderLayout.NORTH);
             this.add(scrollPane, BorderLayout.CENTER);
             this.add(settingsPanel, BorderLayout.SOUTH);
@@ -286,12 +482,59 @@ public class AdminView extends JFrame {
             this.setPreferredSize(new Dimension(200, 500));
             this.setMaximumSize(new Dimension(200, 500));
         }
+        public void updateSettingsPanel(ChatRoomModel chatRoom) {
+            if (user.getUsername().equals(chatRoom.getAdmin())) {
+                System.out.println("User is admin");
+                kickButton.setVisible(true);
+                settingsPanel.revalidate();
+            } else {
+                System.out.println("User is not admin");
+                kickButton.setVisible(false);
+                settingsPanel.revalidate();
+            }
+        }
+        public void clear() {
+            membersPanel.remove(scrollPane);
+        }
+        public void fillButtons(List<UserModel> users) {
+            panel = new JPanel();
+            panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+            memberButtons = new ArrayList<>();
+            for (UserModel u : users) {
+                MembersPanel.MemberButton button = new MembersPanel.MemberButton(u.getUsername(),u.getStatus());
+                memberButtons.add(button);
+                panel.add(button);
+            }
+
+            scrollPane = new JScrollPane(panel);
+            scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+            this.add(scrollPane, BorderLayout.CENTER);
+        }
+
+        public void changeButtons(String username, ChatRoomModel chatRoom) {
+            panel = new JPanel();
+            panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+            memberButtons = new ArrayList<>();
+            for (UserModel u : chatRoom.getUsers()) {
+                if (u.getUsername().contains(username)) {
+                    MembersPanel.MemberButton button = new MembersPanel.MemberButton(u.getUsername(),u.getStatus());
+                    memberButtons.add(button);
+                    panel.add(button);
+                }
+            }
+            scrollPane = new JScrollPane(panel);
+            scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+            this.add(scrollPane, BorderLayout.CENTER);
+            this.repaint();
+            this.revalidate();
+        }
+
 
         class MemberButton extends JButton {
             ImageIcon imageIcon;
             MemberPopupMenu popupMenu;
 
-            public MemberButton(String memberName) {
+            public MemberButton(String memberName, String status) {
                 this.setMinimumSize(new Dimension(175, 35));
                 this.setPreferredSize(new Dimension(200, 35));
                 this.setMaximumSize(new Dimension(200, 35));
@@ -327,7 +570,7 @@ public class AdminView extends JFrame {
 
         //add a new member button
         public void addNewMember(UserModel user){
-            MemberButton button = new MemberButton(user.getUsername());
+            MemberButton button = new MemberButton(user.getUsername(),user.getStatus());
             memberButtons.add(button);
             panel.add(button);
             this.revalidate();
@@ -371,6 +614,33 @@ public class AdminView extends JFrame {
 
         public void setAddItemActionListener(ActionListener listener) {
             add.addActionListener(listener);
+        }
+    }
+
+    class ContactsPopupMenu extends JPopupMenu {
+        JMenuItem addtoBookmark;
+        JMenuItem removeBookmark;
+        JMenuItem removeContact;
+
+        public ContactsPopupMenu() {
+            addtoBookmark = new JMenuItem("Bookmark contact");
+            removeBookmark = new JMenuItem("Remove bookmark");
+            removeContact = new JMenuItem("Remove Contact");
+            this.add(addtoBookmark);
+            this.add(removeBookmark);
+            this.add(removeContact);
+        }
+
+        public void setBookmarkButtonActionListener(ActionListener listener) {
+            addtoBookmark.addActionListener(listener);
+        }
+
+        public void setRemoveBookmarkButtonActionListener(ActionListener listener) {
+            removeBookmark.addActionListener(listener);
+        }
+
+        public void setRemoveContactButtonActionListener(ActionListener listener) {
+            removeContact.addActionListener(listener);
         }
     }
 }

@@ -10,8 +10,6 @@ public class ChatRoomModel implements Serializable {
     private List<MessageModel> chatHistory;
     private String admin;
 
-
-
     /**
      * Default Constructor
      *
@@ -33,18 +31,17 @@ public class ChatRoomModel implements Serializable {
 
     // returns the user if userList contains the specified user
     public UserModel searchUser(String username) {
-        for(UserModel u: users){
-            if(u.getUsername().equals(username))
+        for (UserModel u : users) {
+            if (u.getUsername().equals(username))
                 return u;
         }
         return null;
-
     }
 
     // returns the message if message contains a specified text
     public MessageModel searchMessage(String message) {
-        for(MessageModel c: chatHistory){
-            if(c.getContent().equalsIgnoreCase(message))
+        for (MessageModel c : chatHistory) {
+            if (c.getContent().equalsIgnoreCase(message))
                 return c;
         }
         return null;
@@ -53,8 +50,8 @@ public class ChatRoomModel implements Serializable {
 
     // checks if user is in the chat room
     public boolean isUserHere(String username) {
-        for(UserModel u: users){
-            if(u.getUsername().equals(username))
+        for (UserModel u : users) {
+            if (u.getUsername().equals(username))
                 return true;
         }
         return false;
@@ -104,6 +101,6 @@ public class ChatRoomModel implements Serializable {
 
     @Override
     public String toString() {
-        return  name;
+        return name;
     }
 }
