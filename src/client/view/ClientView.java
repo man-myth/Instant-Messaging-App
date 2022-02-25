@@ -477,11 +477,9 @@ public class ClientView extends JFrame {
 
         public void updateSettingsPanel(ChatRoomModel chatRoom) {
             if (user.getUsername().equals(chatRoom.getAdmin())) {
-                System.out.println("User is admin");
                 kickButton.setVisible(true);
                 settingsPanel.revalidate();
             } else {
-                System.out.println("User is not admin");
                 kickButton.setVisible(false);
                 settingsPanel.revalidate();
             }
