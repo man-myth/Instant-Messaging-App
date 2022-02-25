@@ -17,6 +17,7 @@ public class ClientModel {
     private final ObjectOutputStream outputStream;
     ChatRoomModel currentRoom;
     UserModel user;
+    boolean isLoggedIn;
 
     public ClientModel(Socket clientSocket, ObjectInputStream inputStream, ObjectOutputStream outputStream,
                        UserModel user, ChatRoomModel currentRoom) {
@@ -25,6 +26,7 @@ public class ClientModel {
         this.outputStream = outputStream;
         this.user = user;
         this.currentRoom = currentRoom;
+        isLoggedIn = true;
     }
 
     /*
@@ -304,8 +306,13 @@ public class ClientModel {
         return (String) inputStream.readObject();
     }
 
+    public boolean isLoggedIn() {
+        return isLoggedIn;
+    }
+
     public void logout() {
         try {
+            isLoggedIn = false;
             user.setStatus("Offline");
             user.setActive(false);
             outputStream.writeObject("logout");
