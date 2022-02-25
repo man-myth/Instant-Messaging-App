@@ -75,24 +75,7 @@ public class UserModel implements Serializable {
     public void addChatRoom(ChatRoomModel newRoom) {
         chatRooms.add(newRoom);
     }
-
-    public List<ChatRoomModel> getRoomsList(){
-        List<ChatRoomModel> rooms = new ArrayList<>();
-        //put bookmarked rooms at the top list
-        try {
-            for (ChatRoomModel m : getBookmarks()) {
-                rooms.add(m);
-            }
-            for (ChatRoomModel r : this.getChatRooms()) {
-                if (!rooms.contains(r)) {
-                    rooms.add(r);
-                }
-            }
-        } catch (Exception e){
-            e.printStackTrace();
-        }
-        return rooms;
-    }
+    
     public void setChatRooms(List<ChatRoomModel> chatRooms) {
         this.chatRooms = chatRooms;
     }
