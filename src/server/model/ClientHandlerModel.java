@@ -354,6 +354,9 @@ public class ClientHandlerModel implements Runnable {
                     }
                 } else if (input.equals("logout")) {
                     updateStatusToAll("Offline");
+                    currentUser.setStatus("Offline");
+                    currentUser.setActive(false);
+                    ServerModel.updateUser(currentUser.getUsername(), currentUser);
                     currentUser = null;
                 }
 
