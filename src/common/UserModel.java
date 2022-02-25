@@ -1,7 +1,9 @@
 package common;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 
 public class UserModel implements Serializable {
     private String username;
@@ -23,7 +25,8 @@ public class UserModel implements Serializable {
         this.isActive = false;
     }
 
-    public UserModel(UserModel model) {}
+    public UserModel(UserModel model) {
+    }
 
     public UserModel() {
 
@@ -68,33 +71,17 @@ public class UserModel implements Serializable {
     public void setBookmarks(List<ChatRoomModel> bookmarks) {
         this.bookmarks = bookmarks;
     }
+
     public List<ChatRoomModel> getChatRooms() {
         return chatRooms;
     }
 
-    public void addChatRoom(ChatRoomModel newRoom) {
-        chatRooms.add(newRoom);
-    }
-
-    public List<ChatRoomModel> getRoomsList(){
-        List<ChatRoomModel> rooms = new ArrayList<>();
-        //put bookmarked rooms at the top list
-        try {
-            for (ChatRoomModel m : getBookmarks()) {
-                rooms.add(m);
-            }
-            for (ChatRoomModel r : this.getChatRooms()) {
-                if (!rooms.contains(r)) {
-                    rooms.add(r);
-                }
-            }
-        } catch (Exception e){
-            e.printStackTrace();
-        }
-        return rooms;
-    }
     public void setChatRooms(List<ChatRoomModel> chatRooms) {
         this.chatRooms = chatRooms;
+    }
+
+    public void addChatRoom(ChatRoomModel newRoom) {
+        chatRooms.add(newRoom);
     }
 
     public List<MessageModel> getUnreadMessages() {

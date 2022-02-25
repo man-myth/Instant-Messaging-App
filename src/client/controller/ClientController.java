@@ -1,11 +1,7 @@
 package client.controller;
 
 import client.model.ClientModel;
-import client.view.AddContactToRoomView;
-import client.view.ClientView;
-import client.view.ExitOnCloseAdapter;
-import client.view.KickContactFromRoomView;
-import client.view.SettingsView;
+import client.view.*;
 import common.ChatRoomModel;
 import common.MessageModel;
 import common.UserModel;
@@ -16,7 +12,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.TextEvent;
 import java.awt.event.TextListener;
-import java.io.*;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -189,7 +186,7 @@ public class ClientController implements Runnable {
         // Thread for receiving responses from the server
         new Thread(() -> {
             try {
-                while (true) {
+                while (clientModel.isLoggedIn()) {
                     String event = clientModel.getEvent();
                     System.out.println("Event: " + event);
                     if (event.equals("broadcast")) { // do this if event = "broadcast"

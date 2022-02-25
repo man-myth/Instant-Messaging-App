@@ -4,7 +4,9 @@ import common.ChatRoomModel;
 import common.MessageModel;
 import common.UserModel;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,6 +17,7 @@ public class ClientModel {
     private final ObjectOutputStream outputStream;
     ChatRoomModel currentRoom;
     UserModel user;
+    boolean isLoggedIn;
 
     public ClientModel(Socket clientSocket, ObjectInputStream inputStream, ObjectOutputStream outputStream,
                        UserModel user, ChatRoomModel currentRoom) {
@@ -23,6 +26,7 @@ public class ClientModel {
         this.outputStream = outputStream;
         this.user = user;
         this.currentRoom = currentRoom;
+        isLoggedIn = true;
     }
 
     /*
@@ -57,9 +61,9 @@ public class ClientModel {
         this.currentRoom = currentRoom;
     }
 
-/*------------------------------- MODELS -------------------------------*/
+    /*------------------------------- MODELS -------------------------------*/
 
-/*--- BROADCASTING OF MESSAGE MODEL ---*/
+    /*--- BROADCASTING OF MESSAGE MODEL ---*/
     // added; method that gets message from stream
     public MessageModel getMessageFromStream() throws ClassNotFoundException, IOException {
         return (MessageModel) inputStream.readObject();
@@ -110,14 +114,14 @@ public class ClientModel {
         }
     }
 
-/*--- ADDING CONTACT MODEL ---*/
+    /*--- ADDING CONTACT MODEL ---*/
 
     // adds the new user to contact list
     public void updateChatRooms() {
         List<ChatRoomModel> newChatRoomList = new ArrayList<>();
         try {
             newChatRoomList = (List<ChatRoomModel>) inputStream.readObject();
-        } catch (ClassNotFoundException| IOException e) {
+        } catch (ClassNotFoundException | IOException e) {
             e.printStackTrace();
         }
         user.setChatRooms(newChatRoomList);
@@ -129,13 +133,13 @@ public class ClientModel {
             if (!user.hasContact(contact.getUsername())) {
                 user.getContacts().add(contact);
             }
-        } catch (ClassNotFoundException| IOException e) {
+        } catch (ClassNotFoundException | IOException e) {
             e.printStackTrace();
         }
     }
 
     // updated the UserModel
-    public void updateUser(){
+    public void updateUser() {
         try {
             this.user = (UserModel) inputStream.readObject();
         } catch (IOException e) {
@@ -144,6 +148,7 @@ public class ClientModel {
             e.printStackTrace();
         }
     }
+
     public void addContact(String username) {
         try {
             outputStream.writeObject("add contact");
@@ -152,6 +157,7 @@ public class ClientModel {
             e.printStackTrace();
         }
     }
+
     public void removeContact(String username) {
         try {
             outputStream.writeObject("remove contact");
@@ -163,10 +169,11 @@ public class ClientModel {
 
     /**
      * Returns true if inputted user is an admin, otherwise returns false
+     *
      * @param user
      * @return boolean
      */
-    public boolean isAdmin(UserModel user){
+    public boolean isAdmin(UserModel user) {
         return user.getUsername().equals("admin") ||
                 user.getUsername().equals(currentRoom.getAdmin());
     }
@@ -179,14 +186,15 @@ public class ClientModel {
             e.printStackTrace();
         }
     }
+
     public void removeBookmark(String username) {
-            try {
-                outputStream.writeObject("remove bookmark");
-                outputStream.writeObject(username);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+        try {
+            outputStream.writeObject("remove bookmark");
+            outputStream.writeObject(username);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
+    }
 
     // Send a request to the server for the specified chat room
     public void requestRoom(String roomName) {
@@ -216,7 +224,7 @@ public class ClientModel {
         }
     }
 
-/*--- ADDING/KICKING OF CONTACT TO CHAT ROOM MODEL ---*/
+    /*--- ADDING/KICKING OF CONTACT TO CHAT ROOM MODEL ---*/
 
     // takes the list of contacts and put their usernames in a String array
     // for combo box view
@@ -224,7 +232,7 @@ public class ClientModel {
         ArrayList<String> contacts = new ArrayList<>();
         for (UserModel u : list) {
             //continue if username is equals "your username" or "admin'
-            if(u.getUsername().equals(user.getUsername()) || u.getUsername().equals("admin"))
+            if (u.getUsername().equals(user.getUsername()) || u.getUsername().equals("admin"))
                 continue;
             contacts.add(u.getUsername());
         }
@@ -240,17 +248,16 @@ public class ClientModel {
     }
 
 
-
-/*--- SETTINGS MODEL ---*/
+    /*--- SETTINGS MODEL ---*/
     public boolean changeUsername(String newName, String oldName) {
         if (newName.length() != 0) {
             user.setUsername(newName);
-            try{
-                String[] names = {oldName,newName};
+            try {
+                String[] names = {oldName, newName};
                 outputStream.writeObject("update username");
                 outputStream.writeObject(names);
                 return true;
-            }catch (Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
             }
 
@@ -265,42 +272,47 @@ public class ClientModel {
     public void changePassword(String pass, boolean isValid) {
         if (isValid) {
             user.setPassword(pass);
-            try{
+            try {
                 outputStream.writeObject("update password");
                 outputStream.writeObject(user.getUsername());
                 outputStream.writeObject(pass);
-            }catch (Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
     }
 
-    public void changeStatus(String status){
+    public void changeStatus(String status) {
         try {
             user.setStatus(status);
             currentRoom.searchUser(user.getUsername()).setStatus(status);
             outputStream.writeObject("change status");
             outputStream.writeObject(status);
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
     }
 
-    public void readAllStatus(){
-        try{
+    public void readAllStatus() {
+        try {
             outputStream.writeObject("read all status");
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public String getUsernameStatusStream() throws Exception{
+    public String getUsernameStatusStream() throws Exception {
         return (String) inputStream.readObject();
+    }
+
+    public boolean isLoggedIn() {
+        return isLoggedIn;
     }
 
     public void logout() {
         try {
+            isLoggedIn = false;
             user.setStatus("Offline");
             user.setActive(false);
             outputStream.writeObject("logout");

@@ -45,12 +45,12 @@ public class AddContactToRoomView extends JFrame {
         this.dispose();
     }
 
-    public void errorUserIsHere(){
-        JOptionPane.showMessageDialog(this.getContentPane(), "User " + getSelected()+" is already in this room.", "Error",
+    public void errorUserIsHere() {
+        JOptionPane.showMessageDialog(this.getContentPane(), "User " + getSelected() + " is already in this room.", "Error",
                 JOptionPane.ERROR_MESSAGE);
     }
 
-    public void errorInvalidAction(){
+    public void errorInvalidAction() {
         JOptionPane.showMessageDialog(this.getContentPane(), "No user found.", "Error",
                 JOptionPane.ERROR_MESSAGE);
     }

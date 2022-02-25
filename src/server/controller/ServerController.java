@@ -1,9 +1,7 @@
 package server.controller;
 
-import server.model.*;
-
-import java.net.Socket;
-import java.util.ArrayList;
+import server.model.ServerModel;
+import server.model.Utility;
 
 
 /**
