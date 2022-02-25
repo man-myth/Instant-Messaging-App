@@ -32,6 +32,12 @@ public class AdminView extends JFrame {
     static Font headingFont = new Font("Calibri", Font.PLAIN, 20);
 
     public AdminView(UserModel user, ChatRoomModel publicChat) {
+        menuBar = new JMenuBar();
+        menu = new JMenu("Menu");
+        logOut = new JMenuItem("Log Out");
+        menu.add(logOut);
+        menuBar.add(menu);
+
         mainPanel = new JPanel(new BorderLayout());
         contactsPanel = new ContactsPanel(user);
         chatPanel = new ChatPanel(publicChat);
@@ -41,6 +47,7 @@ public class AdminView extends JFrame {
         mainPanel.add(membersPanel, BorderLayout.EAST);
         mainPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         this.add(mainPanel);
+        this.setJMenuBar(menuBar);
         this.setTitle("Admin");
         this.pack();
         this.setLocationRelativeTo(null);
@@ -48,8 +55,15 @@ public class AdminView extends JFrame {
         this.setResizable(false);
     }
 
+    public void setLogOutListener(ActionListener listener) {
+        logOut.addActionListener(listener);
+    }
+
     public void showErrorMessage(String message) {
         JOptionPane.showMessageDialog(this, message, "Error", JOptionPane.ERROR_MESSAGE);
+    }
+    public String getInput(String prompt) {
+        return JOptionPane.showInputDialog(this, prompt);
     }
 
     public String getMessage() {
@@ -107,6 +121,17 @@ public class AdminView extends JFrame {
         mainPanel.revalidate();
     }
 
+    public void updateRoom(ChatRoomModel room) {
+        mainPanel.remove(chatPanel);
+        chatPanel = new ChatPanel(room);
+        membersPanel.clear();
+        membersPanel.fillButtons(room.getUsers());
+        membersPanel.revalidate();
+        membersPanel.updateSettingsPanel(room);
+        mainPanel.add(chatPanel, BorderLayout.CENTER);
+        mainPanel.revalidate();
+    }
+
     public static ImageIcon scaleIcon(String filename) {
         ImageIcon imageIcon = new ImageIcon(filename);
         Image image = imageIcon.getImage();
@@ -147,6 +172,7 @@ public class AdminView extends JFrame {
     public void changeUsername(String oldName, String newName){
         membersPanel.changeUsername(oldName,newName);
     }
+
     public void membersSearchActionListener(TextListener listener) {
         membersPanel.searchBar.addTextListener(listener);
     }
@@ -181,6 +207,9 @@ public class AdminView extends JFrame {
     public void promptErrorChangeUser() {
         JOptionPane.showMessageDialog(this.getContentPane(), "Username is fixed for Admin", "Error",
                 JOptionPane.ERROR_MESSAGE);
+    }
+    public void updateSettingsPanel(ChatRoomModel currentRoom) {
+        membersPanel.updateSettingsPanel(currentRoom);
     }
 
     public void setStatusImage(String username, String status) {
@@ -305,6 +334,8 @@ public class AdminView extends JFrame {
                     panel.add(button);
                 }
             }
+            scrollPane = new JScrollPane(panel);
+            scrollPane.setPreferredSize(new Dimension(100, 430));
 
             searchBar = new HintTextField("Search Contacts");
             searchBar.setPreferredSize(new Dimension(200, 35));
@@ -384,7 +415,7 @@ public class AdminView extends JFrame {
                 imageIcon = new ImageIcon(scaledImage);
                 this.setIcon(imageIcon);
                 this.setHorizontalAlignment(SwingConstants.LEFT);
-                this.setBackground(Color.WHITE);
+                //this.setBackground(Color.WHITE);
                 if (!isBookmarked) {
                     this.setBackground(Color.WHITE);
                 } else {
@@ -409,9 +440,11 @@ public class AdminView extends JFrame {
         JButton addButton, kickButton, settingsButton;
         JScrollPane scrollPane;
         TextField searchBar;
-        List<MemberButton> memberButtons;
+        public List<MemberButton> memberButtons;
+        UserModel user;
 
         public MembersPanel(UserModel user, ChatRoomModel publicChat) {
+            this.user = user;
             searchBar = new HintTextField("Search Members");
             searchBar.setPreferredSize(new Dimension(200, 25));
             fillButtons(publicChat.getUsers());
@@ -434,18 +467,31 @@ public class AdminView extends JFrame {
             settingsPanel.add(kickButton);
             settingsPanel.add(settingsButton);
             settingsPanel.setPreferredSize(new Dimension(200, 35));
-            if(!user.getUsername().equals(publicChat.getAdmin())){
+            /* if(!user.getUsername().equals(publicChat.getAdmin())){
                kickButton.setVisible(false);
             }
+             */
+            updateSettingsPanel(publicChat);
+
             this.setLayout(new BorderLayout());
             this.setBackground(Color.GREEN);
-
             this.add(searchBar, BorderLayout.NORTH);
             this.add(scrollPane, BorderLayout.CENTER);
             this.add(settingsPanel, BorderLayout.SOUTH);
             this.setMinimumSize(new Dimension(200, 500));
             this.setPreferredSize(new Dimension(200, 500));
             this.setMaximumSize(new Dimension(200, 500));
+        }
+        public void updateSettingsPanel(ChatRoomModel chatRoom) {
+            if (user.getUsername().equals(chatRoom.getAdmin())) {
+                System.out.println("User is admin");
+                kickButton.setVisible(true);
+                settingsPanel.revalidate();
+            } else {
+                System.out.println("User is not admin");
+                kickButton.setVisible(false);
+                settingsPanel.revalidate();
+            }
         }
         public void clear() {
             membersPanel.remove(scrollPane);
