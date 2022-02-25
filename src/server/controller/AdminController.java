@@ -47,6 +47,7 @@ public class AdminController implements Runnable {
     SettingsView.AskNewName newName;
     SettingsView.AskNewPass newPass;
     SettingsView.StatusView statusView;
+    SettingsView.HelpModule helpModule;
 
     // -Constructor
 
@@ -97,7 +98,9 @@ public class AdminController implements Runnable {
 
             //set status listener
             settingsView.changeStatusActionListener(new SetStatusListener());
-
+                    settingsView.helpActionListener(e3 -> {
+                                helpModule = new SettingsView.HelpModule();
+                            });
             //help module display
         });
 
