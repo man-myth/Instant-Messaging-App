@@ -25,6 +25,8 @@ import java.time.LocalTime;
 public class ClientController implements Runnable {
     // -Fields
     private final Socket socket;
+    ObjectOutputStream outputStream;
+    ObjectInputStream inputStream;
 
     ClientView clientView;
     ClientModel clientModel;
@@ -40,6 +42,8 @@ public class ClientController implements Runnable {
     public ClientController(Socket socket, ObjectInputStream inputStream, ObjectOutputStream outputStream,
                             UserModel user, ChatRoomModel publicChat) {
         this.socket = socket;
+        this.outputStream = outputStream;
+        this.inputStream = inputStream;
         this.clientModel = new ClientModel(socket, inputStream, outputStream, user, publicChat);
 
     }
@@ -51,7 +55,7 @@ public class ClientController implements Runnable {
         System.out.println("Logged in with user: " + clientModel.getUser());
         clientView = new ClientView(clientModel.getUser(), clientModel.getCurrentRoom());
         clientView.setWindowAdapter(new ExitOnCloseAdapter(socket));
-        clientView.setStatusImage(clientModel.getUser().getUsername(),clientModel.getUser().getStatus());
+        clientView.setStatusImage(clientModel.getUser().getUsername(), clientModel.getUser().getStatus());
         clientModel.changeStatus("Online");
         clientModel.readAllStatus();
 
@@ -136,13 +140,13 @@ public class ClientController implements Runnable {
 
             kickUserView.setKickButtonActionListener(e1 -> {
                 try {
-                    if (clientModel.isAdmin(clientModel.getUser())){
+                    if (clientModel.isAdmin(clientModel.getUser())) {
                         String username = kickUserView.getSelected();
                         UserModel roomMember = clientModel.getCurrentRoom().searchUser(username);
                         clientModel.getCurrentRoom().kickUser(roomMember);
                         clientView.kickMember(roomMember);
                         kickUserView.successMessage();
-                    } else{
+                    } else {
                         clientView.noPermsMsg();
                     }
 
@@ -175,13 +179,15 @@ public class ClientController implements Runnable {
 
         clientView.setRemoveContactButtonActionListener(new RemoveContactListener());
 
+        clientView.setLogOutListener(new LogOutListener());
+
         // Separate thread for GUI
         EventQueue.invokeLater(() -> clientView.setVisible(true));
 
         // Thread for receiving responses from the server
         new Thread(() -> {
             try {
-                while (true) {
+                while (clientModel.getUser().isActive()) {
                     String event = clientModel.getEvent();
                     System.out.println("Event: " + event);
                     if (event.equals("broadcast")) { // do this if event = "broadcast"
@@ -245,12 +251,14 @@ public class ClientController implements Runnable {
                     } else if (event.equals("get room name")) {
                         clientModel.writeString(clientView.getInput("Enter new room name."));
                         addToRoomView.successMessage();
-                    } else if(event.equals("update status view")){
+                    } else if (event.equals("update status view")) {
                         String status = clientModel.getUsernameStatusStream();
                         String username = clientModel.getUsernameStatusStream();
-                        clientModel.getCurrentRoom().searchUser(username).setStatus(status);
-                        clientModel.getUser().setStatus(status);
-                        clientView.setStatusImage(username,status);
+                        if (clientModel.getCurrentRoom().isUserHere(username)) {
+                            clientModel.getCurrentRoom().searchUser(username).setStatus(status);
+                            clientModel.getUser().setStatus(status);
+                            clientView.setStatusImage(username, status);
+                        }
                     }
                 }
             } catch (Exception e) {
@@ -413,6 +421,14 @@ public class ClientController implements Runnable {
             String username = invokerButton.getText();
             System.out.println("remove " + username);
             clientModel.removeContact(username);
+        }
+    }
+
+    class LogOutListener implements ActionListener {
+        public void actionPerformed(ActionEvent e) {
+            clientModel.logout();
+            clientView.dispose();
+            new LoginController(socket, outputStream, inputStream).run();
         }
     }
 }// END OF CLIENT CONTROLLER
