@@ -34,6 +34,7 @@ public class AuthenticatorController {
 
         if(isVerified.equals("wrong pass")){
             view.promptWrongPassword();
+            toggleChangePass(username);
             return false;
         }
 
@@ -44,20 +45,18 @@ public class AuthenticatorController {
         return true;
     }
 
-    public void toggleChangePass(int attempts, String username){
-        if(model.toggleChangePass(attempts)){
-            int ans =view.promptChangePass();
-            if(ans == JOptionPane.YES_OPTION){
-                newPass = new AuthenticatorView.AskNewPass(); // access the AskNewPass class from SettingsView
-                newPass.changeListener(f -> { // action listener for the button in AskNewPass
-                    String enteredPass = newPass.getPass();
-                    String reEnteredPass = newPass.getRePass();
-                    boolean isPassValid = model.isPassValid(enteredPass, reEnteredPass); // checks if passwords match
-                    newPass.promptError(isPassValid); // prompt an error if passwords do not match
-                    model.changePassword(enteredPass, isPassValid, username); // else, change password
-                    newPass.changeSuccess(isPassValid);
-                });
-            }
+    public void toggleChangePass(String username){
+        int ans =view.promptChangePass();
+        if(ans == JOptionPane.YES_OPTION){
+            newPass = new AuthenticatorView.AskNewPass(); // access the AskNewPass class from SettingsView
+            newPass.changeListener(f -> { // action listener for the button in AskNewPass
+                String enteredPass = newPass.getPass();
+                String reEnteredPass = newPass.getRePass();
+                boolean isPassValid = model.isPassValid(enteredPass, reEnteredPass); // checks if passwords match
+                newPass.promptError(isPassValid); // prompt an error if passwords do not match
+                model.changePassword(enteredPass, isPassValid, username); // else, change password
+                newPass.changeSuccess(isPassValid);
+            });
         }
     }
 

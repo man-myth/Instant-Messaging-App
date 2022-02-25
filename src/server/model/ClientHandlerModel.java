@@ -18,7 +18,6 @@ public class ClientHandlerModel implements Runnable {
     ObjectOutputStream outputStream;
     ObjectInputStream inputStream;
     UserModel currentUser;
-    int loginAttempts = 0;
 
     // constructor
     public ClientHandlerModel(Socket socket) {
@@ -50,12 +49,7 @@ public class ClientHandlerModel implements Runnable {
                         currentUser = getUserFromList(username, password);
                         writeObject(currentUser);
                         writeObject(ServerModel.getPublicChat());
-                        loginAttempts = 0;
                     } else {
-                        if (ServerModel.doesUsernameExist(username)) {
-                            loginAttempts++;
-                            authenticate.toggleChangePass(loginAttempts, username);
-                        }
                         outputStream.writeObject("FAILED");
                     }
                 } else if (input.equals("register")) {
@@ -429,8 +423,7 @@ public class ClientHandlerModel implements Runnable {
             client.writeObject(status);
             client.writeObject(currentUser.getUsername());
         }
-        Utility.exportUsersData(ServerModel.getRegisteredUsers());
-        ServerModel.setRegisteredUsers(Utility.readUsersData("res/data.dat"));
+        //removed utility methods
     }
 
     public UserModel getCurrentUser() {
