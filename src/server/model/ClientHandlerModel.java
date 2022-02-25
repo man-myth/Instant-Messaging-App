@@ -1,5 +1,8 @@
 package server.model;
 
+import common.ChatRoomModel;
+import common.MessageModel;
+import common.UserModel;
 import server.controller.AuthenticatorController;
 
 import java.io.*;

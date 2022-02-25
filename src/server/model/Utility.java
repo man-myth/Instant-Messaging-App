@@ -1,5 +1,8 @@
 package server.model;
 
+import common.ChatRoomModel;
+import common.UserModel;
+
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -9,7 +12,7 @@ public class Utility {
 
     public static void exportUsersData(List<UserModel> users) {
         try (
-                ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream("res/data.dat"));
+                ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream("res/data.dat"))
         ) {
             for (UserModel user : users) {
                 outputStream.writeObject(user);
@@ -24,7 +27,7 @@ public class Utility {
     public static List<UserModel> readUsersData(String filename) {
         List<UserModel> users = new ArrayList<>();
         try (
-                ObjectInputStream inputStream = new ObjectInputStream(new BufferedInputStream(new FileInputStream(filename)));
+                ObjectInputStream inputStream = new ObjectInputStream(new BufferedInputStream(new FileInputStream(filename)))
         ) {
             UserModel u;
             while (true) {

@@ -1,4 +1,4 @@
-package server.model;
+package common;
 
 import java.io.Serializable;
 import java.util.*;
@@ -150,7 +150,7 @@ public class UserModel implements Serializable {
     }
 
     public String toString() {
-        return "server.model.UserModel{" +
+        return "common.UserModel{" +
                 "username='" + username + '\'' +
                 ", password='" + password + '\'' +
                 ", status='" + status + '\'' +

@@ -1,18 +1,17 @@
 package server.model;
 
-import client.controller.LoginController;
-import server.model.MessageModel;
-import server.model.UserModel;
+import common.ChatRoomModel;
+import common.MessageModel;
+import common.UserModel;
 
 import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
 
 public class AdminModel{
 
-    private Socket clientSocket;
+    private final Socket clientSocket;
     private final ObjectInputStream inputStream;
     private final ObjectOutputStream outputStream;
     ChatRoomModel currentRoom;

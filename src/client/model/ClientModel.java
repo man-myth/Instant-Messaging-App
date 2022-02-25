@@ -1,8 +1,8 @@
 package client.model;
 
-import server.model.ChatRoomModel;
-import server.model.MessageModel;
-import server.model.UserModel;
+import common.ChatRoomModel;
+import common.MessageModel;
+import common.UserModel;
 
 import java.io.*;
 import java.net.Socket;
@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ClientModel {
-    private Socket socket;
+    private final Socket socket;
     private final ObjectInputStream inputStream;
     private final ObjectOutputStream outputStream;
     ChatRoomModel currentRoom;

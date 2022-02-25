@@ -1,11 +1,8 @@
 package client.view;
 
-import server.model.UserModel;
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
 import java.util.Objects;
 
 //Adding contact to room

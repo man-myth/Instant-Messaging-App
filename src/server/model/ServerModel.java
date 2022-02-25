@@ -1,5 +1,9 @@
 package server.model;
 
+import common.ChatRoomModel;
+import common.MessageModel;
+import common.UserModel;
+
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -23,8 +27,8 @@ public class ServerModel {
     static List<ClientHandlerModel> clients;
 
     public ServerModel(List<UserModel> registeredUsers, ChatRoomModel publicChat) {
-        this.registeredUsers = registeredUsers;
-        this.publicChat = publicChat;
+        ServerModel.registeredUsers = registeredUsers;
+        ServerModel.publicChat = publicChat;
     }
 
     public void run() {
@@ -114,7 +118,7 @@ public class ServerModel {
     }
 
     public void setClients(List<ClientHandlerModel> clients) {
-        this.clients = clients;
+        ServerModel.clients = clients;
     }
 
     // Method to find a member based on username and returns a list

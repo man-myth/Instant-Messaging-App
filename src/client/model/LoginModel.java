@@ -1,11 +1,10 @@
 package client.model;
 
-import server.model.UserModel;
+import common.UserModel;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.util.Scanner;
 
 public class LoginModel {
     public ObjectInputStream inputStream;

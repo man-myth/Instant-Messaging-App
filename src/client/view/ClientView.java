@@ -1,8 +1,8 @@
 package client.view;
 
-import server.model.ChatRoomModel;
-import server.model.MessageModel;
-import server.model.UserModel;
+import common.ChatRoomModel;
+import common.MessageModel;
+import common.UserModel;
 
 import javax.swing.*;
 import javax.swing.text.BadLocationException;

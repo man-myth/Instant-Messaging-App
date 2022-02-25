@@ -1,7 +1,7 @@
 package server.model;
 
-import javax.swing.*;
-import java.io.IOException;
+import common.UserModel;
+
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.List;

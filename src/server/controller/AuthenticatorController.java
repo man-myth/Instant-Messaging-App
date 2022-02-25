@@ -1,8 +1,7 @@
 package server.controller;
 
-import client.view.SettingsView;
 import server.model.AuthenticatorModel;
-import server.model.UserModel;
+import common.UserModel;
 import server.view.AuthenticatorView;
 
 import javax.swing.*;

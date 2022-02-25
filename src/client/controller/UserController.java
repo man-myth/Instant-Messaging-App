@@ -1,15 +1,12 @@
 package client.controller;
 
-import server.model.UserModel;
-import server.model.ChatRoomModel;
-import server.model.MessageModel;
+import common.UserModel;
 
 import javax.swing.text.View;
-import java.util.List;
 
 public class UserController {
-    private UserModel model;
-    private View view;
+    private final UserModel model;
+    private final View view;
 
     public UserController(UserModel model, View view){
         this.model = model;

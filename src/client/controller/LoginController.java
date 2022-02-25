@@ -4,8 +4,8 @@ import client.model.LoginModel;
 import client.view.ExitOnCloseAdapter;
 import client.view.LoginView;
 import server.controller.AdminController;
-import server.model.ChatRoomModel;
-import server.model.UserModel;
+import common.ChatRoomModel;
+import common.UserModel;
 
 import javax.swing.*;
 import java.io.*;
@@ -14,7 +14,7 @@ import java.net.Socket;
 public class LoginController {
     private RegisterController register;
     private UserModel user;
-    private LoginView loginView;
+    private final LoginView loginView;
     private LoginModel loginModel;
     Socket socket;
     final int PORT = 2022;

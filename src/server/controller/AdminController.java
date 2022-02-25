@@ -1,15 +1,14 @@
 package server.controller;
 
-import client.controller.ClientController;
 import client.controller.LoginController;
 import client.view.AddContactToRoomView;
 import client.view.ExitOnCloseAdapter;
 import client.view.KickContactFromRoomView;
 import client.view.SettingsView;
 import server.model.AdminModel;
-import server.model.ChatRoomModel;
-import server.model.MessageModel;
-import server.model.UserModel;
+import common.ChatRoomModel;
+import common.MessageModel;
+import common.UserModel;
 
 import javax.swing.*;
 import java.awt.*;
@@ -22,12 +21,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.TextEvent;
 import java.awt.event.TextListener;
-import java.util.ArrayList;
-import java.util.List;
 
 import server.view.AdminView;
-import server.view.AuthenticatorView;
-
 
 
 public class AdminController implements Runnable {

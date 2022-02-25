@@ -1,11 +1,10 @@
 package server.view;
 
-import client.view.ClientView;
 import client.view.HintJTextField;
 import client.view.HintTextField;
-import server.model.ChatRoomModel;
-import server.model.MessageModel;
-import server.model.UserModel;
+import common.ChatRoomModel;
+import common.MessageModel;
+import common.UserModel;
 
 import javax.swing.*;
 import javax.swing.text.BadLocationException;
