@@ -278,22 +278,29 @@ public class SettingsView extends JFrame {
     // --- HELP MODULE VIEW
     public static class HelpModule extends JFrame {
         // -Fields
-        String guide = "<html><body width = '%1s'><h1>Questions:</h1>"
-                + "<p><br> Q1: How to kick a user from a chatroom?<br/>"
-                + "<br> Only admin users can kick a user.<br />"
-                + "<br>Q2: How to add a user to bookmarks? <br/>"
-                + "<br>Right click on the contact you want to bookmark and press 'Add to Contact'.<br/> "
-                + "<br>Q3: How to logout?<br/>"
-                + "Click on the logout option located at Menu where you will see the logout option </html>";
+        String guide = "<html><h1>Frequently Asked Questions:</h1>"
+                + "<br><font color = red >NOTE: When making group chats, do not make the group chat name same as the user, it won't work!</font>"
+                + "<br>"
+                + "<br><i>Q1: How to kick a user from public chat?</i>"
+                + "<br>Unless you created the groupchat, only admin can kick a contact from public chat."
+                + "<br><i>Q2: How to add a user to bookmarks?</i><"
+                + "<br>Right click on the contact you want to bookmark and press 'Add to Contact'."
+                + "<br><i>Q3: How to logout?</i>"
+                + "<br>Click on the logout option located at Menu where you will see the option to logout.</html>";
         JLabel helpLabel = new JLabel(guide);
 
         // -Constructor
         public HelpModule() {
 
             // frame details
-            this.setLayout(new FlowLayout());
             this.add(helpLabel);
             helpLabel.setPreferredSize(new Dimension(250, 270));
+           /* helpLabel.setLineWrap(true);
+            helpLabel.setWrapStyleWord(true);
+            helpLabel.setOpaque(false);
+            helpLabel.setEditable(false);
+
+            */
 
             // frame details 2
             this.setPreferredSize(new Dimension(300, 350));
