@@ -476,13 +476,8 @@ public class ClientView extends JFrame {
         }
 
         public void updateSettingsPanel(ChatRoomModel chatRoom) {
-            if (user.getUsername().equals(chatRoom.getAdmin())) {
-                kickButton.setVisible(true);
-                settingsPanel.revalidate();
-            } else {
-                kickButton.setVisible(false);
-                settingsPanel.revalidate();
-            }
+            kickButton.setVisible(user.getUsername().equals(chatRoom.getAdmin()));
+            settingsPanel.revalidate();
         }
 
         public void clear() {

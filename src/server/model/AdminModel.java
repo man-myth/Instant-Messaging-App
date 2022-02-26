@@ -18,6 +18,7 @@ public class AdminModel {
     private final ObjectOutputStream outputStream;
     ChatRoomModel currentRoom;
     UserModel user;
+    boolean isLoggedIn;
 
     public AdminModel(Socket clientSocket, ObjectInputStream inputStream, ObjectOutputStream outputStream,
                       UserModel user, ChatRoomModel currentRoom) {
@@ -26,6 +27,7 @@ public class AdminModel {
         this.outputStream = outputStream;
         this.user = user;
         this.currentRoom = currentRoom;
+        isLoggedIn = true;
     }
 
     /*
@@ -116,7 +118,6 @@ public class AdminModel {
     /*--- ADDING CONTACT MODEL ---*/
 
     // adds the new user to contact list
-
     public void updateChatRooms() {
         List<ChatRoomModel> newChatRoomList = new ArrayList<>();
         try {
@@ -139,7 +140,6 @@ public class AdminModel {
     }
 
     // updated the UserModel
-
     public void updateUser() {
         try {
             this.user = (UserModel) inputStream.readObject();
@@ -168,11 +168,20 @@ public class AdminModel {
         }
     }
 
-    //missing isAdmin method
+    /**
+     * Returns true if inputted user is an admin, otherwise returns false
+     *
+     * @param user
+     * @return boolean
+     */
+    public boolean isAdmin(UserModel user) {
+        return user.getUsername().equals("admin") ||
+                user.getUsername().equals(currentRoom.getAdmin());
+    }
 
     public void addBookmark(String username) {
         try {
-            outputStream.writeObject("add contact");
+            outputStream.writeObject("add bookmark");
             outputStream.writeObject(username);
         } catch (IOException e) {
             e.printStackTrace();
@@ -216,21 +225,6 @@ public class AdminModel {
         }
     }
 
-        /* old code remove?
-    public void receiveContact() {
-        UserModel newUser = null;
-        try {
-            newUser = (UserModel) inputStream.readObject();
-            System.out.println(newUser.getUsername());
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-        user.getContacts().add(newUser);
-    }
-     */
-
     /*--- ADDING/KICKING OF CONTACT TO CHAT ROOM MODEL ---*/
 
     // takes the list of contacts and put their usernames in a String array
@@ -245,6 +239,15 @@ public class AdminModel {
         }
         return contacts.toArray(String[]::new);
     }
+
+    public UserModel getContact(String username) {
+        for (UserModel u : user.getContacts()) {
+            if (u.getUsername().equals(username))
+                return u;
+        }
+        return new UserModel("null", "null");
+    }
+
 
     /*--- SETTINGS MODEL ---*/
     public boolean changeUsername(String newName, String oldName) {
@@ -278,7 +281,6 @@ public class AdminModel {
                 e.printStackTrace();
             }
         }
-
     }
 
     public void changeStatus(String status) {
@@ -305,8 +307,13 @@ public class AdminModel {
         return (String) inputStream.readObject();
     }
 
+    public boolean isLoggedIn() {
+        return isLoggedIn;
+    }
+
     public void logout() {
         try {
+            isLoggedIn = false;
             user.setStatus("Offline");
             user.setActive(false);
             outputStream.writeObject("logout");
