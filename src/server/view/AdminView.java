@@ -1,5 +1,6 @@
 package server.view;
 
+import client.view.ClientView;
 import client.view.HintJTextField;
 import client.view.HintTextField;
 import common.ChatRoomModel;
@@ -21,9 +22,9 @@ import java.util.List;
 public class AdminView extends JFrame {
 
     static Font headingFont = new Font("Calibri", Font.PLAIN, 20);
+    public ContactsPanel contactsPanel;
     JPanel mainPanel;
-    //Changes: Jpanel -> MembersPanel
-    ContactsPanel contactsPanel;
+    // Changes: Jpanel -> MembersPanel
     MembersPanel membersPanel;
     ChatPanel chatPanel;
     JMenuBar menuBar;
@@ -47,7 +48,7 @@ public class AdminView extends JFrame {
         mainPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         this.add(mainPanel);
         this.setJMenuBar(menuBar);
-        this.setTitle("Admin");
+        this.setTitle(user.getUsername());
         this.pack();
         this.setLocationRelativeTo(null);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -119,10 +120,6 @@ public class AdminView extends JFrame {
         }
     }
 
-    public void setRoom(String roomName) {
-
-    }
-
     public void updateContacts(UserModel users) {
         mainPanel.remove(contactsPanel);
         contactsPanel = new ContactsPanel(users);
@@ -140,6 +137,7 @@ public class AdminView extends JFrame {
         mainPanel.add(chatPanel, BorderLayout.CENTER);
         mainPanel.revalidate();
     }
+
 
     public void setMemberButtonsActionListener(ActionListener listener) {
         membersPanel.setMemberButtonsActionListener(listener);
@@ -205,6 +203,14 @@ public class AdminView extends JFrame {
         contactsPanel.revalidate();
     }
 
+    /**
+     * Outputs dialog box stating user does not have proper permissions.
+     */
+    public void noPermsMsg() {
+        JOptionPane.showMessageDialog(null,
+                "You do not have permission to use this feature.");
+    }
+
     public void promptErrorChangeUser() {
         JOptionPane.showMessageDialog(this.getContentPane(), "Username is fixed for Admin", "Error",
                 JOptionPane.ERROR_MESSAGE);
@@ -236,6 +242,7 @@ public class AdminView extends JFrame {
 
     /*---------- INNER CLASSES ----------*/
 
+    /*ChatPanel Class*/
     class ChatPanel extends JPanel {
         public JTextField messageTextArea;
         JLabel roomName;
@@ -271,10 +278,6 @@ public class AdminView extends JFrame {
             this.revalidate();
         }
 
-        public void setKickButtonActionListener(ActionListener listener) {
-            membersPanel.kickButton.addActionListener(listener);
-        }
-
         public void addText(JTextPane pane, String text) {
             StyledDocument doc = pane.getStyledDocument();
 
@@ -304,12 +307,14 @@ public class AdminView extends JFrame {
         }
     }
 
+    /*ContactsPanel Class*/
     class ContactsPanel extends JPanel {
         JPanel panel;
         List<ContactButton> buttons;
         TextField searchBar;
         JScrollPane scrollPane;
         ContactButton publicChatButton;
+
 
         public ContactsPanel(UserModel user) {
             JLabel contactsLabel = new JLabel("Contacts", SwingConstants.CENTER);
@@ -345,7 +350,7 @@ public class AdminView extends JFrame {
 
             this.setLayout(new BorderLayout());
             this.add(contactsLabel, BorderLayout.NORTH);
-            this.add(new JScrollPane(panel), BorderLayout.CENTER);
+            this.add(scrollPane, BorderLayout.CENTER);
             this.add(searchBar, BorderLayout.SOUTH);
             this.setMinimumSize(new Dimension(200, 500));
             this.setPreferredSize(new Dimension(200, 500));
@@ -420,12 +425,12 @@ public class AdminView extends JFrame {
                 imageIcon = new ImageIcon(scaledImage);
                 this.setIcon(imageIcon);
                 this.setHorizontalAlignment(SwingConstants.LEFT);
-                //this.setBackground(Color.WHITE);
                 if (!isBookmarked) {
                     this.setBackground(Color.WHITE);
                 } else {
                     this.setBackground(Color.LIGHT_GRAY);
                 }
+
             }
 
             public ContactsPopupMenu getPopupMenu() {
@@ -435,9 +440,8 @@ public class AdminView extends JFrame {
             public void setBookmarked(Boolean bookmarked) {
                 isBookmarked = bookmarked;
             }
-
-        } //end of ContactButton
-    } //end of ContactsPanel
+        }
+    }//END OF CONTACTS PANEL
 
     /*MembersPanel Class*/
     class MembersPanel extends JPanel {
@@ -448,18 +452,11 @@ public class AdminView extends JFrame {
         TextField searchBar;
         UserModel user;
 
-        public MembersPanel(UserModel user, ChatRoomModel publicChat) {
+        public MembersPanel(UserModel user, ChatRoomModel chatRoom) {
             this.user = user;
             searchBar = new HintTextField("Search Members");
             searchBar.setPreferredSize(new Dimension(200, 25));
-            fillButtons(publicChat.getUsers());
-
-            /*panel = new JPanel();
-            panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-            memberButtons = new ArrayList<>();
-             */
-            // scrollPane = new JScrollPane(panel);
-            scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+            fillButtons(chatRoom.getUsers());
 
             settingsPanel = new JPanel(new GridLayout());
             addButton = new JButton(AdminView.scaleIcon("res/graphics/add-user.png"));
@@ -472,11 +469,7 @@ public class AdminView extends JFrame {
             settingsPanel.add(kickButton);
             settingsPanel.add(settingsButton);
             settingsPanel.setPreferredSize(new Dimension(200, 35));
-            /* if(!user.getUsername().equals(publicChat.getAdmin())){
-               kickButton.setVisible(false);
-            }
-             */
-            updateSettingsPanel(publicChat);
+            updateSettingsPanel(chatRoom);
 
             this.setLayout(new BorderLayout());
             this.setBackground(Color.GREEN);
@@ -489,15 +482,8 @@ public class AdminView extends JFrame {
         }
 
         public void updateSettingsPanel(ChatRoomModel chatRoom) {
-            if (user.getUsername().equals(chatRoom.getAdmin())) {
-                System.out.println("User is admin");
-                kickButton.setVisible(true);
-                settingsPanel.revalidate();
-            } else {
-                System.out.println("User is not admin");
-                kickButton.setVisible(false);
-                settingsPanel.revalidate();
-            }
+            kickButton.setVisible(user.getUsername().equals(chatRoom.getAdmin()));
+            settingsPanel.revalidate();
         }
 
         public void clear() {
@@ -509,7 +495,7 @@ public class AdminView extends JFrame {
             panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
             memberButtons = new ArrayList<>();
             for (UserModel u : users) {
-                MembersPanel.MemberButton button = new MembersPanel.MemberButton(u.getUsername(), u.getStatus());
+                MemberButton button = new MemberButton(u.getUsername(), u.getStatus());
                 memberButtons.add(button);
                 panel.add(button);
             }
@@ -525,7 +511,7 @@ public class AdminView extends JFrame {
             memberButtons = new ArrayList<>();
             for (UserModel u : chatRoom.getUsers()) {
                 if (u.getUsername().contains(username)) {
-                    MembersPanel.MemberButton button = new MembersPanel.MemberButton(u.getUsername(), u.getStatus());
+                    MemberButton button = new MemberButton(u.getUsername(), u.getStatus());
                     memberButtons.add(button);
                     panel.add(button);
                 }
@@ -592,8 +578,15 @@ public class AdminView extends JFrame {
 
                 popupMenu = new MemberPopupMenu();
                 this.setComponentPopupMenu(popupMenu);
+                switch (status) {
+                    case "Online" -> imageIcon = new ImageIcon("res/graphics/active-user.png");
+                    case "Offline", "Invisible" -> imageIcon = new ImageIcon("res/graphics/user.png");
+                    case "Away from keyboard" -> imageIcon = new ImageIcon("res/graphics/afk-user.png");
+                    case "Busy" -> imageIcon = new ImageIcon("res/graphics/busy-user.png");
+                    case "Do not disturb" -> imageIcon = new ImageIcon("res/graphics/dont disturb-user.png");
+                    case "Idle" -> imageIcon = new ImageIcon("res/graphics/idle-user.png");
+                }
 
-                imageIcon = new ImageIcon("res/graphics/user.png");
 
                 Image image = imageIcon.getImage();
                 Image scaledImage = image.getScaledInstance(30, 30, java.awt.Image.SCALE_SMOOTH);
@@ -608,9 +601,9 @@ public class AdminView extends JFrame {
             }
         }
 
-    }
+    }//END OF MEMBERS PANEL
 
-    /*MemberPopupMenu Class*/
+/*MemberPopupMenu Class*/
     class MemberPopupMenu extends JPopupMenu {
         JMenuItem add;
 

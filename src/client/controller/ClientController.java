@@ -141,9 +141,7 @@ public class ClientController implements Runnable {
                 try {
                     if (clientModel.isAdmin(clientModel.getUser())) {
                         String username = kickUserView.getSelected();
-                        UserModel roomMember = clientModel.getCurrentRoom().searchUser(username);
-                        clientModel.getCurrentRoom().kickUser(roomMember);
-                        clientView.kickMember(roomMember);
+                        clientModel.kickContactFromRoom(username, clientModel.getCurrentRoom().getName());
                         kickUserView.successMessage();
                     } else {
                         clientView.noPermsMsg();
@@ -244,6 +242,7 @@ public class ClientController implements Runnable {
                     } else if (event.equals("update chat rooms")) {
                         clientModel.updateChatRooms();
                         clientView.updateContacts(clientModel.getUser());
+                        clientView.updateRoom(clientModel.getCurrentRoom());
 
                         // Re-set action listeners
                         clientView.setContactButtonsActionListener(new ContactButtonActionListener());

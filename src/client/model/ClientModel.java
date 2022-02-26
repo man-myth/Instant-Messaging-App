@@ -124,7 +124,15 @@ public class ClientModel {
         } catch (ClassNotFoundException | IOException e) {
             e.printStackTrace();
         }
+
         user.setChatRooms(newChatRoomList);
+
+        // Update current room
+        for (ChatRoomModel room : newChatRoomList) {
+            if (room.getName().equals(currentRoom.getName())) {
+                currentRoom = room;
+            }
+        }
     }
 
     public void updateContacts() {
@@ -218,6 +226,16 @@ public class ClientModel {
         try {
             outputStream.writeObject("add contact to room");
             outputStream.writeObject(newMember);
+            outputStream.writeObject(roomName);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void kickContactFromRoom(String username, String roomName) {
+        try {
+            outputStream.writeObject("kick contact from room");
+            outputStream.writeObject(username);
             outputStream.writeObject(roomName);
         } catch (IOException e) {
             e.printStackTrace();

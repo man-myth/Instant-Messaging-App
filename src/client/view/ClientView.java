@@ -315,7 +315,8 @@ public class ClientView extends JFrame {
             contactsLabel.setFont(ClientView.headingFont);
             List<ChatRoomModel> rooms = user.getChatRooms();
             List<ChatRoomModel> bookmarkedRooms = user.getBookmarks();
-
+            List<MessageModel> unreadMessages = user.getUnreadMessages();
+            System.out.println("Unread messages: " + unreadMessages.size());
             panel = new JPanel();
             panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
             publicChatButton = new ContactButton("Public Chat", false, true);
@@ -324,14 +325,40 @@ public class ClientView extends JFrame {
             panel.add(publicChatButton);
 
             for (ChatRoomModel bookmarkedRoom : bookmarkedRooms) {
-                ContactButton button = new ContactButton(bookmarkedRoom.getName(), false, true);
+                ContactButton button = null;
+                for (MessageModel message : unreadMessages) {
+                    if (message.getReceiver().getAdmin() != "") {
+                        if (message.getSender().getUsername().equals(bookmarkedRoom.getName())) {
+                            button = new ContactButton(bookmarkedRoom.getName(), true, true);
+                        }
+                    } else if (message.getReceiver().getName().equals(bookmarkedRoom.getName())) {
+                        button = new ContactButton(bookmarkedRoom.getName(), true, true);
+                    }
+                }
+
+                if (button == null) {
+                    button = new ContactButton(bookmarkedRoom.getName(), false, true);
+                }
                 buttons.add(button);
                 panel.add(button);
-
             }
             for (ChatRoomModel room : rooms) {
                 if (!bookmarkedRooms.contains(room)) {
-                    ContactButton button = new ContactButton(room.getName(), false, false);
+                    ContactButton button = null;
+                    for (MessageModel message : unreadMessages) {
+                        if (message.getReceiver().getAdmin() != "") {
+                            if (message.getSender().getUsername().equals(room.getName())) {
+                                button = new ContactButton(room.getName(), true, false);
+                            }
+                        } else if (message.getReceiver().getName().equals(room.getName())) {
+                            button = new ContactButton(room.getName(), true, false);
+                        }
+
+                    }
+
+                    if (button == null) {
+                        button = new ContactButton(room.getName(), false, false);
+                    }
                     buttons.add(button);
                     panel.add(button);
                 }
@@ -476,13 +503,8 @@ public class ClientView extends JFrame {
         }
 
         public void updateSettingsPanel(ChatRoomModel chatRoom) {
-            if (user.getUsername().equals(chatRoom.getAdmin())) {
-                kickButton.setVisible(true);
-                settingsPanel.revalidate();
-            } else {
-                kickButton.setVisible(false);
-                settingsPanel.revalidate();
-            }
+            kickButton.setVisible(user.getUsername().equals(chatRoom.getAdmin()));
+            settingsPanel.revalidate();
         }
 
         public void clear() {
