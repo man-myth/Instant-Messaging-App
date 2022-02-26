@@ -1,5 +1,6 @@
 package server.controller;
 
+import client.controller.ClientController;
 import client.controller.LoginController;
 import client.view.AddContactToRoomView;
 import client.view.ExitOnCloseAdapter;
@@ -65,129 +66,40 @@ public class AdminController implements Runnable {
         adminModel.changeStatus("Online");
         adminModel.readAllStatus();
 
-        //- settings actions
-        adminView.settingsButtonListener(e -> {
-            //asking new username listener
-            settingsView = new SettingsView();
-            settingsView.changeNameActionListener(e1 -> {
-                adminView.promptErrorChangeUser(); // admin cannot access the AskNewName class from SettingsView, prompt error
+        //settings listener
+        adminView.settingsButtonListener(new SettingsListener());
 
-            });
+        //adding of contact to a room listener
+        adminView.setAddButtonActionListener(new AddToRoomButtonListener());
 
-            //asking new password listener
-            settingsView.changePassActionListener(e2 -> {
-                newPass = new SettingsView.AskNewPass(); // access the AskNewPass class from SettingsView
-                newPass.changeListener(f -> { // action listener for the button in AskNewPass
-                    String enteredPass = newPass.getPass();
-                    String reEnteredPass = newPass.getRePass();
-                    boolean isPassValid = adminModel.isPassValid(enteredPass, reEnteredPass); // checks if passwords match
-                    newPass.promptError(isPassValid); // prompt an error if passwords do not match
-                    adminModel.changePassword(enteredPass, isPassValid); // else, change password
-                    currentRoom.searchUser(adminModel.getUser().getUsername()).setPassword(enteredPass);
-                    newPass.changeSuccess(isPassValid);
-                });
-            });
+        //kick user from the room listener
+        adminView.setKickButtonActionListener(new KickButtonListener());
 
-
-            //set status listener
-            settingsView.changeStatusActionListener(new SetStatusListener());
-            settingsView.helpActionListener(e3 -> {
-                helpModule = new SettingsView.HelpModule();
-            });
-            //help module display
-        });
-
-
-        //- adding of contact to a room actions
-        adminView.setAddButtonActionListener(e -> {
-            /*
-             * once the add button to room is clicked,
-             * get the contacts of the user and put it in the combo box view
-             */
-            String[] contactArray = adminModel.listToStringArrayAdd(adminModel.getUser().getContacts());
-            addToRoomView = new AddContactToRoomView(contactArray);
-
-            // calls the addContactToRoom method from client model if add button is clicked
-            addToRoomView.setAddButtonActionListener(e1 -> {
-                try {
-                    String username = addToRoomView.getSelected();
-                    UserModel newMember = adminModel.getUser().searchUserInContact(username);
-                    boolean isUserHere = currentRoom.isUserHere(username);
-                    if (isUserHere)
-                        addToRoomView.errorUserIsHere();
-                    else {
-                        currentRoom.addUser(newMember);
-                        adminView.addNewMember(newMember);
-                        addToRoomView.successMessage();
-                    }
-                } catch (NullPointerException error) {
-                    addToRoomView.errorInvalidAction();
-                }
-            });
-        });
-
-        //- kick user from the room actions
-        adminView.setKickButtonActionListener(e2 -> {
-            String[] contactArray = adminModel.listToStringArrayAdd(currentRoom.getUsers());
-            kickUserView = new KickContactFromRoomView(contactArray);
-
-            kickUserView.setKickButtonActionListener(e1 -> {
-                try {
-                    String username = kickUserView.getSelected();
-                    UserModel roomMember = currentRoom.searchUser(username);
-                    currentRoom.kickUser(roomMember);
-                    adminView.kickMember(roomMember);
-                    kickUserView.successMessage();
-                } catch (NullPointerException error) {
-                    kickUserView.errorInvalidAction();
-                }
-            });
-        });
-
-        //- broadcasting messages actions
-        /*
-        adminView.setMessageListener(e -> {
-            String message = adminView.getMessage();
-            MessageModel msg = new MessageModel(adminModel.getUser(), currentRoom, message, LocalTime.now(),
-                    LocalDate.now());
-            boolean doBroadcast = adminModel.broadcastMessage(message, msg);
-            if (doBroadcast) {
-                adminView.addMessage(msg);
-                adminView.clearTextArea();
-            }
-        });
-
-        // Set ActionListener for member button popup menu
-        adminView.setAddItemActionListener(e -> {
-            JMenuItem menuItem = (JMenuItem) e.getSource();
-            JPopupMenu popupMenu = (JPopupMenu) menuItem.getParent();
-            JButton invokerButton = (JButton) popupMenu.getInvoker();
-            String username = invokerButton.getText();
-            adminModel.addContact(username);
-        });
-         */
-        //- broadcasting messages actions
+        //broadcasting messages listener
         adminView.setMessageListener(new MessageListener());
 
-        // Set ActionListener for member button popup menu
+        //member button popup menu listener
         adminView.setAddItemActionListener(new AddContactListener());
 
-        // Set ActionListener for contact buttons
+        //contact buttons listener
         adminView.setContactButtonsActionListener(new ContactButtonActionListener());
 
         //members search bar text listener
         adminView.membersSearchActionListener(new MembersSearchTextListener());
 
-        //members search bar text listener
+        //contacts search bar text listener
         adminView.contactsSearchListener(new ContactsSearchListener());
 
-        // Set ActionListener for contact button popup menu
+        //bookmark button popup menu listener
         adminView.setBookmarkButtonActionListener(new AddBookmarkListener());
 
+        //remove bookmark button popup menu listener
         adminView.setRemoveBookmarkButtonActionListener(new RemoveBookmarkListener());
 
+        //bookmark contact popup menu listener
         adminView.setRemoveContactButtonActionListener(new RemoveContactListener());
 
+        //logout listener
         adminView.setLogOutListener(new LogOutListener());
 
         // Separate thread for GUI
@@ -196,12 +108,15 @@ public class AdminController implements Runnable {
         // Thread for receiving responses from the server
         new Thread(() -> {
             try {
-                while (true) {
+                while (adminModel.isLoggedIn()) {
                     String event = adminModel.getEvent();
-                    System.out.println(event);
+                    System.out.println("Event: " + event);
                     if (event.equals("broadcast")) { // do this if event = "broadcast"
                         MessageModel message = adminModel.getMessageFromStream();
-                        adminView.addMessage(message);
+                        if (adminModel.getCurrentRoom().getName().equalsIgnoreCase("Public Chat")) {
+                            adminView.addMessage(message);
+                        }
+
                     } else if (event.equals("contact added")) { // do this if event = "contact added"
                         adminModel.updateChatRooms();
                         adminModel.updateContacts();
@@ -212,11 +127,10 @@ public class AdminController implements Runnable {
                         adminView.setRemoveBookmarkButtonActionListener(new RemoveBookmarkListener());
                         adminView.setRemoveContactButtonActionListener(new RemoveContactListener());
                         adminView.contactsSearchListener(new ContactsSearchListener());
-                        // System.out.println(adminModel.getUser().getContacts());
 
                     } else if (event.equals("adding self")) {
                         adminView.showErrorMessage("You are adding yourself!");
-                    } else if (event.equals("contact updated")) { // do this if event = "contact added"
+                    } else if (event.equals("contact updated")) { // do this if event = "contact added/removed"
                         adminModel.updateUser();
                         adminView.updateContacts(adminModel.getUser());
 
@@ -261,38 +175,158 @@ public class AdminController implements Runnable {
                     } else if (event.equals("update status view")) {
                         String status = adminModel.getUsernameStatusStream();
                         String username = adminModel.getUsernameStatusStream();
-                        adminModel.getCurrentRoom().searchUser(username).setStatus(status);
-                        adminModel.getUser().setStatus(status);
-                        adminView.setStatusImage(username, status);
+                        if (adminModel.getCurrentRoom().isUserHere(username)) {
+                            adminModel.getCurrentRoom().searchUser(username).setStatus(status);
+                            adminModel.getUser().setStatus(status);
+                            adminView.setStatusImage(username, status);
+                        }
                     }
                 }
             } catch (Exception e) {
-                System.out.println(socket + "has disconnected.");
-                //e.printStackTrace();
+                //System.out.println(socket + "has disconnected.");
+                e.printStackTrace();
             }
         }).start();
 
     }//end of run() thread
 
-    //remove?
-    public void receiveMessage(MessageModel message) {
-        adminView.addMessage(message);
+    class SettingsListener implements ActionListener{
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            //asking new username listener
+            settingsView = new SettingsView();
+            settingsView.changeNameActionListener(e1 -> adminView.promptErrorChangeUser());
+
+            //asking new password listener
+            settingsView.changePassActionListener(e2 -> {
+                newPass = new SettingsView.AskNewPass(); // access the AskNewPass class from SettingsView
+                newPass.changeListener(f -> { // action listener for the button in AskNewPass
+                    String enteredPass = newPass.getPass();
+                    String reEnteredPass = newPass.getRePass();
+                    boolean isPassValid = adminModel.isPassValid(enteredPass, reEnteredPass); // checks if passwords match
+                    newPass.promptError(isPassValid); // prompt an error if passwords do not match
+                    adminModel.changePassword(enteredPass, isPassValid); // else, change password
+                    newPass.changeSuccess(isPassValid);
+                });
+            });
+
+
+            //set status listener
+            settingsView.changeStatusActionListener(new SetStatusListener());
+
+            //help module display
+            settingsView.helpActionListener(e3 -> {
+                helpModule = new SettingsView.HelpModule(); // access the HelpModule class from SettingsView
+
+            });
+        }
     }
 
-    public void broadcastMessage() {
-        String message = adminView.getMessage();
-        if (message.isEmpty()) {
-            return;
+    class SetStatusListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            String currStatus = adminModel.getUser().getStatus();
+            String username = adminModel.getUser().getUsername();
+            statusView = new SettingsView.StatusView();
+            statusView.setCurrentStatus(currStatus);
+            statusView.online.addActionListener(b -> {
+                adminModel.getUser().setStatus("Online");
+                adminModel.changeStatus("Online"); //change status in server side
+                statusView.setLabelOnline();
+            });
+
+            statusView.offline.addActionListener(b2 -> {
+                adminModel.getUser().setStatus("Offline");
+                adminModel.changeStatus("Offline"); //change status in server side
+                statusView.setLabelOffline();
+            });
+
+            statusView.afk.addActionListener(b2 -> {
+                adminModel.getUser().setStatus("Away from keyboard");
+                adminModel.changeStatus("Away from keyboard"); //change status in server side
+                statusView.setLabelAFK();
+            });
+
+            statusView.busy.addActionListener(b2 -> {
+                adminModel.getUser().setStatus("Busy");
+                adminModel.changeStatus("Busy"); //change status in server side
+                statusView.setLabelBusy();
+            });
+
+            statusView.disturb.addActionListener(b2 -> {
+                adminModel.getUser().setStatus("Do not disturb");
+                adminModel.changeStatus("Do not disturb"); //change status in server side
+                statusView.setLabelDisturb();
+            });
+
+            statusView.idle.addActionListener(b2 -> {
+                adminModel.getUser().setStatus("Idle");
+                adminModel.changeStatus("Idle"); //change status in server side
+                statusView.setLabelIdle();
+            });
+
+            statusView.invi.addActionListener(b2 -> {
+                adminModel.getUser().setStatus("Invisible");
+                adminModel.changeStatus("Invisible"); //change status in server side
+                statusView.setLabelInvi();
+            });
         }
-        try {
-            outputStream.writeObject("broadcast");
-            MessageModel msg = new MessageModel(adminModel.getUser(), currentRoom, message, LocalTime.now(), LocalDate.now());
-            outputStream.writeObject(msg);
-            adminView.addMessage(msg);
-        } catch (IOException ex) {
-            ex.printStackTrace();
+    }
+
+    class AddToRoomButtonListener implements ActionListener{
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            /*
+             * once the add button to room is clicked,
+             * get the contacts of the user and put it in the combo box view
+             */
+            String[] contactArray = adminModel.listToStringArrayAdd(adminModel.getUser().getContacts());
+            addToRoomView = new AddContactToRoomView(contactArray);
+
+            // calls the addContactToRoom method from client model if add button is clicked
+            addToRoomView.setAddButtonActionListener(e1 -> {
+                try {
+                    String username = addToRoomView.getSelected();
+                    UserModel newMember = adminModel.getUser().searchUserInContact(username);
+                    boolean isUserHere = adminModel.getCurrentRoom().isUserHere(username);
+                    if (isUserHere)
+                        addToRoomView.errorUserIsHere();
+                    else {
+                        adminModel.addContactToRoom(newMember, adminModel.getCurrentRoom().getName());
+                        if (!adminModel.getCurrentRoom().getAdmin().equals("")) {
+                            addToRoomView.successMessage();
+                        }
+                    }
+                } catch (NullPointerException error) {
+                    addToRoomView.errorInvalidAction();
+                }
+            });
         }
-        adminView.clearTextArea();
+    }
+
+    class KickButtonListener implements ActionListener{
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            String[] contactArray = adminModel.listToStringArrayAdd(adminModel.getCurrentRoom().getUsers());
+            kickUserView = new KickContactFromRoomView(contactArray);
+
+            kickUserView.setKickButtonActionListener(e1 -> {
+                try {
+                    if (adminModel.isAdmin(adminModel.getUser())) {
+                        String username = kickUserView.getSelected();
+                        UserModel roomMember = adminModel.getCurrentRoom().searchUser(username);
+                        adminModel.getCurrentRoom().kickUser(roomMember);
+                        adminView.kickMember(roomMember);
+                        kickUserView.successMessage();
+                    } else {
+                        adminView.noPermsMsg();
+                    }
+
+                } catch (NullPointerException error) {
+                    kickUserView.errorInvalidAction();
+                }
+            });
+        }
     }
 
     class MembersSearchTextListener implements TextListener {
@@ -405,56 +439,6 @@ public class AdminController implements Runnable {
             adminModel.logout();
             adminView.dispose();
             new LoginController(socket, outputStream, inputStream).run();
-        }
-    }
-
-    class SetStatusListener implements ActionListener {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            String currStatus = adminModel.getUser().getStatus();
-            statusView = new SettingsView.StatusView();
-            statusView.setCurrentStatus(currStatus);
-            statusView.online.addActionListener(b -> {
-                adminModel.getUser().setStatus("Online");
-                adminModel.changeStatus("Online"); // change status in server side
-                statusView.setLabelOnline();
-            });
-
-            statusView.offline.addActionListener(b2 -> {
-                adminModel.getUser().setStatus("Offline");
-                adminModel.changeStatus("Offline"); // change status in server side
-                statusView.setLabelOffline();
-            });
-
-            statusView.afk.addActionListener(b2 -> {
-                adminModel.getUser().setStatus("Away from keyboard");
-                adminModel.changeStatus("Away from keyboard"); // change status in server side
-                statusView.setLabelAFK();
-            });
-
-            statusView.busy.addActionListener(b2 -> {
-                adminModel.getUser().setStatus("Busy");
-                adminModel.changeStatus("Busy"); // change status in server side
-                statusView.setLabelBusy();
-            });
-
-            statusView.disturb.addActionListener(b2 -> {
-                adminModel.getUser().setStatus("Do not disturb");
-                adminModel.changeStatus("Do not disturb"); // change status in server side
-                statusView.setLabelDisturb();
-            });
-
-            statusView.idle.addActionListener(b2 -> {
-                adminModel.getUser().setStatus("Idle");
-                adminModel.changeStatus("Idle"); // change status in server side
-                statusView.setLabelIdle();
-            });
-
-            statusView.invi.addActionListener(b2 -> {
-                adminModel.getUser().setStatus("Invisible");
-                adminModel.changeStatus("Invisible"); // change status in server side
-                statusView.setLabelInvi();
-            });
         }
     }
 }// END OF ADMIN CONTROLLER
