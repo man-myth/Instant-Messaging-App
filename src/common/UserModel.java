@@ -3,6 +3,7 @@ package common;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 
 public class UserModel implements Serializable {
@@ -22,6 +23,7 @@ public class UserModel implements Serializable {
         this.contacts = new ArrayList<>();
         this.chatRooms = new ArrayList<>();
         this.bookmarks = new ArrayList<>();
+        this.unreadMessages = new ArrayList<>();
         this.isActive = false;
     }
 
@@ -94,6 +96,43 @@ public class UserModel implements Serializable {
 
         if (toRemove != null) {
             chatRooms.remove(toRemove);
+        }
+    }
+
+    public void addUnreadMessage(MessageModel message) {
+        unreadMessages.add(message);
+    }
+
+    public boolean roomHasUnreadMessage(String roomName) {
+        for (ChatRoomModel room : chatRooms) {
+            if (room.getName().equals(roomName)) {
+                for (MessageModel message : unreadMessages) {
+                    if (message.getReceiver().getAdmin() != "") {
+                        if (message.getSender().getUsername().equals(room.getName())) {
+                            return true;
+                        }
+                    } else if (message.getReceiver().getName().equals(room.getName())) {
+                        return true;
+                    }
+
+
+                }
+            }
+        }
+        return false;
+    }
+
+    public void clearUnreadMessagesFromRoom(String roomName) {
+        Iterator<MessageModel> i = unreadMessages.iterator();
+        while (i.hasNext()) {
+            MessageModel message = i.next();
+            if (message.getReceiver().getAdmin() != "") {
+                if (message.getSender().getUsername().equals(roomName)) {
+                    i.remove();
+                }
+            } else if (message.getReceiver().getName().equals(roomName)) {
+                i.remove();
+            }
         }
     }
 

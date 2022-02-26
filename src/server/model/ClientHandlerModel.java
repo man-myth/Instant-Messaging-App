@@ -40,6 +40,7 @@ public class ClientHandlerModel implements Runnable {
             while (true) {
                 String input = (String) inputStream.readObject();
                 System.out.println(input);
+
                 if (input.equals("login")) {
                     AuthenticatorController authenticate = new AuthenticatorController(inputStream, outputStream,
                             ServerModel.getRegisteredUsers());
@@ -117,10 +118,7 @@ public class ClientHandlerModel implements Runnable {
                         currentUser = getUserFromList(currentUser.getUsername());
 
                         outputStream.writeObject("contact updated");
-                        /*outputStream.writeObject(currentUser.getChatRooms());
-                        outputStream.writeObject(user);*/
                         outputStream.writeObject(currentUser);
-
 
                         // Update client view of new contact if new contact is logged in
                         for (ClientHandlerModel client : ServerModel.clients) {
@@ -158,7 +156,6 @@ public class ClientHandlerModel implements Runnable {
                     currentUser = getUserFromList(currentUser.getUsername());
                     outputStream.writeObject("contact updated");
                     outputStream.writeObject(currentUser);
-
                 } else if (input.equals("add bookmark")) {
                     String username = (String) inputStream.readObject();
                     System.out.println("adding " + username + " to bookmark");
@@ -183,7 +180,6 @@ public class ClientHandlerModel implements Runnable {
                         outputStream.writeObject("bookmark updated");
                         outputStream.writeObject(currentUser);
                     }
-
                 } else if (input.equals("remove bookmark")) {
                     String username = (String) inputStream.readObject();
                     System.out.println("removing " + username + " to bookmark");
@@ -206,10 +202,21 @@ public class ClientHandlerModel implements Runnable {
                     currentUser = getUserFromList(currentUser.getUsername());
                     outputStream.writeObject("bookmark updated");
                     outputStream.writeObject(currentUser);
-
                 } else if (input.equals("get room")) {
                     currentUser = getUserFromList(currentUser.getUsername());
                     String roomName = (String) inputStream.readObject();
+                    if (currentUser.roomHasUnreadMessage(roomName)) {
+                        currentUser.clearUnreadMessagesFromRoom(roomName);
+
+                        // Save data
+                        ServerModel.updateUser(currentUser.getUsername(), currentUser);
+                        Utility.exportUsersData(ServerModel.getRegisteredUsers());
+                        currentUser = getUserFromList(currentUser.getUsername());
+
+                        outputStream.writeObject("contact updated");
+                        outputStream.writeObject(currentUser);
+                    }
+
                     outputStream.writeObject("return room");
                     ChatRoomModel chatRoom = roomName.equals("Public Chat") ? ServerModel.getPublicChat() : getChatRoomFromList(currentUser, roomName);
                     System.out.println(chatRoom.getAdmin());
@@ -238,6 +245,10 @@ public class ClientHandlerModel implements Runnable {
                                 user.updateChatroom(senderChatRoom.getName(), senderChatRoom);
                             }
                             ServerModel.updateUser(user.getUsername(), user);
+                        }
+
+                        if (!user.isActive()) {
+                            user.addUnreadMessage(newMessage);
                         }
                     }
                     Utility.exportUsersData(ServerModel.getRegisteredUsers());
