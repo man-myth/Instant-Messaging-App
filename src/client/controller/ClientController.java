@@ -220,6 +220,7 @@ public class ClientController implements Runnable {
                         clientModel.updateUser();
                         System.out.println("updating contacts....");
                         clientView.updateContacts(clientModel.getUser());
+
                         // Re-set action listeners
                         clientView.setContactButtonsActionListener(new ContactButtonActionListener());
                         clientView.setBookmarkButtonActionListener(new AddBookmarkListener());
@@ -229,6 +230,19 @@ public class ClientController implements Runnable {
                     } else if (event.equals("return room")) {
                         clientModel.receiveRoom();
                         clientView.updateRoom(clientModel.getCurrentRoom());
+
+                        if (clientModel.getUser().roomHasUnreadMessage(clientModel.getCurrentRoom().getName())) {
+                            clientModel.updateUser();
+                            clientModel.getUser().clearUnreadMessagesFromRoom(clientModel.getCurrentRoom().getName());
+                            clientView.updateContacts(clientModel.getUser());
+
+                            // Re-set action listeners
+                            clientView.setContactButtonsActionListener(new ContactButtonActionListener());
+                            clientView.setBookmarkButtonActionListener(new AddBookmarkListener());
+                            clientView.setRemoveBookmarkButtonActionListener(new RemoveBookmarkListener());
+                            clientView.setRemoveContactButtonActionListener(new RemoveContactListener());
+                            clientView.contactsSearchListener(new ContactsSearchListener());
+                        }
 
                         // Re-set action listeners
                         clientView.setAddItemActionListener(new AddContactListener());
@@ -246,6 +260,10 @@ public class ClientController implements Runnable {
 
                         // Re-set action listeners
                         clientView.setContactButtonsActionListener(new ContactButtonActionListener());
+                        clientView.setBookmarkButtonActionListener(new AddBookmarkListener());
+                        clientView.setRemoveBookmarkButtonActionListener(new RemoveBookmarkListener());
+                        clientView.setRemoveContactButtonActionListener(new RemoveContactListener());
+                        clientView.contactsSearchListener(new ContactsSearchListener());
                     } else if (event.equals("get room name")) {
                         clientModel.writeString(clientView.getInput("Enter new room name."));
                         addToRoomView.successMessage();

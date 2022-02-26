@@ -317,6 +317,9 @@ public class ClientView extends JFrame {
             List<ChatRoomModel> bookmarkedRooms = user.getBookmarks();
             List<MessageModel> unreadMessages = user.getUnreadMessages();
             System.out.println("Unread messages: " + unreadMessages.size());
+            for (MessageModel model : unreadMessages) {
+                System.out.println(model.getContent());
+            }
             panel = new JPanel();
             panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
             publicChatButton = new ContactButton("Public Chat", false, true);
@@ -346,8 +349,9 @@ public class ClientView extends JFrame {
                 if (!bookmarkedRooms.contains(room)) {
                     ContactButton button = null;
                     for (MessageModel message : unreadMessages) {
-                        if (message.getReceiver().getAdmin() != "") {
+                        if (message.getReceiver().getAdmin().equals("")) {
                             if (message.getSender().getUsername().equals(room.getName())) {
+                                System.out.println("Helloo");
                                 button = new ContactButton(room.getName(), true, false);
                             }
                         } else if (message.getReceiver().getName().equals(room.getName())) {
