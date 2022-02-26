@@ -336,6 +336,52 @@ public class ClientHandlerModel implements Runnable {
                         }
                     }
 
+                } else if (input.equals("kick contact from room")) {
+                    UserModel kick = getUserFromList((String) inputStream.readObject());
+                    ChatRoomModel room = getChatRoomFromList(currentUser, (String) inputStream.readObject());
+                    room.kickUser(kick);
+
+                    kick.removeChatRoom(room);
+                    ServerModel.updateUser(kick.getUsername(), kick);
+
+                    currentUser.updateChatroom(room.getName(), room);
+                    // Kick user from other members as well
+                    for (UserModel user : room.getUsers()) {
+                        if (user.getUsername().equals(currentUser.getUsername()) || user.getUsername().equals(kick.getUsername())) {
+                            continue;
+                        }
+                        user.updateChatroom(room.getName(), room);
+                        ServerModel.updateUser(user.getUsername(), user);
+                    }
+
+                    // Save .dat file
+                    ServerModel.updateUser(currentUser.getUsername(), currentUser);
+                    Utility.exportUsersData(ServerModel.getRegisteredUsers());
+                    ServerModel.setRegisteredUsers(Utility.readUsersData("res/data.dat"));
+                    currentUser = getUserFromList(currentUser.getUsername());
+
+                    outputStream.writeObject("update chat rooms");
+                    outputStream.writeObject(currentUser.getChatRooms());
+
+                    for (ClientHandlerModel client : ServerModel.clients) {
+                        if (client.currentUser == null || client.equals(this)) {
+                            continue;
+                        }
+                        if (kick.getUsername().equals(client.currentUser.getUsername())) {
+                            client.currentUser = getUserFromList(kick.getUsername());
+                            client.writeObject("update chat rooms");
+                            client.writeObject(client.currentUser.getChatRooms());
+                            break;
+                        }
+                        for (UserModel user : room.getUsers()) {
+                            if (user.getUsername().equals(client.currentUser.getUsername())) {
+                                client.currentUser = getUserFromList(user.getUsername());
+                                client.writeObject("update chat rooms");
+                                client.writeObject(client.currentUser.getChatRooms());
+                                break;
+                            }
+                        }
+                    }
                 } else if (input.equals("change status")) {
                     String status = (String) inputStream.readObject();
                     updateStatusToAll(status);
