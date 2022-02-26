@@ -322,7 +322,7 @@ public class ClientView extends JFrame {
             }
             panel = new JPanel();
             panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-            publicChatButton = new ContactButton("Public Chat", false, true);
+            publicChatButton = new ContactButton("Public Chat", false, true, true);
             buttons = new ArrayList<>();
             buttons.add(publicChatButton);
             panel.add(publicChatButton);
@@ -332,15 +332,15 @@ public class ClientView extends JFrame {
                 for (MessageModel message : unreadMessages) {
                     if (message.getReceiver().getAdmin() != "") {
                         if (message.getSender().getUsername().equals(bookmarkedRoom.getName())) {
-                            button = new ContactButton(bookmarkedRoom.getName(), true, true);
+                            button = new ContactButton(bookmarkedRoom.getName(), true, true, false);
                         }
                     } else if (message.getReceiver().getName().equals(bookmarkedRoom.getName())) {
-                        button = new ContactButton(bookmarkedRoom.getName(), true, true);
+                        button = new ContactButton(bookmarkedRoom.getName(), true, true, true);
                     }
                 }
 
                 if (button == null) {
-                    button = new ContactButton(bookmarkedRoom.getName(), false, true);
+                    button = new ContactButton(bookmarkedRoom.getName(), false, true, !bookmarkedRoom.getAdmin().equals(""));
                 }
                 buttons.add(button);
                 panel.add(button);
@@ -349,19 +349,19 @@ public class ClientView extends JFrame {
                 if (!bookmarkedRooms.contains(room)) {
                     ContactButton button = null;
                     for (MessageModel message : unreadMessages) {
+                        // If chat room is a private room
                         if (message.getReceiver().getAdmin().equals("")) {
                             if (message.getSender().getUsername().equals(room.getName())) {
-                                System.out.println("Helloo");
-                                button = new ContactButton(room.getName(), true, false);
+                                button = new ContactButton(room.getName(), true, false, false);
                             }
+                            // Else if room is a group chat
                         } else if (message.getReceiver().getName().equals(room.getName())) {
-                            button = new ContactButton(room.getName(), true, false);
+                            button = new ContactButton(room.getName(), true, false, true);
                         }
-
                     }
 
                     if (button == null) {
-                        button = new ContactButton(room.getName(), false, false);
+                        button = new ContactButton(room.getName(), false, false, !room.getAdmin().equals(""));
                     }
                     buttons.add(button);
                     panel.add(button);
@@ -433,14 +433,14 @@ public class ClientView extends JFrame {
             ContactsPopupMenu popupMenu;
             Boolean isBookmarked;
 
-            public ContactButton(String contactName, boolean hasUnread, boolean isBookmarked) {
+            public ContactButton(String contactName, boolean hasUnread, boolean isBookmarked, boolean isGroup) {
                 this.isBookmarked = isBookmarked;
                 this.setMaximumSize(new Dimension(Integer.MAX_VALUE, 35));
                 this.setText(contactName);
                 if (hasUnread) {
-                    imageIcon = new ImageIcon("res/graphics/has-unread.png");
+                    imageIcon = isGroup ? new ImageIcon("res/graphics/has-unread-group.png") : new ImageIcon("res/graphics/has-unread.png");
                 } else {
-                    imageIcon = new ImageIcon("res/graphics/user.png");
+                    imageIcon = isGroup ? new ImageIcon("res/graphics/group.png") : new ImageIcon("res/graphics/user.png");
                 }
                 popupMenu = new ContactsPopupMenu();
                 this.setComponentPopupMenu(popupMenu);
