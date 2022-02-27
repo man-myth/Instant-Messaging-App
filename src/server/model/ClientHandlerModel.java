@@ -96,6 +96,10 @@ public class ClientHandlerModel implements Runnable {
                         outputStream.writeObject("adding self");
                     }
 
+                    if(currentUser.hasContact(username)){
+                        outputStream.writeObject("already has contact");
+                    }
+
                     // Run if user is not null and user is not yet a contact of current user
                     if (user != null && !currentUser.hasContact(username) && !addingSelf) {
                         // Contains initial list of chat room members
@@ -132,7 +136,8 @@ public class ClientHandlerModel implements Runnable {
                                 client.currentUser = getUserFromList(user.getUsername());
                                 client.writeObject("contact updated");
                                 client.writeObject(client.currentUser);
-                                client.writeObject(user);
+                                //client.writeObject(user);
+                                //changes: commented this ^ duplicate line of sending user to stream
                                 break;
                             }
                         }

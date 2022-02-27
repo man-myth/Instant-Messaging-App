@@ -70,7 +70,7 @@ public class ClientController implements Runnable {
         //broadcasting messages listener
         clientView.setMessageListener(new MessageListener());
 
-        //member button popup menu listener
+        //add button popup menu listener
         clientView.setAddItemActionListener(new AddContactListener());
 
         //contact buttons listener
@@ -122,7 +122,9 @@ public class ClientController implements Runnable {
 
                     } else if (event.equals("adding self")) {
                         clientView.showErrorMessage("You are adding yourself!");
-                    } else if (event.equals("contact updated")) { // do this if event = "contact added/removed"
+                    } else if (event.equals("already has contact")){
+                        clientView.showErrorMessage("You already have a contact of that user");
+                    }else if (event.equals("contact updated")) { // do this if event = "contact added/removed"
                         clientModel.updateUser();
                         clientView.updateContacts(clientModel.getUser());
 
@@ -417,9 +419,8 @@ public class ClientController implements Runnable {
             JPopupMenu popupMenu = (JPopupMenu) menuItem.getParent();
             JButton invokerButton = (JButton) popupMenu.getInvoker();
             String username = invokerButton.getText();
-            UserModel newContact = clientModel.getCurrentRoom().searchUser(username);
             clientModel.addContact(username);
-            clientModel.getUser().getContacts().add(newContact);
+            //changes: removed duplicate add
 
         }
     }
