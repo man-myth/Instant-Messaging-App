@@ -211,19 +211,24 @@ public class ClientController implements Runnable {
             //asking new username listener
             settingsView = new SettingsView();
             settingsView.changeNameActionListener(e1 -> {
-                newName = new SettingsView.AskNewName(); // access the AskNewName class from SettingsView
-                newName.changeListener(f -> { // action listener for the button in AskNewNAme
-                    String enteredName = newName.getText();
-                    String oldName = clientModel.getUser().getUsername();
-                    boolean isChanged = clientModel.changeUsername(enteredName, oldName);
-                    if (isChanged) {
-                        clientView.changeUsername(oldName, enteredName); //change button text of username
-                        newName.changeSuccess(oldName, enteredName);
-                    } else {
-                        newName.promptError();
-                    }
-                });
+                if (clientModel.getUser().getUsername().equals("admin")){
+                    clientView.showErrorMessage("Admin's username is fixed.");
+                }else {
+                    newName = new SettingsView.AskNewName(); // access the AskNewName class from SettingsView
+                    newName.changeListener(f -> { // action listener for the button in AskNewNAme
+                        String enteredName = newName.getText();
+                        String oldName = clientModel.getUser().getUsername();
+                        boolean isChanged = clientModel.changeUsername(enteredName, oldName);
+                        if (isChanged) {
+                            clientView.changeUsername(oldName, enteredName); //change button text of username
+                            newName.changeSuccess(oldName, enteredName);
+                        } else {
+                            newName.promptError();
+                        }
+                    });
+                }
             });
+
 
             //asking new password listener
             settingsView.changePassActionListener(e2 -> {
