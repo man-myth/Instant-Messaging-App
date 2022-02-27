@@ -185,6 +185,13 @@ public class ClientModel {
         return user.getUsername().equals("admin") ||
                 user.getUsername().equals(currentRoom.getAdmin());
     }
+    public boolean isBookmarked(String username){
+       for(ChatRoomModel bookmarks: user.getBookmarks()){
+           if (username.equals(bookmarks.getName()))
+               return true;
+       }
+       return false;
+    }
 
     public void addBookmark(String username) {
         try {
