@@ -473,7 +473,7 @@ public class ClientController implements Runnable {
 
 
             if(clientModel.isBookmarked(username)) {
-                clientView.showErrorMessage("You aren't allowed to perform this action please try again.");
+                clientView.showErrorMessage("Please 'remove bookmark' first before removing contact.");
             } else
             clientModel.removeContact(username);
         }
