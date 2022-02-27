@@ -455,6 +455,11 @@ public class ClientController implements Runnable {
             JButton invokerButton = (JButton) popupMenu.getInvoker();
             String username = invokerButton.getText();
             System.out.println("remove " + username);
+
+
+            if(clientModel.isBookmarked(username)) {
+                clientView.showErrorMessage("You aren't allowed to perform this action please try again.");
+            } else
             clientModel.removeContact(username);
         }
     }
