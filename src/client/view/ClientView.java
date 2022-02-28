@@ -316,16 +316,13 @@ public class ClientView extends JFrame {
             List<ChatRoomModel> rooms = user.getChatRooms();
             List<ChatRoomModel> bookmarkedRooms = user.getBookmarks();
             List<MessageModel> unreadMessages = user.getUnreadMessages();
-            System.out.println("Unread messages: " + unreadMessages.size());
-            for (MessageModel model : unreadMessages) {
-                System.out.println(model.getContent());
-            }
+
             panel = new JPanel();
             panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-            publicChatButton = new ContactButton("Public Chat", false, true, true);
+            //publicChatButton = new ContactButton("Public Chat", false, true, true);
             buttons = new ArrayList<>();
-            buttons.add(publicChatButton);
-            panel.add(publicChatButton);
+            //buttons.add(publicChatButton);
+            //panel.add(publicChatButton);
 
             for (ChatRoomModel bookmarkedRoom : bookmarkedRooms) {
                 ContactButton button = null;
@@ -391,7 +388,7 @@ public class ClientView extends JFrame {
         public void fillContactButtonsSearch(List<ContactButton> contactButtons) {
             panel = new JPanel();
             panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-            panel.add(publicChatButton);
+            //panel.add(publicChatButton);
 
             for (ContactButton b : contactButtons) {
                 panel.add(b);
@@ -439,9 +436,12 @@ public class ClientView extends JFrame {
                 this.setText(contactName);
                 if (hasUnread) {
                     imageIcon = isGroup ? new ImageIcon("res/graphics/has-unread-group.png") : new ImageIcon("res/graphics/has-unread.png");
+                    this.setFont(this.getFont().deriveFont(Font.BOLD));
                 } else {
                     imageIcon = isGroup ? new ImageIcon("res/graphics/group.png") : new ImageIcon("res/graphics/user.png");
+                    this.setFont(this.getFont().deriveFont(Font.PLAIN));
                 }
+
                 popupMenu = new ContactsPopupMenu();
                 this.setComponentPopupMenu(popupMenu);
 

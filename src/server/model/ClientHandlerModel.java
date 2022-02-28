@@ -63,6 +63,7 @@ public class ClientHandlerModel implements Runnable {
                     String username = (String) inputStream.readObject();
                     String password = (String) inputStream.readObject();
                     UserModel newUser = new UserModel(username, password);
+                    newUser.addChatRoom(ServerModel.getPublicChat());
 
                     // if username already exists, prompt a message
                     if (ServerModel.doesUsernameExist(newUser.getUsername()))
@@ -72,6 +73,34 @@ public class ClientHandlerModel implements Runnable {
                         ServerModel.getPublicChat().addUser(newUser);
                         Utility.exportUsersData(ServerModel.getRegisteredUsers());
                         outputStream.writeObject("registered");
+
+                        for (UserModel user : ServerModel.getPublicChat().getUsers()) {
+                            if (user.getUsername().equals(currentUser.getUsername()) || user.getUsername().equals(newUser.getUsername())) {
+                                continue;
+                            }
+                            user = getUserFromList(user.getUsername());
+                            user.updateChatroom("Public Chat", ServerModel.getPublicChat());
+                            ServerModel.updateUser(user.getUsername(), user);
+                        }
+
+                        // Save .dat file
+                        Utility.exportUsersData(ServerModel.getRegisteredUsers());
+                        ServerModel.setRegisteredUsers(Utility.readUsersData("res/data.dat"));
+
+                        // Update view for users logged in
+                        for (ClientHandlerModel client : ServerModel.clients) {
+                            if (client.currentUser == null || client.equals(this)) {
+                                continue;
+                            }
+                            for (UserModel user : ServerModel.getPublicChat().getUsers()) {
+                                if (user.getUsername().equals(client.currentUser.getUsername())) {
+                                    client.currentUser = getUserFromList(user.getUsername());
+                                    client.writeObject("update chat rooms");
+                                    client.writeObject(client.currentUser.getChatRooms());
+                                    break;
+                                }
+                            }
+                        }
                     }
                 } else if (input.equals("broadcast")) {
                     ChatRoomModel publicChat = ServerModel.getPublicChat();
@@ -96,7 +125,7 @@ public class ClientHandlerModel implements Runnable {
                         outputStream.writeObject("adding self");
                     }
 
-                    if(currentUser.hasContact(username)){
+                    if (currentUser.hasContact(username)) {
                         outputStream.writeObject("already has contact");
                     }
 
@@ -215,7 +244,8 @@ public class ClientHandlerModel implements Runnable {
                     String roomName = (String) inputStream.readObject();
 
                     outputStream.writeObject("return room");
-                    ChatRoomModel chatRoom = roomName.equals("Public Chat") ? ServerModel.getPublicChat() : getChatRoomFromList(currentUser, roomName);
+                    // ChatRoomModel chatRoom = roomName.equals("Public Chat") ? ServerModel.getPublicChat() : getChatRoomFromList(currentUser, roomName);
+                    ChatRoomModel chatRoom = getChatRoomFromList(currentUser, roomName);
                     outputStream.writeObject(chatRoom);
 
                     if (currentUser.roomHasUnreadMessage(roomName)) {
@@ -358,7 +388,14 @@ public class ClientHandlerModel implements Runnable {
 
                 } else if (input.equals("kick contact from room")) {
                     UserModel kick = getUserFromList((String) inputStream.readObject());
-                    ChatRoomModel room = getChatRoomFromList(currentUser, (String) inputStream.readObject());
+                    String roomName = (String) inputStream.readObject();
+                    if (roomName.equals("Public Chat")) {
+                        ChatRoomModel publicChat = ServerModel.getPublicChat();
+                        publicChat.kickUser(kick);
+                        Utility.exportPublicChat(publicChat);
+                        ServerModel.setPublicChat(Utility.readPublicChat("res/publicChat.dat"));
+                    }
+                    ChatRoomModel room = getChatRoomFromList(currentUser, roomName);
                     room.kickUser(kick);
 
                     kick.removeChatRoom(room);
@@ -408,7 +445,7 @@ public class ClientHandlerModel implements Runnable {
 
                 } else if (input.equals("read all status")) {
                     for (ClientHandlerModel client : ServerModel.clients) {
-                        if (client == null || client.equals(this)) {
+                        if (client.currentUser == null || client.equals(this)) {
                             continue;
                         }
                         if (client.clientSocket.isClosed())
@@ -484,7 +521,7 @@ public class ClientHandlerModel implements Runnable {
         for (ClientHandlerModel client : ServerModel.clients) {
             //if socket is closed in the client, continue
             //if client is equal to this client, continue
-            if (client == null || client.equals(this) || client.clientSocket.isClosed()) {
+            if (client.currentUser == null || client.equals(this) || client.clientSocket.isClosed()) {
                 continue;
             }
             client.writeObject("update status view");
