@@ -46,10 +46,13 @@ public class ClientHandlerModel implements Runnable {
                             ServerModel.getRegisteredUsers());
                     String username = (String) inputStream.readObject();
                     String password = (String) inputStream.readObject();
-                    System.out.printf("Attempting to login with username:%s and password:%s\n", username, password);
+                    System.out.printf("[SERVER]: Attempting to login with username:%s and password:%s\n", username, password);
                     if (authenticate.isVerified(username, password)) {
                         outputStream.writeObject("VERIFIED");
                         currentUser = getUserFromList(username, password);
+                        currentUser.setActive(true);
+                        currentUser.setStatus("Online");
+                        ServerModel.updateUser(currentUser.getUsername(), currentUser);
                         writeObject(currentUser);
                         writeObject(ServerModel.getPublicChat());
                     } else {
@@ -93,6 +96,10 @@ public class ClientHandlerModel implements Runnable {
                         outputStream.writeObject("adding self");
                     }
 
+                    if(currentUser.hasContact(username)){
+                        outputStream.writeObject("already has contact");
+                    }
+
                     // Run if user is not null and user is not yet a contact of current user
                     if (user != null && !currentUser.hasContact(username) && !addingSelf) {
                         // Contains initial list of chat room members
@@ -129,7 +136,8 @@ public class ClientHandlerModel implements Runnable {
                                 client.currentUser = getUserFromList(user.getUsername());
                                 client.writeObject("contact updated");
                                 client.writeObject(client.currentUser);
-                                client.writeObject(user);
+                                //client.writeObject(user);
+                                //changes: commented this ^ duplicate line of sending user to stream
                                 break;
                             }
                         }
@@ -205,6 +213,11 @@ public class ClientHandlerModel implements Runnable {
                 } else if (input.equals("get room")) {
                     currentUser = getUserFromList(currentUser.getUsername());
                     String roomName = (String) inputStream.readObject();
+
+                    outputStream.writeObject("return room");
+                    ChatRoomModel chatRoom = roomName.equals("Public Chat") ? ServerModel.getPublicChat() : getChatRoomFromList(currentUser, roomName);
+                    outputStream.writeObject(chatRoom);
+
                     if (currentUser.roomHasUnreadMessage(roomName)) {
                         currentUser.clearUnreadMessagesFromRoom(roomName);
 
@@ -213,14 +226,8 @@ public class ClientHandlerModel implements Runnable {
                         Utility.exportUsersData(ServerModel.getRegisteredUsers());
                         currentUser = getUserFromList(currentUser.getUsername());
 
-                        outputStream.writeObject("contact updated");
                         outputStream.writeObject(currentUser);
                     }
-
-                    outputStream.writeObject("return room");
-                    ChatRoomModel chatRoom = roomName.equals("Public Chat") ? ServerModel.getPublicChat() : getChatRoomFromList(currentUser, roomName);
-                    System.out.println(chatRoom.getAdmin());
-                    outputStream.writeObject(chatRoom);
                 } else if (input.equals("send message")) {
                     currentUser = getUserFromList(currentUser.getUsername());
                     MessageModel newMessage = (MessageModel) inputStream.readObject();
@@ -236,7 +243,7 @@ public class ClientHandlerModel implements Runnable {
                     for (UserModel user : receivers) {
                         if (!user.getUsername().equals(currentUser.getUsername())) {
                             // If chat room is a private room
-                            if (senderChatRoom.getUsers().size() == 2) {
+                            if (senderChatRoom.getAdmin().equals("")) {
                                 ChatRoomModel receiverChatRoom = getChatRoomFromList(user, currentUser.getUsername());
                                 receiverChatRoom.setChatHistory(senderChatRoom.getChatHistory());
                                 user.updateChatroom(currentUser.getUsername(), receiverChatRoom);
@@ -244,11 +251,13 @@ public class ClientHandlerModel implements Runnable {
                             } else {
                                 user.updateChatroom(senderChatRoom.getName(), senderChatRoom);
                             }
-                            ServerModel.updateUser(user.getUsername(), user);
-                        }
 
-                        if (!user.isActive()) {
-                            user.addUnreadMessage(newMessage);
+                            if (!user.isActive()) {
+                                System.out.println("Added message: " + newMessage.getContent() + " to " + user.getUsername() + ", receiver: " + newMessage.getReceiver().getName());
+
+                                user.addUnreadMessage(newMessage);
+                            }
+                            ServerModel.updateUser(user.getUsername(), user);
                         }
                     }
                     Utility.exportUsersData(ServerModel.getRegisteredUsers());
@@ -399,7 +408,7 @@ public class ClientHandlerModel implements Runnable {
 
                 } else if (input.equals("read all status")) {
                     for (ClientHandlerModel client : ServerModel.clients) {
-                        if (client.equals(this)) {
+                        if (client == null || client.equals(this)) {
                             continue;
                         }
                         if (client.clientSocket.isClosed())
@@ -475,14 +484,13 @@ public class ClientHandlerModel implements Runnable {
         for (ClientHandlerModel client : ServerModel.clients) {
             //if socket is closed in the client, continue
             //if client is equal to this client, continue
-            if (client.equals(this) || client.clientSocket.isClosed()) {
+            if (client == null || client.equals(this) || client.clientSocket.isClosed()) {
                 continue;
             }
             client.writeObject("update status view");
             client.writeObject(status);
             client.writeObject(currentUser.getUsername());
         }
-        //removed utility methods
     }
 
     public UserModel getCurrentUser() {

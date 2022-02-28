@@ -107,15 +107,13 @@ public class UserModel implements Serializable {
         for (ChatRoomModel room : chatRooms) {
             if (room.getName().equals(roomName)) {
                 for (MessageModel message : unreadMessages) {
-                    if (message.getReceiver().getAdmin() != "") {
+                    if (message.getReceiver().getAdmin().equals("")) {
                         if (message.getSender().getUsername().equals(room.getName())) {
                             return true;
                         }
                     } else if (message.getReceiver().getName().equals(room.getName())) {
                         return true;
                     }
-
-
                 }
             }
         }
@@ -126,7 +124,7 @@ public class UserModel implements Serializable {
         Iterator<MessageModel> i = unreadMessages.iterator();
         while (i.hasNext()) {
             MessageModel message = i.next();
-            if (message.getReceiver().getAdmin() != "") {
+            if (message.getReceiver().getAdmin().equals("")) {
                 if (message.getSender().getUsername().equals(roomName)) {
                     i.remove();
                 }

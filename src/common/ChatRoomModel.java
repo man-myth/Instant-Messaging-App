@@ -64,15 +64,7 @@ public class ChatRoomModel implements Serializable {
 
     // removes the user from list of users
     public void kickUser(UserModel user) {
-        UserModel toKick = null;
-        for (UserModel u : users) {
-            if (user.getUsername().equals(u.getUsername())) {
-                toKick = u;
-            }
-        }
-        if (toKick != null) {
-            users.remove(toKick);
-        }
+        users.removeIf(u -> user.getUsername().equals(u.getUsername()));
     }
 
     // Setters
