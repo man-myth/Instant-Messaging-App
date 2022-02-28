@@ -185,6 +185,13 @@ public class ClientModel {
         return user.getUsername().equals("admin") ||
                 user.getUsername().equals(currentRoom.getAdmin());
     }
+    public boolean isBookmarked(String username){
+       for(ChatRoomModel bookmarks: user.getBookmarks()){
+           if (username.equals(bookmarks.getName()))
+               return true;
+       }
+       return false;
+    }
 
     public void addBookmark(String username) {
         try {
@@ -222,6 +229,9 @@ public class ClientModel {
         }
     }
 
+
+    /*--- ADDING/KICKING OF CONTACT TO CHAT ROOM MODEL ---*/
+
     public void addContactToRoom(UserModel newMember, String roomName) {
         try {
             outputStream.writeObject("add contact to room");
@@ -241,8 +251,6 @@ public class ClientModel {
             e.printStackTrace();
         }
     }
-
-    /*--- ADDING/KICKING OF CONTACT TO CHAT ROOM MODEL ---*/
 
     // takes the list of contacts and put their usernames in a String array
     // for combo box view

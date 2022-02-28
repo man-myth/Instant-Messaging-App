@@ -10,7 +10,7 @@ import java.util.List;
 
 public class UpdateDatFiles {
     public static void main(String[] args) {
-        List users = new ArrayList<>();
+        List<UserModel> users = new ArrayList<>();
         users.add(new UserModel("admin", "root"));
         users.add(new UserModel("user1", "pass1"));
         users.add(new UserModel("user2", "pass2"));
@@ -22,6 +22,12 @@ public class UpdateDatFiles {
         users.add(new UserModel("user8", "user8"));
         users.add(new UserModel("user9", "user9"));
         users.add(new UserModel("user10", "user10"));
+
+        //add all users to admin
+//        for(UserModel u: users){
+//            if(!u.getUsername().equals("admin"))
+//                users.get(0).getContacts().add(u);
+//        }
         Utility.exportUsersData(users);
         List<MessageModel> messages = new ArrayList<>();
         messages.add(new MessageModel(new UserModel("test", "test"), new ChatRoomModel("test", ""), "Hello!", LocalTime.now(), LocalDate.now()));
