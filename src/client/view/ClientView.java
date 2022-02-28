@@ -439,9 +439,12 @@ public class ClientView extends JFrame {
                 this.setText(contactName);
                 if (hasUnread) {
                     imageIcon = isGroup ? new ImageIcon("res/graphics/has-unread-group.png") : new ImageIcon("res/graphics/has-unread.png");
+                    this.setFont(this.getFont().deriveFont(Font.BOLD));
                 } else {
                     imageIcon = isGroup ? new ImageIcon("res/graphics/group.png") : new ImageIcon("res/graphics/user.png");
+                    this.setFont(this.getFont().deriveFont(Font.PLAIN));
                 }
+
                 popupMenu = new ContactsPopupMenu();
                 this.setComponentPopupMenu(popupMenu);
 
