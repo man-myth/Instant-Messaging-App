@@ -68,9 +68,11 @@ public class LoginController {
 //                                userModel, (ChatRoomModel) inputStream.readObject()).run();
 //                    }
 //                    else {
+                    if(!userModel.getStatus().equals("Suspended")) {
                         ClientController clientController = new ClientController(socket, inputStream,
                                 outputStream, userModel, (ChatRoomModel) inputStream.readObject());
                         clientController.run();
+                    }
                     //}
                 } catch (Exception ex) {
                     ex.printStackTrace();

@@ -27,8 +27,10 @@ public class ClientView extends JFrame {
     JMenuBar menuBar;
     JMenu menu;
     JMenuItem logOut;
+    UserModel user;
 
-    public ClientView(UserModel user, ChatRoomModel publicChat) {
+    public ClientView(UserModel u, ChatRoomModel publicChat) {
+        this.user = u;
         menuBar = new JMenuBar();
         menu = new JMenu("Menu");
         logOut = new JMenuItem("Log Out");
@@ -92,6 +94,11 @@ public class ClientView extends JFrame {
     public void setAddItemActionListener(ActionListener listener) {
         for (MembersPanel.MemberButton button : membersPanel.getMemberButtons()) {
             button.getPopupMenu().setAddItemActionListener(listener);
+        }
+    }
+    public void setRemoveUserActionListener(ActionListener listener) {
+        for (MembersPanel.MemberButton button : membersPanel.getMemberButtons()) {
+            button.getPopupMenu().setRemoveUserActionListener(listener);
         }
     }
 
@@ -601,7 +608,7 @@ public class ClientView extends JFrame {
                 this.setMaximumSize(new Dimension(200, 35));
                 this.setText(memberName);
 
-                popupMenu = new MemberPopupMenu();
+                popupMenu = new MemberPopupMenu(memberName);
                 this.setComponentPopupMenu(popupMenu);
                 switch (status) {
                     case "Online" -> imageIcon = new ImageIcon("res/graphics/active-user.png");
@@ -631,14 +638,22 @@ public class ClientView extends JFrame {
     /*MemberPopupMenu Class*/
     class MemberPopupMenu extends JPopupMenu {
         JMenuItem add;
+        JMenuItem remove;
 
-        public MemberPopupMenu() {
+        public MemberPopupMenu(String username) {
             add = new JMenuItem("Add contact");
+            remove = new JMenuItem("Suspend account");
             this.add(add);
+            if(user.getUsername().equals("admin")){
+                this.add(remove);
+            }
         }
 
         public void setAddItemActionListener(ActionListener listener) {
             add.addActionListener(listener);
+        }
+        public void setRemoveUserActionListener(ActionListener listener) {
+            remove.addActionListener(listener);
         }
     }
 

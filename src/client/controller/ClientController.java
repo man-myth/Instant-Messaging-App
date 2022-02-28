@@ -65,6 +65,9 @@ public class ClientController implements Runnable {
         //adding of contact to a room listener
         clientView.setAddButtonActionListener(new AddToRoomListener());
 
+        //removing a user from app
+        clientView.setRemoveUserActionListener(new RemoveUserListener());
+
         //kick user from the room listener
         clientView.setKickButtonActionListener(new KickFromRoomListener());
 
@@ -298,6 +301,7 @@ public class ClientController implements Runnable {
         }
     }
 
+
     class KickFromRoomListener implements ActionListener{
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -438,6 +442,16 @@ public class ClientController implements Runnable {
             String username = invokerButton.getText();
             clientModel.addContact(username);
             //changes: removed duplicate add
+        }
+    }
+    class RemoveUserListener implements ActionListener{
+        public void actionPerformed(ActionEvent e) {
+            JMenuItem menuItem = (JMenuItem) e.getSource();
+            JPopupMenu popupMenu = (JPopupMenu) menuItem.getParent();
+            JButton invokerButton = (JButton) popupMenu.getInvoker();
+            String username = invokerButton.getText();
+            System.out.println("delete " + username);
+            //clientModel.addContact(username);
         }
     }
 
