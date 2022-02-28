@@ -39,12 +39,12 @@ public class ClientController implements Runnable {
 
     // -Constructor
     public ClientController(Socket socket, ObjectInputStream inputStream, ObjectOutputStream outputStream,
-                            UserModel user, ChatRoomModel publicChat) {
+                            UserModel user, ChatRoomModel room) {
         this.socket = socket;
         this.outputStream = outputStream;
         this.inputStream = inputStream;
-        this.currentRoom = publicChat;
-        this.clientModel = new ClientModel(socket, inputStream, outputStream, user, publicChat);
+        this.currentRoom = room;
+        this.clientModel = new ClientModel(socket, inputStream, outputStream, user, room);
 
     }
 
@@ -182,6 +182,8 @@ public class ClientController implements Runnable {
                         clientView.setBookmarkButtonActionListener(new AddBookmarkListener());
                         clientView.setRemoveBookmarkButtonActionListener(new RemoveBookmarkListener());
                         clientView.setRemoveContactButtonActionListener(new RemoveContactListener());
+                        clientView.setAddItemActionListener(new AddContactListener());
+                        clientView.setMessageListener(new MessageListener());
                         clientView.contactsSearchListener(new ContactsSearchListener());
                     } else if (event.equals("get room name")) {
                         clientModel.writeString(clientView.getInput("Enter new room name."));
@@ -436,7 +438,6 @@ public class ClientController implements Runnable {
             String username = invokerButton.getText();
             clientModel.addContact(username);
             //changes: removed duplicate add
-
         }
     }
 
