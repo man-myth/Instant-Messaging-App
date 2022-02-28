@@ -118,10 +118,11 @@ public class ClientHandlerModel implements Runnable {
                 } else if (input.equals("broadcast")) {
                     ChatRoomModel publicChat = ServerModel.getPublicChat();
                     MessageModel newMessage = (MessageModel) inputStream.readObject();
-                    publicChat.getChatHistory().add(newMessage);
+                    ServerModel.getPublicChat().getChatHistory().add(newMessage); //changes: used ServerModel.getPublicChat() instead of variable publicChat
 
-                    Utility.exportPublicChat(publicChat);
+                    Utility.exportPublicChat(ServerModel.getPublicChat());
                     ServerModel.setPublicChat(Utility.readPublicChat("res/publicChat.dat"));
+                    currentUser.getChatRooms().set(0,ServerModel.getPublicChat()); //changes: update Public Chat of current user
 
                     for (ClientHandlerModel client : ServerModel.clients) {
                         if (client.equals(this)) {
@@ -129,6 +130,7 @@ public class ClientHandlerModel implements Runnable {
                         }
                         client.writeObject("broadcast");
                         client.writeObject(newMessage);
+                        client.currentUser.getChatRooms().set(0,ServerModel.getPublicChat()); //changes: update Public Chat of every currentUser in client
                     }
                 } else if (input.equals("add contact")) {
                     String username = (String) inputStream.readObject();
