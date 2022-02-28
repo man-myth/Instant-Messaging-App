@@ -24,16 +24,37 @@ public class UpdateDatFiles {
         users.add(new UserModel("user10", "user10"));
 
         //add all users to admin
-//        for(UserModel u: users){
-//            if(!u.getUsername().equals("admin"))
-//                users.get(0).getContacts().add(u);
-//        }
         Utility.exportUsersData(users);
+
         List<MessageModel> messages = new ArrayList<>();
         messages.add(new MessageModel(new UserModel("test", "test"), new ChatRoomModel("test", ""), "Hello!", LocalTime.now(), LocalDate.now()));
         messages.add(new MessageModel(new UserModel("test", "test"), new ChatRoomModel("test", ""), "Hi!", LocalTime.now(), LocalDate.now()));
         messages.add(new MessageModel(new UserModel("test", "test"), new ChatRoomModel("test", ""), "shhh", LocalTime.now(), LocalDate.now()));
         ChatRoomModel publicChat = new ChatRoomModel("Public Chat", Utility.readUsersData("res/data.dat"), messages, "admin");
+        publicChat.setUsers(users);
         Utility.exportPublicChat(publicChat);
+
+        for (UserModel u : users) {
+            u.addChatRoom(publicChat);
+        }
+
+        for(UserModel u: users){
+            if(!u.getUsername().equals("admin")){
+                //create array list for the new room
+                ArrayList<UserModel> userRooms = new ArrayList<>();
+                userRooms.add(u);
+                userRooms.add(users.get(0));
+
+                //add contact and room to admin
+                users.get(0).getContacts().add(u);
+                users.get(0).addChatRoom(new ChatRoomModel(u.getUsername(), userRooms, new ArrayList<>(),""));
+
+                //add contact and room to user
+                u.getContacts().add(users.get(0));
+                u.addChatRoom(new ChatRoomModel(users.get(0).getUsername(), userRooms, new ArrayList<>(),""));
+            }
+        }
+
+        Utility.exportUsersData(users);
     }
 }

@@ -69,6 +69,19 @@ public class ClientHandlerModel implements Runnable {
                     if (ServerModel.doesUsernameExist(newUser.getUsername()))
                         outputStream.writeObject("invalid");
                     else {
+                        //list for creating rooms for both new user and admin
+                        ArrayList<UserModel> userRooms = new ArrayList<>();
+                        userRooms.add(ServerModel.getRegisteredUsers().get(0));
+                        userRooms.add(newUser);
+
+                        //add the new user to the contact and room of admin
+                        ServerModel.getRegisteredUsers().get(0).getContacts().add(newUser);
+                        ServerModel.getRegisteredUsers().get(0).addChatRoom(new ChatRoomModel(newUser.getUsername(), userRooms, new ArrayList<>(),""));
+
+                        //add admin to contact and room of new user
+                        newUser.getContacts().add(ServerModel.getRegisteredUsers().get(0));
+                        newUser.addChatRoom(new ChatRoomModel(ServerModel.getRegisteredUsers().get(0).getUsername(), userRooms, new ArrayList<>(),""));
+
                         ServerModel.addRegisteredUser(newUser);
                         ServerModel.getPublicChat().addUser(newUser);
                         Utility.exportUsersData(ServerModel.getRegisteredUsers());

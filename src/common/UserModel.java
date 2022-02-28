@@ -87,16 +87,8 @@ public class UserModel implements Serializable {
     }
 
     public void removeChatRoom(ChatRoomModel room) {
-        ChatRoomModel toRemove = null;
-        for (ChatRoomModel r : chatRooms) {
-            if (room.getName().equals(r.getName())) {
-                toRemove = r;
-            }
-        }
-
-        if (toRemove != null) {
-            chatRooms.remove(toRemove);
-        }
+        //clean up
+        chatRooms.removeIf(r -> room.getName().equals(r.getName()));
     }
 
     public void addUnreadMessage(MessageModel message) {
