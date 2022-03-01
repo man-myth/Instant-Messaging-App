@@ -246,6 +246,15 @@ public class ClientModel {
         }
     }
 
+    public void getStatusFromStream(){
+        try {
+            user.setStatus((String) inputStream.readObject());
+        }
+        catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
 
     /*--- ADDING/KICKING OF CONTACT TO CHAT ROOM MODEL ---*/
 

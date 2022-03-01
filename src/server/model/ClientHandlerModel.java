@@ -280,7 +280,7 @@ public class ClientHandlerModel implements Runnable {
                     ServerModel.setRegisteredUsers(Utility.readUsersData("res/data.dat"));
                     currentUser = getUserFromList(currentUser.getUsername());
 
-                    updateUserToAll(toSuspend, "Susended");
+                    updateUserToAll(toSuspend, "Suspended");
 
                 } else if (input.equals("reactivate user")) {
                     String username = (String) inputStream.readObject();
@@ -312,6 +312,7 @@ public class ClientHandlerModel implements Runnable {
                     ChatRoomModel chatRoom = getChatRoomFromList(currentUser, roomName);
                     outputStream.writeObject(chatRoom);
                     outputStream.writeObject(currentUser);
+                    outputStream.writeObject(currentUser.getStatus());
 
                     if (currentUser.roomHasUnreadMessage(roomName)) {
                         currentUser.clearUnreadMessagesFromRoom(roomName);
@@ -509,15 +510,20 @@ public class ClientHandlerModel implements Runnable {
                     updateStatusToAll(status);
 
                 } else if (input.equals("read all status")) {
-                    for (ClientHandlerModel client : ServerModel.clients) {
-                        if (client.currentUser == null || client.equals(this)) {
-                            continue;
-                        }
-                        if (client.clientSocket.isClosed())
-                            continue;
+//                    for (ClientHandlerModel client : ServerModel.clients) {
+//                        if (client.currentUser == null || client.equals(this)) {
+//                            continue;
+//                        }
+//                        if (client.clientSocket.isClosed())
+//                            continue;
+//                        outputStream.writeObject("update status view");
+//                        outputStream.writeObject(client.getCurrentUser().getStatus());
+//                        outputStream.writeObject(client.getCurrentUser().getUsername());
+//                    }
+                    for(UserModel u: ServerModel.getRegisteredUsers()){
                         outputStream.writeObject("update status view");
-                        outputStream.writeObject(client.getCurrentUser().getStatus());
-                        outputStream.writeObject(client.getCurrentUser().getUsername());
+                        outputStream.writeObject(u.getStatus());
+                        outputStream.writeObject(u.getUsername());
                     }
                 } else if (input.equals("logout")) {
                     updateStatusToAll("Offline");

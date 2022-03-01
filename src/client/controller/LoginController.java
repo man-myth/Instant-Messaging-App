@@ -5,7 +5,7 @@ import client.view.ExitOnCloseAdapter;
 import client.view.LoginView;
 import common.ChatRoomModel;
 import common.UserModel;
-import server.controller.AdminControllerExtend;
+
 
 import javax.swing.*;
 import java.io.IOException;
