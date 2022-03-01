@@ -534,6 +534,7 @@ public class ClientView extends JFrame {
             panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
             memberButtons = new ArrayList<>();
             for (UserModel u : users) {
+                System.out.println(u.getUsername() + ":" + u.getStatus());
                 MemberButton button = new MemberButton(u.getUsername(), u.getStatus());
                 memberButtons.add(button);
                 panel.add(button);

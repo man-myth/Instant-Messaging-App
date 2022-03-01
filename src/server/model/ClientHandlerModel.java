@@ -273,14 +273,20 @@ public class ClientHandlerModel implements Runnable {
                             break;
                         }
                     }
+                    for(UserModel u : ServerModel.getPublicChat().getUsers()){
+                        if(u.getUsername().equals(username)){
+                            u.setStatus("Suspended");
+                            break;
+                        }
+                    }
                     System.out.println(users.get(1).getStatus() + users.get(2).getStatus() + users.get(3).getStatus());
 
                     Utility.exportUsersData(users);
-
+                    Utility.exportPublicChat(ServerModel.getPublicChat());
                     ServerModel.setRegisteredUsers(Utility.readUsersData("res/data.dat"));
                     currentUser = getUserFromList(currentUser.getUsername());
 
-                    updateUserToAll(toSuspend, "Susended");
+                    updateUserToAll(toSuspend, "Suspended");
 
                 } else if (input.equals("reactivate user")) {
                     String username = (String) inputStream.readObject();
@@ -296,8 +302,14 @@ public class ClientHandlerModel implements Runnable {
                             break;
                         }
                     }
+                    for(UserModel u : ServerModel.getPublicChat().getUsers()){
+                        if(u.getUsername().equals(username)){
+                            u.setStatus("Offline");
+                            break;
+                        }
+                    }
                     System.out.println(users.get(1).getStatus() + users.get(2).getStatus() + users.get(3).getStatus());
-
+                    Utility.exportPublicChat(ServerModel.getPublicChat());
                     Utility.exportUsersData(users);
                     ServerModel.setRegisteredUsers(Utility.readUsersData("res/data.dat"));
                     currentUser = getUserFromList(currentUser.getUsername());
@@ -535,6 +547,7 @@ public class ClientHandlerModel implements Runnable {
         } catch (ClassNotFoundException | IOException e) {
             System.out.println(clientSocket + "has disconnected.");
             currentUser.setActive(false);
+            currentUser.setStatus("Offline");
             // e.printStackTrace();
             try {
                 updateStatusToAll("Offline");
