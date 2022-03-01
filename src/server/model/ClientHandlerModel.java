@@ -76,11 +76,11 @@ public class ClientHandlerModel implements Runnable {
 
                         //add the new user to the contact and room of admin
                         ServerModel.getRegisteredUsers().get(0).getContacts().add(newUser);
-                        ServerModel.getRegisteredUsers().get(0).addChatRoom(new ChatRoomModel(newUser.getUsername(), userRooms, new ArrayList<>(),""));
+                        ServerModel.getRegisteredUsers().get(0).addChatRoom(new ChatRoomModel(newUser.getUsername(), userRooms, new ArrayList<>(), ""));
 
                         //add admin to contact and room of new user
                         newUser.getContacts().add(ServerModel.getRegisteredUsers().get(0));
-                        newUser.addChatRoom(new ChatRoomModel(ServerModel.getRegisteredUsers().get(0).getUsername(), userRooms, new ArrayList<>(),""));
+                        newUser.addChatRoom(new ChatRoomModel(ServerModel.getRegisteredUsers().get(0).getUsername(), userRooms, new ArrayList<>(), ""));
 
                         ServerModel.addRegisteredUser(newUser);
                         ServerModel.getPublicChat().addUser(newUser);
@@ -122,7 +122,7 @@ public class ClientHandlerModel implements Runnable {
 
                     Utility.exportPublicChat(ServerModel.getPublicChat());
                     ServerModel.setPublicChat(Utility.readPublicChat("res/publicChat.dat"));
-                    currentUser.getChatRooms().set(0,ServerModel.getPublicChat()); //changes: update Public Chat of current user
+                    currentUser.getChatRooms().set(0, ServerModel.getPublicChat()); //changes: update Public Chat of current user
 
                     for (ClientHandlerModel client : ServerModel.clients) {
                         if (client.equals(this)) {
@@ -130,7 +130,7 @@ public class ClientHandlerModel implements Runnable {
                         }
                         client.writeObject("broadcast");
                         client.writeObject(newMessage);
-                        client.currentUser.getChatRooms().set(0,ServerModel.getPublicChat()); //changes: update Public Chat of every currentUser in client
+                        client.currentUser.getChatRooms().set(0, ServerModel.getPublicChat()); //changes: update Public Chat of every currentUser in client
                     }
                 } else if (input.equals("add contact")) {
                     String username = (String) inputStream.readObject();
@@ -265,8 +265,8 @@ public class ClientHandlerModel implements Runnable {
                     System.out.println(users.get(1).getStatus() + users.get(2).getStatus() + users.get(3).getStatus());
                     UserModel toSuspend = new UserModel();
 
-                    for(int i =0; i< username.length() ;i++){
-                        if(users.get(i).getUsername().equals(username)){
+                    for (int i = 0; i < username.length(); i++) {
+                        if (users.get(i).getUsername().equals(username)) {
                             toSuspend = users.get(i);
                             users.get(i).setStatus("Suspended");
                             System.out.println("suspending " + users.get(i).getUsername());
@@ -282,14 +282,14 @@ public class ClientHandlerModel implements Runnable {
 
                     updateUserToAll(toSuspend, "Susended");
 
-                } else if(input.equals("reactivate user")){
+                } else if (input.equals("reactivate user")) {
                     String username = (String) inputStream.readObject();
                     List<UserModel> users = ServerModel.getRegisteredUsers();
                     System.out.println(users.get(1).getStatus() + users.get(2).getStatus() + users.get(3).getStatus());
                     UserModel toReactivate = new UserModel();
 
-                    for(int i =0; i< username.length() ;i++){
-                        if(users.get(i).getUsername().equals(username)){
+                    for (int i = 0; i < username.length(); i++) {
+                        if (users.get(i).getUsername().equals(username)) {
                             toReactivate = users.get(i);
                             users.get(i).setStatus("Offline");
                             System.out.println("reactivating " + users.get(i).getUsername());
@@ -311,6 +311,7 @@ public class ClientHandlerModel implements Runnable {
                     // ChatRoomModel chatRoom = roomName.equals("Public Chat") ? ServerModel.getPublicChat() : getChatRoomFromList(currentUser, roomName);
                     ChatRoomModel chatRoom = getChatRoomFromList(currentUser, roomName);
                     outputStream.writeObject(chatRoom);
+                    outputStream.writeObject(currentUser);
 
                     if (currentUser.roomHasUnreadMessage(roomName)) {
                         currentUser.clearUnreadMessagesFromRoom(roomName);
@@ -320,7 +321,7 @@ public class ClientHandlerModel implements Runnable {
                         Utility.exportUsersData(ServerModel.getRegisteredUsers());
                         currentUser = getUserFromList(currentUser.getUsername());
 
-                        outputStream.writeObject(currentUser);
+
                     }
                 } else if (input.equals("send message")) {
                     currentUser = getUserFromList(currentUser.getUsername());
@@ -602,6 +603,7 @@ public class ClientHandlerModel implements Runnable {
             client.writeObject(user.getUsername());
         }
     }
+
     public UserModel getCurrentUser() {
         return currentUser;
     }

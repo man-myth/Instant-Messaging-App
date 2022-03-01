@@ -154,10 +154,10 @@ public class ClientController implements Runnable {
                         clientView.contactsSearchListener(new ContactsSearchListener());
                     } else if (event.equals("return room")) {
                         clientModel.receiveRoom();
+                        clientModel.updateUser();
                         clientView.updateRoom(clientModel.getCurrentRoom());
 
                         if (clientModel.getUser().roomHasUnreadMessage(clientModel.getCurrentRoom().getName())) {
-                            clientModel.updateUser();
                             clientModel.getUser().clearUnreadMessagesFromRoom(clientModel.getCurrentRoom().getName());
                             clientView.updateContacts(clientModel.getUser());
 
