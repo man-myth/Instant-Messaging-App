@@ -26,6 +26,9 @@ public class AuthenticatorModel {
         if (username.length() == 0)
             return "enter username";
         for (UserModel user : users) {
+            if(user.getStatus().equals("Suspended")){
+                return "does not exist";
+            }
             if (user.getUsername().compareTo(username) == 0 && user.getPassword().compareTo(password) == 0) {
                 if (user.isActive()) {
                     return "is active";

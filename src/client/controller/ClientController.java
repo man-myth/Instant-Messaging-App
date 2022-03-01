@@ -66,7 +66,7 @@ public class ClientController implements Runnable {
         clientView.setAddButtonActionListener(new AddToRoomListener());
 
         //removing a user from app
-        clientView.setRemoveUserActionListener(new RemoveUserListener());
+        clientView.setRemoveUserActionListener(new SuspendUserListener());
 
         //kick user from the room listener
         clientView.setKickButtonActionListener(new KickFromRoomListener());
@@ -194,6 +194,9 @@ public class ClientController implements Runnable {
                     } else if (event.equals("update status view")) {
                         String status = clientModel.getUsernameStatusStream();
                         String username = clientModel.getUsernameStatusStream();
+                        if(clientModel.getUser().getStatus().equals("Suspended")){
+                            new LogOutListener().logout();
+                        }
                         if (clientModel.getCurrentRoom().isUserHere(username)) {
                             clientModel.getCurrentRoom().searchUser(username).setStatus(status);
                             clientModel.getUser().setStatus(status);
@@ -444,14 +447,14 @@ public class ClientController implements Runnable {
             //changes: removed duplicate add
         }
     }
-    class RemoveUserListener implements ActionListener{
+    class SuspendUserListener implements ActionListener{
         public void actionPerformed(ActionEvent e) {
             JMenuItem menuItem = (JMenuItem) e.getSource();
             JPopupMenu popupMenu = (JPopupMenu) menuItem.getParent();
             JButton invokerButton = (JButton) popupMenu.getInvoker();
             String username = invokerButton.getText();
-            System.out.println("delete " + username);
-            //clientModel.addContact(username);
+            System.out.println("suspend " + username);
+            clientModel.suspendUser(username);
         }
     }
 
@@ -496,6 +499,10 @@ public class ClientController implements Runnable {
 
     class LogOutListener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
+           logout();
+        }
+
+        public void logout(){
             clientModel.logout();
             clientView.dispose();
             new LoginController(socket, outputStream, inputStream).run();

@@ -165,6 +165,14 @@ public class ClientModel {
             e.printStackTrace();
         }
     }
+    public void suspendUser(String username) {
+        try {
+            outputStream.writeObject("suspend user");
+            outputStream.writeObject(username);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     public void removeContact(String username) {
         try {

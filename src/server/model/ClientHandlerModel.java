@@ -252,6 +252,18 @@ public class ClientHandlerModel implements Runnable {
                     currentUser = getUserFromList(currentUser.getUsername());
                     outputStream.writeObject("bookmark updated");
                     outputStream.writeObject(currentUser);
+                } else if (input.equals("suspend user")) {
+                    String username = (String) inputStream.readObject();
+                    List<UserModel> users = ServerModel.getRegisteredUsers();
+                    for(int i =0; i< username.length() ;i++){
+                        if(users.get(i).getUsername().equals(username)){
+                            users.get(i).setStatus("Suspended");
+                            break;
+                        }
+                    }
+                    ServerModel.setRegisteredUsers(users);
+                    updateStatusToAll("Suspended");
+
                 } else if (input.equals("get room")) {
                     currentUser = getUserFromList(currentUser.getUsername());
                     String roomName = (String) inputStream.readObject();
