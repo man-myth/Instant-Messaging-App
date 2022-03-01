@@ -27,10 +27,10 @@ public class UpdateDatFiles {
         Utility.exportUsersData(users);
 
         List<MessageModel> messages = new ArrayList<>();
-        messages.add(new MessageModel(new UserModel("test", "test"), new ChatRoomModel("test", ""), "Hello!", LocalTime.now(), LocalDate.now()));
-        messages.add(new MessageModel(new UserModel("test", "test"), new ChatRoomModel("test", ""), "Hi!", LocalTime.now(), LocalDate.now()));
-        messages.add(new MessageModel(new UserModel("test", "test"), new ChatRoomModel("test", ""), "shhh", LocalTime.now(), LocalDate.now()));
-        ChatRoomModel publicChat = new ChatRoomModel("Public Chat", Utility.readUsersData("res/data.dat"), messages, "admin");
+        messages.add(new MessageModel(new UserModel("admin", "test"), new ChatRoomModel("Public Chat", ""), "Hello!", LocalTime.now(), LocalDate.now()));
+        messages.add(new MessageModel(new UserModel("user1", "test"), new ChatRoomModel("Public Chat", ""), "Hi!", LocalTime.now(), LocalDate.now()));
+        messages.add(new MessageModel(new UserModel("user2", "test"), new ChatRoomModel("Public Chat", ""), "shhh", LocalTime.now(), LocalDate.now()));
+        ChatRoomModel publicChat = new ChatRoomModel("Public Chat", Utility.readUsersData("res/data.dat"), messages, "");
         publicChat.setUsers(users);
         Utility.exportPublicChat(publicChat);
 
