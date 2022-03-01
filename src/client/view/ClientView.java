@@ -653,8 +653,11 @@ public class ClientView extends JFrame {
             add = new JMenuItem("Add contact");
             suspend = new JMenuItem("Suspend account");
             reactivate = new JMenuItem("Reactivate account");
+
+            // check if the button is of your name
             if(!member.equals(user.getUsername())){
                 this.add(add);
+                //add options only to admin
                 if (user.getUsername().equals("admin")) {
                     this.add(suspend);
                     this.add(reactivate);
