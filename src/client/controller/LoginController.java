@@ -62,24 +62,14 @@ public class LoginController {
                 loginView.dispose();
                 try {
                     UserModel userModel = loginModel.getUserModel();
-                    //changes: only use client controller
-//                    if (userModel.getUsername().equals("admin")) {
-//                        new AdminControllerExtend(socket, inputStream, outputStream,
-//                                userModel, (ChatRoomModel) inputStream.readObject()).run();
-//                    }
-//                    else {
                         ClientController clientController = new ClientController(socket, inputStream,
                                 outputStream, userModel, (ChatRoomModel) inputStream.readObject());
                         clientController.run();
-                    //}
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }
             } else {
                 System.out.println("Failed to log in.");
-                //loginView.dispose();
-                //LoginController login = new LoginController();
-                //login.run();
             }
         });
 

@@ -54,7 +54,6 @@ public class ClientController implements Runnable {
     public void run() {
         System.out.println("Logged in with user: " + clientModel.getUser());
         clientView = new ClientView(clientModel.getUser(), clientModel.getCurrentRoom());
-        System.out.println("++++" + clientModel.getCurrentRoom().searchUser("user2").getStatus());
         clientView.setWindowAdapter(new ExitOnCloseAdapter(socket));
         clientView.setStatusImage(clientModel.getUser().getUsername(), clientModel.getUser().getStatus());
         clientModel.changeStatus("Online");
@@ -144,7 +143,6 @@ public class ClientController implements Runnable {
                         clientView.contactsSearchListener(new ContactsSearchListener());
                     } else if (event.equals("bookmark updated")) { // do this if event = "bookmark added/removed"
                         clientModel.updateUser();
-                        System.out.println("updating contacts....");
                         clientView.updateContacts(clientModel.getUser());
 
                         // Re-set action listeners
@@ -200,25 +198,17 @@ public class ClientController implements Runnable {
                     } else if (event.equals("update status view")) {
                         String status = clientModel.getUsernameStatusStream();
                         String username = clientModel.getUsernameStatusStream();
-
                         if (clientModel.getCurrentRoom().isUserHere(username)) {
                             clientModel.getCurrentRoom().searchUser(username).setStatus(status);
                             clientModel.getUser().setStatus(status);
                             clientView.setStatusImage(username, status);
                         }
-                    } else if (event.equals("suspended user")) {
-                        String status = clientModel.getUsernameStatusStream();
-                        String username = clientModel.getUsernameStatusStream();
-                        System.out.println("inside update status view : " + username + status);
-//                          if(clientModel.getUser().getStatus().equals("Suspended")){
-//                            new LogOutListener().logout();
-//                        }
-                        clientView.setStatusImage(username, status);
-//                        if (clientModel.getCurrentRoom().isUserHere(username)) {
-//                            clientModel.getCurrentRoom().searchUser(username).setStatus(status);
-//                            //clientModel.getUser().setStatus(status);
-//                            clientView.setStatusImage(username, status);
-//                        }
+                        if(username.equals(clientModel.getUser().getUsername()) && clientModel.getUser().getStatus().equals("Suspended")){
+                            clientModel.isLoggedIn = false;
+                            clientModel.getUser().setActive(false);
+                            clientView.dispose();
+                            new LoginController(socket, outputStream, inputStream).run();
+                        }
                     }
                 }
             } catch (Exception e) {
@@ -518,13 +508,10 @@ public class ClientController implements Runnable {
 
     class LogOutListener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
-           logout();
-        }
-
-        public void logout(){
             clientModel.logout();
             clientView.dispose();
             new LoginController(socket, outputStream, inputStream).run();
         }
+
     }
 }// END OF CLIENT CONTROLLER

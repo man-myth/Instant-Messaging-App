@@ -17,7 +17,7 @@ public class ClientModel {
     private final ObjectOutputStream outputStream;
     ChatRoomModel currentRoom;
     UserModel user;
-    boolean isLoggedIn;
+    public boolean isLoggedIn;
 
     public ClientModel(Socket clientSocket, ObjectInputStream inputStream, ObjectOutputStream outputStream,
                        UserModel user, ChatRoomModel currentRoom) {
