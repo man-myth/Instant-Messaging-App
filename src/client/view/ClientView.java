@@ -495,11 +495,6 @@ public class ClientView extends JFrame {
             this.user = user;
             searchBar = new HintTextField("Search Members");
             searchBar.setPreferredSize(new Dimension(200, 25));
-            if(user.getUsername().equals("admin")){
-                int length = chatRoom.getUsers().size();
-                List<UserModel> usersWithoutAdmin = chatRoom.getUsers().subList(1, length);
-                chatRoom.setUsers(usersWithoutAdmin);
-            }
             fillButtons(chatRoom.getUsers());
 
             settingsPanel = new JPanel(new GridLayout());
@@ -620,7 +615,7 @@ public class ClientView extends JFrame {
                 this.setMaximumSize(new Dimension(200, 35));
                 this.setText(memberName);
 
-                popupMenu = new MemberPopupMenu();
+                popupMenu = new MemberPopupMenu(memberName);
                 this.setComponentPopupMenu(popupMenu);
                 switch (status) {
                     case "Online" -> imageIcon = new ImageIcon("res/graphics/active-user.png");
@@ -654,16 +649,17 @@ public class ClientView extends JFrame {
         JMenuItem suspend;
         JMenuItem reactivate;
 
-        public MemberPopupMenu() {
+        public MemberPopupMenu(String member) {
             add = new JMenuItem("Add contact");
             suspend = new JMenuItem("Suspend account");
             reactivate = new JMenuItem("Reactivate account");
-            this.add(add);
-            if(user.getUsername().equals("admin")){
-                this.add(suspend);
-                this.add(reactivate);
+            if(!member.equals(user.getUsername())){
+                this.add(add);
+                if (user.getUsername().equals("admin")) {
+                    this.add(suspend);
+                    this.add(reactivate);
+                }
             }
-
         }
 
         public void setAddItemActionListener(ActionListener listener) {
