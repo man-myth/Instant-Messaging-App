@@ -198,19 +198,27 @@ public class ClientController implements Runnable {
                         String roomName = null;
                         while (!status.equals("added contact to room")) {
                             roomName = "";
-                            while (roomName == null || roomName.equals("")) {
+                            while (roomName != null && roomName.equals("")) {
                                 roomName = clientView.getInput("Enter new room name.");
-                                if (roomName == null || roomName.equals("")) {
+                                if (roomName != null && roomName.equals("")) {
                                     clientView.showErrorMessage("Input cannot be empty!");
                                 }
                             }
-                            clientModel.writeString(roomName);
-                            status = clientModel.getEvent();
-                            if (status.equals("invalid room name")) {
-                                clientView.showErrorMessage("Invalid room name.");
+                            if (roomName == null) {
+                                clientModel.writeString(null);
+                                addToRoomView.dispose();
+                                break;
+                            } else {
+                                clientModel.writeString(roomName);
+                                status = clientModel.getEvent();
+                                if (status.equals("invalid room name")) {
+                                    clientView.showErrorMessage("Invalid room name.");
+                                }
                             }
                         }
-                        addToRoomView.successMessage();
+                        if (status.equals("added contact to room")) {
+                            addToRoomView.successMessage();
+                        }
                     } else if (event.equals("update status view")) {
                         String status = clientModel.getUsernameStatusStream();
                         String username = clientModel.getUsernameStatusStream();
@@ -219,7 +227,7 @@ public class ClientController implements Runnable {
                             clientModel.getUser().setStatus(status);
                             clientView.setStatusImage(username, status);
                         }
-                        if(username.equals(clientModel.getUser().getUsername()) && clientModel.getUser().getStatus().equals("Suspended")){
+                        if (username.equals(clientModel.getUser().getUsername()) && clientModel.getUser().getStatus().equals("Suspended")) {
                             clientView.showErrorMessage("Your account has been suspended. Please contact the admin to reactivate your account");
                             clientModel.isLoggedIn = false;
                             clientModel.getUser().setActive(false);

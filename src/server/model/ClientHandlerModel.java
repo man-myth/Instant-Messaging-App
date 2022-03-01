@@ -50,7 +50,7 @@ public class ClientHandlerModel implements Runnable {
                     if (authenticate.isVerified(username, password)) {
                         outputStream.writeObject("VERIFIED");
                         currentUser = getUserFromList(username, password);
-                        currentUser.updateChatroom("Public Chat", ServerModel.getPublicChat());
+                        currentUser.getChatRooms().set(0, ServerModel.getPublicChat());
                         currentUser.setActive(true);
                         currentUser.setStatus("Online");
                         ServerModel.updateUser(currentUser.getUsername(), currentUser);
@@ -128,7 +128,7 @@ public class ClientHandlerModel implements Runnable {
                     currentUser.getChatRooms().set(0, ServerModel.getPublicChat()); //changes: update Public Chat of current user
 
                     for (ClientHandlerModel client : ServerModel.clients) {
-                        if (client.equals(this)) {
+                        if (client.currentUser == null || client.equals(this)) {
                             continue;
                         }
                         client.writeObject("broadcast");
@@ -276,8 +276,8 @@ public class ClientHandlerModel implements Runnable {
                             break;
                         }
                     }
-                    for(UserModel u : ServerModel.getPublicChat().getUsers()){
-                        if(u.getUsername().equals(username)){
+                    for (UserModel u : ServerModel.getPublicChat().getUsers()) {
+                        if (u.getUsername().equals(username)) {
                             u.setStatus("Suspended");
                             break;
                         }
@@ -305,8 +305,8 @@ public class ClientHandlerModel implements Runnable {
                             break;
                         }
                     }
-                    for(UserModel u : ServerModel.getPublicChat().getUsers()){
-                        if(u.getUsername().equals(username)){
+                    for (UserModel u : ServerModel.getPublicChat().getUsers()) {
+                        if (u.getUsername().equals(username)) {
                             u.setStatus("Offline");
                             break;
                         }
@@ -413,14 +413,17 @@ public class ClientHandlerModel implements Runnable {
                     UserModel newMember = (UserModel) inputStream.readObject();
                     ChatRoomModel room = getChatRoomFromList(currentUser, (String) inputStream.readObject());
                     // If added member to private chat room
+                    String roomName = "";
                     if (room.getAdmin().equals("")) {
                         // Create new group chat
                         boolean repeat = true;
-                        String roomName = "";
                         outputStream.writeObject("get room name");
                         while (repeat) {
                             repeat = false;
                             roomName = (String) inputStream.readObject();
+                            if (roomName == null) {
+                                break;
+                            }
                             for (UserModel user : ServerModel.getRegisteredUsers()) {
                                 if (getChatRoomFromList(user, roomName) != null) {
                                     repeat = true;
@@ -431,22 +434,24 @@ public class ClientHandlerModel implements Runnable {
                                 outputStream.writeObject("invalid room name");
                             }
                         }
-                        System.out.println(repeat);
-                        System.out.println("Hello!");
-                        outputStream.writeObject("added contact to room");
+                        if (roomName != null) {
+                            System.out.println(repeat);
+                            System.out.println("Hello!");
+                            outputStream.writeObject("added contact to room");
 
-                        ChatRoomModel newRoom = new ChatRoomModel(roomName, new ArrayList<>(room.getUsers()), new ArrayList<>(), currentUser.getUsername());
-                        newRoom.addUser(newMember);
-                        currentUser.addChatRoom(newRoom);
+                            ChatRoomModel newRoom = new ChatRoomModel(roomName, new ArrayList<>(room.getUsers()), new ArrayList<>(), currentUser.getUsername());
+                            newRoom.addUser(newMember);
+                            currentUser.addChatRoom(newRoom);
 
-                        // Update chat rooms of other members
-                        for (UserModel user : newRoom.getUsers()) {
-                            if (user.getUsername().equals(currentUser.getUsername())) {
-                                continue;
+                            // Update chat rooms of other members
+                            for (UserModel user : newRoom.getUsers()) {
+                                if (user.getUsername().equals(currentUser.getUsername())) {
+                                    continue;
+                                }
+                                System.out.println("Adding " + user.getUsername() + " to " + newRoom.getName());
+                                user.addChatRoom(newRoom);
+                                ServerModel.updateUser(user.getUsername(), user);
                             }
-                            System.out.println("Adding " + user.getUsername() + " to " + newRoom.getName());
-                            user.addChatRoom(newRoom);
-                            ServerModel.updateUser(user.getUsername(), user);
                         }
                     } else { // If room is already a group chat
                         room.addUser(newMember);
@@ -554,7 +559,7 @@ public class ClientHandlerModel implements Runnable {
 //                        outputStream.writeObject(client.getCurrentUser().getStatus());
 //                        outputStream.writeObject(client.getCurrentUser().getUsername());
 //                    }
-                    for(UserModel u: ServerModel.getRegisteredUsers()){
+                    for (UserModel u : ServerModel.getRegisteredUsers()) {
                         outputStream.writeObject("update status view");
                         outputStream.writeObject(u.getStatus());
                         outputStream.writeObject(u.getUsername());
@@ -575,12 +580,12 @@ public class ClientHandlerModel implements Runnable {
         } catch (ClassNotFoundException | IOException e) {
             System.out.println(clientSocket + "has disconnected.");
             currentUser.setActive(false);
-            if(!currentUser.getStatus().equals("Suspended")) {
+            if (!currentUser.getStatus().equals("Suspended")) {
                 currentUser.setStatus("Offline");
             }
             // e.printStackTrace();
             try {
-                if(!currentUser.getStatus().equals("Suspended")) {
+                if (!currentUser.getStatus().equals("Suspended")) {
                     updateStatusToAll("Offline");
                 }
                 clientSocket.close();
