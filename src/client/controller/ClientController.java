@@ -163,8 +163,6 @@ public class ClientController implements Runnable {
                             clientView.updateContacts(clientModel.getUser());
 
                             // Re-set action listeners
-                            clientView.setRemoveUserActionListener(new SuspendUserListener());
-                            clientView.setReactivateUserActionListener(new ReactivateUserListener());
                             clientView.setContactButtonsActionListener(new ContactButtonActionListener());
                             clientView.setBookmarkButtonActionListener(new AddBookmarkListener());
                             clientView.setRemoveBookmarkButtonActionListener(new RemoveBookmarkListener());
@@ -174,6 +172,8 @@ public class ClientController implements Runnable {
 
                         // Re-set action listeners
                         clientView.setAddItemActionListener(new AddContactListener());
+                        clientView.setRemoveUserActionListener(new SuspendUserListener());
+                        clientView.setReactivateUserActionListener(new ReactivateUserListener());
                         clientView.setMessageListener(new MessageListener());
                     } else if (event.equals("new message")) {
                         // Update GUI if current room has new message
