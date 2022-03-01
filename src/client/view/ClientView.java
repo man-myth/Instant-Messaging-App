@@ -615,7 +615,7 @@ public class ClientView extends JFrame {
                 this.setMaximumSize(new Dimension(200, 35));
                 this.setText(memberName);
 
-                popupMenu = new MemberPopupMenu(memberName);
+                popupMenu = new MemberPopupMenu();
                 this.setComponentPopupMenu(popupMenu);
                 switch (status) {
                     case "Online" -> imageIcon = new ImageIcon("res/graphics/active-user.png");
@@ -649,7 +649,7 @@ public class ClientView extends JFrame {
         JMenuItem suspend;
         JMenuItem reactivate;
 
-        public MemberPopupMenu(String username) {
+        public MemberPopupMenu() {
             add = new JMenuItem("Add contact");
             suspend = new JMenuItem("Suspend account");
             reactivate = new JMenuItem("Reactivate account");
