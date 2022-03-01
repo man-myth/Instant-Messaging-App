@@ -154,6 +154,7 @@ public class ClientController implements Runnable {
                     } else if (event.equals("return room")) {
                         clientModel.receiveRoom();
                         clientModel.updateUser();
+                        clientModel.getStatusFromStream(); //changes: resets status of user
                         clientView.updateRoom(clientModel.getCurrentRoom());
 
                         if (clientModel.getUser().roomHasUnreadMessage(clientModel.getCurrentRoom().getName())) {
