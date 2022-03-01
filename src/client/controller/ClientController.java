@@ -35,7 +35,7 @@ public class ClientController implements Runnable {
     SettingsView.AskNewPass newPass;
     SettingsView.HelpModule helpModule;
     SettingsView.StatusView statusView;
-    SettingsView.ServerLog serverLog;
+
 
     // -Constructor
     public ClientController(Socket socket, ObjectInputStream inputStream, ObjectOutputStream outputStream,
@@ -279,14 +279,6 @@ public class ClientController implements Runnable {
 
             });
 
-            //server log listener
-            settingsView.logActionListener(e4 -> {
-                if (!clientModel.getUser().getUsername().equals("admin")){
-                    clientView.showErrorMessage("Sorry only viewable for the administrator");
-                } else {
-                    serverLog = new SettingsView.ServerLog(); // access the ServerLog class from SettingsView
-                }
-            });
         }
     }
 
