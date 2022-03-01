@@ -17,7 +17,7 @@ public class ClientModel {
     private final ObjectOutputStream outputStream;
     ChatRoomModel currentRoom;
     UserModel user;
-    boolean isLoggedIn;
+    public boolean isLoggedIn;
 
     public ClientModel(Socket clientSocket, ObjectInputStream inputStream, ObjectOutputStream outputStream,
                        UserModel user, ChatRoomModel currentRoom) {
@@ -242,6 +242,15 @@ public class ClientModel {
         try {
             currentRoom = (ChatRoomModel) inputStream.readObject();
         } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void getStatusFromStream(){
+        try {
+            user.setStatus((String) inputStream.readObject());
+        }
+        catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
         }
     }

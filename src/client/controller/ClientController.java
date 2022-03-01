@@ -143,7 +143,6 @@ public class ClientController implements Runnable {
                         clientView.contactsSearchListener(new ContactsSearchListener());
                     } else if (event.equals("bookmark updated")) { // do this if event = "bookmark added/removed"
                         clientModel.updateUser();
-                        System.out.println("updating contacts....");
                         clientView.updateContacts(clientModel.getUser());
 
                         // Re-set action listeners
@@ -155,6 +154,7 @@ public class ClientController implements Runnable {
                     } else if (event.equals("return room")) {
                         clientModel.receiveRoom();
                         clientModel.updateUser();
+                        clientModel.getStatusFromStream(); //changes: resets status of user
                         clientView.updateRoom(clientModel.getCurrentRoom());
 
                         if (clientModel.getUser().roomHasUnreadMessage(clientModel.getCurrentRoom().getName())) {
@@ -171,6 +171,8 @@ public class ClientController implements Runnable {
 
                         // Re-set action listeners
                         clientView.setAddItemActionListener(new AddContactListener());
+                        clientView.setRemoveUserActionListener(new SuspendUserListener());
+                        clientView.setReactivateUserActionListener(new ReactivateUserListener());
                         clientView.setMessageListener(new MessageListener());
                     } else if (event.equals("new message")) {
                         // Update GUI if current room has new message
@@ -212,25 +214,18 @@ public class ClientController implements Runnable {
                     } else if (event.equals("update status view")) {
                         String status = clientModel.getUsernameStatusStream();
                         String username = clientModel.getUsernameStatusStream();
-
                         if (clientModel.getCurrentRoom().isUserHere(username)) {
                             clientModel.getCurrentRoom().searchUser(username).setStatus(status);
                             clientModel.getUser().setStatus(status);
                             clientView.setStatusImage(username, status);
                         }
-                    } else if (event.equals("suspended user")) {
-                        String status = clientModel.getUsernameStatusStream();
-                        String username = clientModel.getUsernameStatusStream();
-                        System.out.println("inside update status view : " + username + status);
-//                          if(clientModel.getUser().getStatus().equals("Suspended")){
-//                            new LogOutListener().logout();
-//                        }
-                        clientView.setStatusImage(username, status);
-//                        if (clientModel.getCurrentRoom().isUserHere(username)) {
-//                            clientModel.getCurrentRoom().searchUser(username).setStatus(status);
-//                            //clientModel.getUser().setStatus(status);
-//                            clientView.setStatusImage(username, status);
-//                        }
+                        if(username.equals(clientModel.getUser().getUsername()) && clientModel.getUser().getStatus().equals("Suspended")){
+                            clientView.showErrorMessage("Your account has been suspended. Please contact the admin to reactivate your account");
+                            clientModel.isLoggedIn = false;
+                            clientModel.getUser().setActive(false);
+                            clientView.dispose();
+                            new LoginController(socket, outputStream, inputStream).run();
+                        }
                     }
                 }
             } catch (Exception e) {
@@ -483,19 +478,16 @@ public class ClientController implements Runnable {
             JPopupMenu popupMenu = (JPopupMenu) menuItem.getParent();
             JButton invokerButton = (JButton) popupMenu.getInvoker();
             String username = invokerButton.getText();
-            System.out.println("suspend " + username);
             clientModel.reactivateUser(username);
         }
     }
 
     class AddBookmarkListener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
-            System.out.println("Inside bookmark listener");
             JMenuItem menuItem = (JMenuItem) e.getSource();
             JPopupMenu popupMenu = (JPopupMenu) menuItem.getParent();
             JButton invokerButton = (JButton) popupMenu.getInvoker();
             String username = invokerButton.getText();
-            System.out.println("Bookmark " + username);
             clientModel.addBookmark(username);
         }
     }
@@ -512,13 +504,10 @@ public class ClientController implements Runnable {
 
     class RemoveContactListener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
-            //System.out.println("Inside bookmark listener");
             JMenuItem menuItem = (JMenuItem) e.getSource();
             JPopupMenu popupMenu = (JPopupMenu) menuItem.getParent();
             JButton invokerButton = (JButton) popupMenu.getInvoker();
             String username = invokerButton.getText();
-            System.out.println("remove " + username);
-
 
             if (clientModel.isBookmarked(username)) {
                 clientView.showErrorMessage("Please 'remove bookmark' first before removing contact.");
@@ -537,5 +526,6 @@ public class ClientController implements Runnable {
             clientView.dispose();
             new LoginController(socket, outputStream, inputStream).run();
         }
+
     }
 }// END OF CLIENT CONTROLLER

@@ -615,7 +615,7 @@ public class ClientView extends JFrame {
                 this.setMaximumSize(new Dimension(200, 35));
                 this.setText(memberName);
 
-                popupMenu = new MemberPopupMenu();
+                popupMenu = new MemberPopupMenu(memberName);
                 this.setComponentPopupMenu(popupMenu);
                 switch (status) {
                     case "Online" -> imageIcon = new ImageIcon("res/graphics/active-user.png");
@@ -649,16 +649,20 @@ public class ClientView extends JFrame {
         JMenuItem suspend;
         JMenuItem reactivate;
 
-        public MemberPopupMenu() {
+        public MemberPopupMenu(String member) {
             add = new JMenuItem("Add contact");
             suspend = new JMenuItem("Suspend account");
             reactivate = new JMenuItem("Reactivate account");
-            this.add(add);
-            if(user.getUsername().equals("admin")){
-                this.add(suspend);
-                this.add(reactivate);
-            }
 
+            // check if the button is of your name
+            if(!member.equals(user.getUsername())){
+                this.add(add);
+                //add options only to admin
+                if (user.getUsername().equals("admin")) {
+                    this.add(suspend);
+                    this.add(reactivate);
+                }
+            }
         }
 
         public void setAddItemActionListener(ActionListener listener) {

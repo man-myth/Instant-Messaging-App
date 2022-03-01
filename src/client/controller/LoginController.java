@@ -5,7 +5,7 @@ import client.view.ExitOnCloseAdapter;
 import client.view.LoginView;
 import common.ChatRoomModel;
 import common.UserModel;
-import server.controller.AdminControllerExtend;
+
 
 import javax.swing.*;
 import java.io.IOException;
@@ -62,24 +62,14 @@ public class LoginController {
                 loginView.dispose();
                 try {
                     UserModel userModel = loginModel.getUserModel();
-                    //changes: only use client controller
-//                    if (userModel.getUsername().equals("admin")) {
-//                        new AdminControllerExtend(socket, inputStream, outputStream,
-//                                userModel, (ChatRoomModel) inputStream.readObject()).run();
-//                    }
-//                    else {
                         ClientController clientController = new ClientController(socket, inputStream,
                                 outputStream, userModel, (ChatRoomModel) inputStream.readObject());
                         clientController.run();
-                    //}
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }
             } else {
                 System.out.println("Failed to log in.");
-                //loginView.dispose();
-                //LoginController login = new LoginController();
-                //login.run();
             }
         });
 
