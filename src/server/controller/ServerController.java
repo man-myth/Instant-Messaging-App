@@ -12,7 +12,6 @@ import server.model.Utility;
  */
 public class ServerController {
     public ServerModel serverModel;
-    public AdminController adminController;
 
 
     public ServerController() {
