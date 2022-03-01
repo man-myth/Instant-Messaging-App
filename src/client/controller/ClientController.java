@@ -68,6 +68,9 @@ public class ClientController implements Runnable {
         //removing a user from app
         clientView.setRemoveUserActionListener(new SuspendUserListener());
 
+        //reactivating account
+        clientView.setReactivateUserActionListener(new ReactivateUserListener());
+
         //kick user from the room listener
         clientView.setKickButtonActionListener(new KickFromRoomListener());
 
@@ -194,14 +197,25 @@ public class ClientController implements Runnable {
                     } else if (event.equals("update status view")) {
                         String status = clientModel.getUsernameStatusStream();
                         String username = clientModel.getUsernameStatusStream();
-                        if(clientModel.getUser().getStatus().equals("Suspended")){
-                            new LogOutListener().logout();
-                        }
+
                         if (clientModel.getCurrentRoom().isUserHere(username)) {
                             clientModel.getCurrentRoom().searchUser(username).setStatus(status);
                             clientModel.getUser().setStatus(status);
                             clientView.setStatusImage(username, status);
                         }
+                    } else if (event.equals("suspended user")) {
+                        String status = clientModel.getUsernameStatusStream();
+                        String username = clientModel.getUsernameStatusStream();
+                        System.out.println("inside update status view : " + username + status);
+//                          if(clientModel.getUser().getStatus().equals("Suspended")){
+//                            new LogOutListener().logout();
+//                        }
+                        clientView.setStatusImage(username, status);
+//                        if (clientModel.getCurrentRoom().isUserHere(username)) {
+//                            clientModel.getCurrentRoom().searchUser(username).setStatus(status);
+//                            //clientModel.getUser().setStatus(status);
+//                            clientView.setStatusImage(username, status);
+//                        }
                     }
                 }
             } catch (Exception e) {
@@ -455,6 +469,16 @@ public class ClientController implements Runnable {
             String username = invokerButton.getText();
             System.out.println("suspend " + username);
             clientModel.suspendUser(username);
+        }
+    }
+    class ReactivateUserListener implements ActionListener{
+        public void actionPerformed(ActionEvent e) {
+            JMenuItem menuItem = (JMenuItem) e.getSource();
+            JPopupMenu popupMenu = (JPopupMenu) menuItem.getParent();
+            JButton invokerButton = (JButton) popupMenu.getInvoker();
+            String username = invokerButton.getText();
+            System.out.println("suspend " + username);
+            clientModel.reactivateUser(username);
         }
     }
 

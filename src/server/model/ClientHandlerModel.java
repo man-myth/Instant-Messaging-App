@@ -254,16 +254,50 @@ public class ClientHandlerModel implements Runnable {
                     outputStream.writeObject(currentUser);
                 } else if (input.equals("suspend user")) {
                     String username = (String) inputStream.readObject();
+                    System.out.println("username received: " + username);
+
                     List<UserModel> users = ServerModel.getRegisteredUsers();
+                    System.out.println(users.get(1).getStatus() + users.get(2).getStatus() + users.get(3).getStatus());
+                    UserModel toSuspend = new UserModel();
+
                     for(int i =0; i< username.length() ;i++){
                         if(users.get(i).getUsername().equals(username)){
+                            toSuspend = users.get(i);
                             users.get(i).setStatus("Suspended");
+                            System.out.println("suspending " + users.get(i).getUsername());
                             break;
                         }
                     }
-                    ServerModel.setRegisteredUsers(users);
-                    updateStatusToAll("Suspended");
+                    System.out.println(users.get(1).getStatus() + users.get(2).getStatus() + users.get(3).getStatus());
 
+                    Utility.exportUsersData(users);
+
+                    ServerModel.setRegisteredUsers(Utility.readUsersData("res/data.dat"));
+                    currentUser = getUserFromList(currentUser.getUsername());
+
+                    updateUserToAll(toSuspend, "Susended");
+
+                } else if(input.equals("reactivate user")){
+                    String username = (String) inputStream.readObject();
+                    List<UserModel> users = ServerModel.getRegisteredUsers();
+                    System.out.println(users.get(1).getStatus() + users.get(2).getStatus() + users.get(3).getStatus());
+                    UserModel toReactivate = new UserModel();
+
+                    for(int i =0; i< username.length() ;i++){
+                        if(users.get(i).getUsername().equals(username)){
+                            toReactivate = users.get(i);
+                            users.get(i).setStatus("Offline");
+                            System.out.println("reactivating " + users.get(i).getUsername());
+                            break;
+                        }
+                    }
+                    System.out.println(users.get(1).getStatus() + users.get(2).getStatus() + users.get(3).getStatus());
+
+                    Utility.exportUsersData(users);
+                    ServerModel.setRegisteredUsers(Utility.readUsersData("res/data.dat"));
+                    currentUser = getUserFromList(currentUser.getUsername());
+
+                    updateUserToAll(toReactivate, "Offline");
                 } else if (input.equals("get room")) {
                     currentUser = getUserFromList(currentUser.getUsername());
                     String roomName = (String) inputStream.readObject();
@@ -555,6 +589,14 @@ public class ClientHandlerModel implements Runnable {
         }
     }
 
+    public void updateUserToAll(UserModel user, String status) throws IOException {
+
+        for (ClientHandlerModel client : ServerModel.clients) {
+            client.writeObject("update status view");
+            client.writeObject(status);
+            client.writeObject(user.getUsername());
+        }
+    }
     public UserModel getCurrentUser() {
         return currentUser;
     }

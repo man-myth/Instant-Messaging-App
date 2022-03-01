@@ -101,6 +101,11 @@ public class ClientView extends JFrame {
             button.getPopupMenu().setRemoveUserActionListener(listener);
         }
     }
+    public void setReactivateUserActionListener(ActionListener listener) {
+        for (MembersPanel.MemberButton button : membersPanel.getMemberButtons()) {
+            button.getPopupMenu().setReactivateUserActionListener(listener);
+        }
+    }
 
     public void setContactButtonsActionListener(ActionListener listener) {
         contactsPanel.setContactButtonsActionListener(listener);
@@ -158,6 +163,7 @@ public class ClientView extends JFrame {
             case "Busy" -> memberButton.setIcon(scaleIcon("res/graphics/busy-user.png"));
             case "Do not disturb" -> memberButton.setIcon(scaleIcon("res/graphics/dont disturb-user.png"));
             case "Idle" -> memberButton.setIcon(scaleIcon("res/graphics/idle-user.png"));
+            case "Suspended" -> memberButton.setIcon(scaleIcon("res/graphics/suspended-user.png"));
         }
 
     }
@@ -617,6 +623,7 @@ public class ClientView extends JFrame {
                     case "Busy" -> imageIcon = new ImageIcon("res/graphics/busy-user.png");
                     case "Do not disturb" -> imageIcon = new ImageIcon("res/graphics/dont disturb-user.png");
                     case "Idle" -> imageIcon = new ImageIcon("res/graphics/idle-user.png");
+                    case "Suspended" -> imageIcon = new ImageIcon("res/graphics/suspended-user.png");
                 }
 
 
@@ -638,22 +645,29 @@ public class ClientView extends JFrame {
     /*MemberPopupMenu Class*/
     class MemberPopupMenu extends JPopupMenu {
         JMenuItem add;
-        JMenuItem remove;
+        JMenuItem suspend;
+        JMenuItem reactivate;
 
         public MemberPopupMenu(String username) {
             add = new JMenuItem("Add contact");
-            remove = new JMenuItem("Suspend account");
+            suspend = new JMenuItem("Suspend account");
+            reactivate = new JMenuItem("Reactivate account");
             this.add(add);
             if(user.getUsername().equals("admin")){
-                this.add(remove);
+                this.add(suspend);
+                this.add(reactivate);
             }
+
         }
 
         public void setAddItemActionListener(ActionListener listener) {
             add.addActionListener(listener);
         }
         public void setRemoveUserActionListener(ActionListener listener) {
-            remove.addActionListener(listener);
+            suspend.addActionListener(listener);
+        }
+        public void setReactivateUserActionListener(ActionListener listener) {
+            reactivate.addActionListener(listener);
         }
     }
 
