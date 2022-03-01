@@ -50,6 +50,7 @@ public class ClientHandlerModel implements Runnable {
                     if (authenticate.isVerified(username, password)) {
                         outputStream.writeObject("VERIFIED");
                         currentUser = getUserFromList(username, password);
+                        currentUser.updateChatroom("Public Chat", ServerModel.getPublicChat());
                         currentUser.setActive(true);
                         currentUser.setStatus("Online");
                         ServerModel.updateUser(currentUser.getUsername(), currentUser);
@@ -84,6 +85,8 @@ public class ClientHandlerModel implements Runnable {
 
                         ServerModel.addRegisteredUser(newUser);
                         ServerModel.getPublicChat().addUser(newUser);
+                        Utility.exportPublicChat(ServerModel.getPublicChat());
+                        ServerModel.setPublicChat(Utility.readPublicChat("res/publicChat.dat"));
                         Utility.exportUsersData(ServerModel.getRegisteredUsers());
                         outputStream.writeObject("registered");
 
