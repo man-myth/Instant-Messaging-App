@@ -328,7 +328,9 @@ public class ClientModel {
     public void changeStatus(String status) {
         try {
             user.setStatus(status);
-            currentRoom.searchUser(user.getUsername()).setStatus(status);
+            UserModel roomUser = currentRoom.searchUser(user.getUsername());
+            if(roomUser != null)
+                roomUser.setStatus(status);
             outputStream.writeObject("change status");
             outputStream.writeObject(status);
         } catch (Exception e) {

@@ -155,15 +155,16 @@ public class ClientView extends JFrame {
                 break;
             }
         }
-
-        switch (status) {
-            case "Online" -> memberButton.setIcon(scaleIcon("res/graphics/active-user.png"));
-            case "Offline", "Invisible" -> memberButton.setIcon(scaleIcon("res/graphics/user.png"));
-            case "Away from keyboard" -> memberButton.setIcon(scaleIcon("res/graphics/afk-user.png"));
-            case "Busy" -> memberButton.setIcon(scaleIcon("res/graphics/busy-user.png"));
-            case "Do not disturb" -> memberButton.setIcon(scaleIcon("res/graphics/dont disturb-user.png"));
-            case "Idle" -> memberButton.setIcon(scaleIcon("res/graphics/idle-user.png"));
-            case "Suspended" -> memberButton.setIcon(scaleIcon("res/graphics/suspended-user.png"));
+        if(memberButton!=null) {
+            switch (status) {
+                case "Online" -> memberButton.setIcon(scaleIcon("res/graphics/active-user.png"));
+                case "Offline", "Invisible" -> memberButton.setIcon(scaleIcon("res/graphics/user.png"));
+                case "Away from keyboard" -> memberButton.setIcon(scaleIcon("res/graphics/afk-user.png"));
+                case "Busy" -> memberButton.setIcon(scaleIcon("res/graphics/busy-user.png"));
+                case "Do not disturb" -> memberButton.setIcon(scaleIcon("res/graphics/dont disturb-user.png"));
+                case "Idle" -> memberButton.setIcon(scaleIcon("res/graphics/idle-user.png"));
+                case "Suspended" -> memberButton.setIcon(scaleIcon("res/graphics/suspended-user.png"));
+            }
         }
 
     }

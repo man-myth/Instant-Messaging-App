@@ -118,10 +118,11 @@ public class ClientHandlerModel implements Runnable {
                 } else if (input.equals("broadcast")) {
                     ChatRoomModel publicChat = ServerModel.getPublicChat();
                     MessageModel newMessage = (MessageModel) inputStream.readObject();
-                    publicChat.getChatHistory().add(newMessage);
+                    ServerModel.getPublicChat().getChatHistory().add(newMessage); //changes: used ServerModel.getPublicChat() instead of variable publicChat
 
-                    Utility.exportPublicChat(publicChat);
+                    Utility.exportPublicChat(ServerModel.getPublicChat());
                     ServerModel.setPublicChat(Utility.readPublicChat("res/publicChat.dat"));
+                    currentUser.getChatRooms().set(0,ServerModel.getPublicChat()); //changes: update Public Chat of current user
 
                     for (ClientHandlerModel client : ServerModel.clients) {
                         if (client.equals(this)) {
@@ -129,6 +130,7 @@ public class ClientHandlerModel implements Runnable {
                         }
                         client.writeObject("broadcast");
                         client.writeObject(newMessage);
+                        client.currentUser.getChatRooms().set(0,ServerModel.getPublicChat()); //changes: update Public Chat of every currentUser in client
                     }
                 } else if (input.equals("add contact")) {
                     String username = (String) inputStream.readObject();
@@ -223,9 +225,11 @@ public class ClientHandlerModel implements Runnable {
                         ServerModel.updateUser(currentUser.getUsername(), currentUser);
 
                         // Save data
+                        String currentStatus = currentUser.getStatus();
                         Utility.exportUsersData(ServerModel.getRegisteredUsers());
                         ServerModel.setRegisteredUsers(Utility.readUsersData("res/data.dat"));
                         currentUser = getUserFromList(currentUser.getUsername());
+                        currentUser.setStatus(currentStatus);
 
                         outputStream.writeObject("bookmark updated");
                         outputStream.writeObject(currentUser);
@@ -234,7 +238,6 @@ public class ClientHandlerModel implements Runnable {
                     String username = (String) inputStream.readObject();
                     System.out.println("removing " + username + " to bookmark");
 
-                    ChatRoomModel room = null;
                     // find the room to bookmark from list of chatrooms
                     for (ChatRoomModel chat : currentUser.getBookmarks()) {
                         if (chat.getName().equals(username)) {
@@ -247,9 +250,11 @@ public class ClientHandlerModel implements Runnable {
                     ServerModel.updateUser(currentUser.getUsername(), currentUser);
 
                     // Save data
+                    String currentStatus = currentUser.getStatus();
                     Utility.exportUsersData(ServerModel.getRegisteredUsers());
                     ServerModel.setRegisteredUsers(Utility.readUsersData("res/data.dat"));
                     currentUser = getUserFromList(currentUser.getUsername());
+                    currentUser.setStatus(currentStatus);
                     outputStream.writeObject("bookmark updated");
                     outputStream.writeObject(currentUser);
                 } else if (input.equals("suspend user")) {
