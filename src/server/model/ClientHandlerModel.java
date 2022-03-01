@@ -400,8 +400,27 @@ public class ClientHandlerModel implements Runnable {
                     // If added member to private chat room
                     if (room.getAdmin().equals("")) {
                         // Create new group chat
+                        boolean repeat = true;
+                        String roomName = "";
                         outputStream.writeObject("get room name");
-                        ChatRoomModel newRoom = new ChatRoomModel((String) inputStream.readObject(), new ArrayList<>(room.getUsers()), new ArrayList<>(), currentUser.getUsername());
+                        while (repeat) {
+                            repeat = false;
+                            roomName = (String) inputStream.readObject();
+                            for (UserModel user : ServerModel.getRegisteredUsers()) {
+                                if (getChatRoomFromList(user, roomName) != null) {
+                                    repeat = true;
+                                }
+                            }
+                            if (repeat) {
+                                System.out.println("invalid");
+                                outputStream.writeObject("invalid room name");
+                            }
+                        }
+                        System.out.println(repeat);
+                        System.out.println("Hello!");
+                        outputStream.writeObject("added contact to room");
+
+                        ChatRoomModel newRoom = new ChatRoomModel(roomName, new ArrayList<>(room.getUsers()), new ArrayList<>(), currentUser.getUsername());
                         newRoom.addUser(newMember);
                         currentUser.addChatRoom(newRoom);
 

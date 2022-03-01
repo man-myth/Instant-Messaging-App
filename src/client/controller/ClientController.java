@@ -129,9 +129,9 @@ public class ClientController implements Runnable {
 
                     } else if (event.equals("adding self")) {
                         clientView.showErrorMessage("You are adding yourself!");
-                    } else if (event.equals("already has contact")){
+                    } else if (event.equals("already has contact")) {
                         clientView.showErrorMessage("You already have a contact of that user");
-                    }else if (event.equals("contact updated")) { // do this if event = "contact added/removed"
+                    } else if (event.equals("contact updated")) { // do this if event = "contact added/removed"
                         clientModel.updateUser();
                         clientView.updateContacts(clientModel.getUser());
 
@@ -193,7 +193,22 @@ public class ClientController implements Runnable {
                         clientView.setMessageListener(new MessageListener());
                         clientView.contactsSearchListener(new ContactsSearchListener());
                     } else if (event.equals("get room name")) {
-                        clientModel.writeString(clientView.getInput("Enter new room name."));
+                        String status = "";
+                        String roomName = null;
+                        while (!status.equals("added contact to room")) {
+                            roomName = "";
+                            while (roomName == null || roomName.equals("")) {
+                                roomName = clientView.getInput("Enter new room name.");
+                                if (roomName == null || roomName.equals("")) {
+                                    clientView.showErrorMessage("Input cannot be empty!");
+                                }
+                            }
+                            clientModel.writeString(roomName);
+                            status = clientModel.getEvent();
+                            if (status.equals("invalid room name")) {
+                                clientView.showErrorMessage("Invalid room name.");
+                            }
+                        }
                         addToRoomView.successMessage();
                     } else if (event.equals("update status view")) {
                         String status = clientModel.getUsernameStatusStream();
@@ -227,17 +242,17 @@ public class ClientController implements Runnable {
     }// end of run method
 
 
-/*---ACTION LISTENERS---*/
+    /*---ACTION LISTENERS---*/
 
-    class SettingsListeners implements ActionListener{
+    class SettingsListeners implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
             //asking new username listener
             settingsView = new SettingsView();
             settingsView.changeNameActionListener(e1 -> {
-                if (clientModel.getUser().getUsername().equals("admin")){
+                if (clientModel.getUser().getUsername().equals("admin")) {
                     clientView.showErrorMessage("Admin's username is fixed.");
-                }else {
+                } else {
                     newName = new SettingsView.AskNewName(); // access the AskNewName class from SettingsView
                     newName.changeListener(f -> { // action listener for the button in AskNewNAme
                         String enteredName = newName.getText();
@@ -280,7 +295,7 @@ public class ClientController implements Runnable {
         }
     }
 
-    class AddToRoomListener implements ActionListener{
+    class AddToRoomListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
             /*
@@ -300,9 +315,6 @@ public class ClientController implements Runnable {
                         addToRoomView.errorUserIsHere();
                     else {
                         clientModel.addContactToRoom(newMember, clientModel.getCurrentRoom().getName());
-                        if (!clientModel.getCurrentRoom().getAdmin().equals("")) {
-                            addToRoomView.successMessage();
-                        }
                     }
                 } catch (NullPointerException error) {
                     addToRoomView.errorInvalidAction();
@@ -312,7 +324,7 @@ public class ClientController implements Runnable {
     }
 
 
-    class KickFromRoomListener implements ActionListener{
+    class KickFromRoomListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
             String[] contactArray = clientModel.listToStringArrayAdd(clientModel.getCurrentRoom().getUsers());
@@ -454,7 +466,8 @@ public class ClientController implements Runnable {
             //changes: removed duplicate add
         }
     }
-    class SuspendUserListener implements ActionListener{
+
+    class SuspendUserListener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
             JMenuItem menuItem = (JMenuItem) e.getSource();
             JPopupMenu popupMenu = (JPopupMenu) menuItem.getParent();
@@ -464,7 +477,8 @@ public class ClientController implements Runnable {
             clientModel.suspendUser(username);
         }
     }
-    class ReactivateUserListener implements ActionListener{
+
+    class ReactivateUserListener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
             JMenuItem menuItem = (JMenuItem) e.getSource();
             JPopupMenu popupMenu = (JPopupMenu) menuItem.getParent();
@@ -507,19 +521,19 @@ public class ClientController implements Runnable {
             System.out.println("remove " + username);
 
 
-            if(clientModel.isBookmarked(username)) {
+            if (clientModel.isBookmarked(username)) {
                 clientView.showErrorMessage("Please 'remove bookmark' first before removing contact.");
             } else
-            clientModel.removeContact(username);
+                clientModel.removeContact(username);
         }
     }
 
     class LogOutListener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
-           logout();
+            logout();
         }
 
-        public void logout(){
+        public void logout() {
             clientModel.logout();
             clientView.dispose();
             new LoginController(socket, outputStream, inputStream).run();
