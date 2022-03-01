@@ -10,7 +10,6 @@ public class SettingsView extends JFrame {
     JButton changePass = new JButton("Change password");
     JButton changeStatus = new JButton("Change status");
     JButton help = new JButton("Need help?");
-    JButton serverLog = new JButton("Server Log");
 
     // -Constructor
     public SettingsView() {
@@ -27,8 +26,6 @@ public class SettingsView extends JFrame {
         help.setFocusable(false);
         help.setPreferredSize(new Dimension(150, 50));
 
-        serverLog.setFocusable(false);
-        serverLog.setPreferredSize(new Dimension(150, 50));
 
 
         // frame details 1
@@ -40,7 +37,6 @@ public class SettingsView extends JFrame {
         this.add(changePass);
         this.add(changeStatus);
         this.add(help);
-        this.add(serverLog);
 
         // frame details 2
         this.pack();
@@ -70,9 +66,6 @@ public class SettingsView extends JFrame {
     public void helpActionListener(ActionListener listener) {
         help.addActionListener(listener);
     }
-
-    // adds action listener to server log button
-    public void logActionListener(ActionListener listener){ serverLog.addActionListener(listener); }
 
 
 
@@ -322,16 +315,6 @@ public class SettingsView extends JFrame {
         }
     }
 
-    // --- HELP MODULE VIEW
-    public static class ServerLog extends JFrame{
-        // insert contents here
-
-        // -Constructor
-        public ServerLog(){
-            // insert contents here
-
-        }
-    }
 
 
 }// end of SettingsView
