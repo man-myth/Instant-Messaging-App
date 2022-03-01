@@ -495,6 +495,11 @@ public class ClientView extends JFrame {
             this.user = user;
             searchBar = new HintTextField("Search Members");
             searchBar.setPreferredSize(new Dimension(200, 25));
+            if(user.getUsername().equals("admin")){
+                int length = chatRoom.getUsers().size();
+                List<UserModel> usersWithoutAdmin = chatRoom.getUsers().subList(1, length);
+                chatRoom.setUsers(usersWithoutAdmin);
+            }
             fillButtons(chatRoom.getUsers());
 
             settingsPanel = new JPanel(new GridLayout());
@@ -534,7 +539,6 @@ public class ClientView extends JFrame {
             panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
             memberButtons = new ArrayList<>();
             for (UserModel u : users) {
-                System.out.println(u.getUsername() + ":" + u.getStatus());
                 MemberButton button = new MemberButton(u.getUsername(), u.getStatus());
                 memberButtons.add(button);
                 panel.add(button);
