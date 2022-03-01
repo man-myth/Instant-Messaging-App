@@ -547,10 +547,14 @@ public class ClientHandlerModel implements Runnable {
         } catch (ClassNotFoundException | IOException e) {
             System.out.println(clientSocket + "has disconnected.");
             currentUser.setActive(false);
-            currentUser.setStatus("Offline");
+            if(!currentUser.getStatus().equals("Suspended")) {
+                currentUser.setStatus("Offline");
+            }
             // e.printStackTrace();
             try {
-                updateStatusToAll("Offline");
+                if(!currentUser.getStatus().equals("Suspended")) {
+                    updateStatusToAll("Offline");
+                }
                 clientSocket.close();
             } catch (IOException ex) {
                 ex.printStackTrace();

@@ -204,6 +204,7 @@ public class ClientController implements Runnable {
                             clientView.setStatusImage(username, status);
                         }
                         if(username.equals(clientModel.getUser().getUsername()) && clientModel.getUser().getStatus().equals("Suspended")){
+                            clientView.showErrorMessage("Your account has been suspended. Please contact the admin to reactivate your account");
                             clientModel.isLoggedIn = false;
                             clientModel.getUser().setActive(false);
                             clientView.dispose();
@@ -462,19 +463,16 @@ public class ClientController implements Runnable {
             JPopupMenu popupMenu = (JPopupMenu) menuItem.getParent();
             JButton invokerButton = (JButton) popupMenu.getInvoker();
             String username = invokerButton.getText();
-            System.out.println("suspend " + username);
             clientModel.reactivateUser(username);
         }
     }
 
     class AddBookmarkListener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
-            System.out.println("Inside bookmark listener");
             JMenuItem menuItem = (JMenuItem) e.getSource();
             JPopupMenu popupMenu = (JPopupMenu) menuItem.getParent();
             JButton invokerButton = (JButton) popupMenu.getInvoker();
             String username = invokerButton.getText();
-            System.out.println("Bookmark " + username);
             clientModel.addBookmark(username);
         }
     }
@@ -491,13 +489,10 @@ public class ClientController implements Runnable {
 
     class RemoveContactListener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
-            //System.out.println("Inside bookmark listener");
             JMenuItem menuItem = (JMenuItem) e.getSource();
             JPopupMenu popupMenu = (JPopupMenu) menuItem.getParent();
             JButton invokerButton = (JButton) popupMenu.getInvoker();
             String username = invokerButton.getText();
-            System.out.println("remove " + username);
-
 
             if(clientModel.isBookmarked(username)) {
                 clientView.showErrorMessage("Please 'remove bookmark' first before removing contact.");
