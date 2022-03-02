@@ -109,7 +109,6 @@ public class ClientController implements Runnable {
             try {
                 while (clientModel.isLoggedIn()) {
                     String event = clientModel.getEvent();
-                    System.out.println("Event: " + event);
                     if (event.equals("broadcast")) { // do this if event = "broadcast"
                         MessageModel message = clientModel.getMessageFromStream();
                         if (clientModel.getCurrentRoom().getName().equalsIgnoreCase("Public Chat")) {
@@ -237,8 +236,8 @@ public class ClientController implements Runnable {
                     }
                 }
             } catch (Exception e) {
-                //System.out.println(socket + "has disconnected.");
-                e.printStackTrace();
+                System.out.println(socket + "has disconnected.");
+                //e.printStackTrace();
             }
         }).start();
     }// end of run method
@@ -475,7 +474,6 @@ public class ClientController implements Runnable {
             JPopupMenu popupMenu = (JPopupMenu) menuItem.getParent();
             JButton invokerButton = (JButton) popupMenu.getInvoker();
             String username = invokerButton.getText();
-            System.out.println("suspend " + username);
             clientModel.suspendUser(username);
         }
     }
