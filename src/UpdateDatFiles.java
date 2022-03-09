@@ -12,13 +12,13 @@ public class UpdateDatFiles {
     public static void main(String[] args) {
         List<UserModel> users = new ArrayList<>();
         users.add(new UserModel("admin", "root"));
-        users.add(new UserModel("user1", "pass1"));
-        users.add(new UserModel("user2", "pass2"));
-        users.add(new UserModel("user3", "pass3"));
-        users.add(new UserModel("user4", "pass4"));
-        users.add(new UserModel("user5", "pass5"));
-//        users.add(new UserModel("user6", "pass6"));
-//        users.add(new UserModel("user7", "user7"));
+        users.add(new UserModel("gwyn", "gwyn"));
+        users.add(new UserModel("bill", "bill"));
+        users.add(new UserModel("jethro", "jethro"));
+        users.add(new UserModel("matt", "matt"));
+        users.add(new UserModel("mayn", "mayn"));
+        users.add(new UserModel("steph", "steph"));
+        users.add(new UserModel("meet", "meet"));
 //        users.add(new UserModel("user8", "user8"));
 //        users.add(new UserModel("user9", "user9"));
 //        users.add(new UserModel("user10", "user10"));
@@ -27,9 +27,9 @@ public class UpdateDatFiles {
         Utility.exportUsersData(users);
 
         List<MessageModel> messages = new ArrayList<>();
-        messages.add(new MessageModel(new UserModel("admin", "test"), new ChatRoomModel("Public Chat", ""), "Hello!", LocalTime.now(), LocalDate.now()));
-        messages.add(new MessageModel(new UserModel("user1", "test"), new ChatRoomModel("Public Chat", ""), "Hi!", LocalTime.now(), LocalDate.now()));
-        messages.add(new MessageModel(new UserModel("user2", "test"), new ChatRoomModel("Public Chat", ""), "shhh", LocalTime.now(), LocalDate.now()));
+//        messages.add(new MessageModel(new UserModel("admin", "test"), new ChatRoomModel("Public Chat", ""), "Hello!", LocalTime.now(), LocalDate.now()));
+//        messages.add(new MessageModel(new UserModel("user1", "test"), new ChatRoomModel("Public Chat", ""), "Hi!", LocalTime.now(), LocalDate.now()));
+//        messages.add(new MessageModel(new UserModel("user2", "test"), new ChatRoomModel("Public Chat", ""), "shhh", LocalTime.now(), LocalDate.now()));
         ChatRoomModel publicChat = new ChatRoomModel("Public Chat", Utility.readUsersData("res/data.dat"), messages, "");
         publicChat.setUsers(users);
         Utility.exportPublicChat(publicChat);
