@@ -14,7 +14,7 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 
 public class LoginController {
-    final int PORT = 2022;
+    final int PORT = 13683;
     private final LoginView loginView;
     Socket socket;
     ObjectInputStream inputStream;
@@ -26,7 +26,7 @@ public class LoginController {
     public LoginController() {
         loginView = new LoginView();
         try {
-            socket = new Socket("localhost", PORT);
+            socket = new Socket("localhost", 2022);
             socket.setTcpNoDelay(true);
             outputStream = new ObjectOutputStream(socket.getOutputStream());
             outputStream.flush();
